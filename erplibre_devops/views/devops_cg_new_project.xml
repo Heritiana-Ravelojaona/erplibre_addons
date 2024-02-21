@@ -112,6 +112,8 @@
                             <field name="config" />
                             <field name="model_to_remove" />
                             <field name="odoo_config" />
+                            <field name="use_existing_meta_module" />
+                            <field name="use_existing_meta_module_ucb_only" />
                             <field name="new_project_with_code_generator" />
                             <field name="keep_bd_alive" />
                             <field name="bd_name_demo" />

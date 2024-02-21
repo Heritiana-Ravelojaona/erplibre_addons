@@ -79,17 +79,60 @@ class DevopsPlanActionWizard(models.TransientModel):
         store=True, compute="_compute_has_configured_path"
     )
 
+    working_compute_module_path = fields.Char(
+        store=True, compute="_compute_has_configured_path"
+    )
+
+    working_compute_module_cg_path = fields.Char(
+        store=True, compute="_compute_has_configured_path"
+    )
+
+    working_compute_module_template_path = fields.Char(
+        store=True, compute="_compute_has_configured_path"
+    )
+
     force_show_final = fields.Boolean(
         help="Will show final view without being in this state."
     )
 
     working_module_path_suggestion = fields.Selection(
         selection=[
+            ("#", "Manual"),
             ("addons/addons", "Addons private"),
             ("addons/ERPLibre_erplibre_addons", "ERPLibre addons"),
             ("addons/TechnoLibre_odoo-code-generator", "Code generator"),
         ],
+        default="#",
+        required=True,
         help="Suggestion relative path",
+    )
+
+    working_module_cg_path_suggestion = fields.Selection(
+        selection=[
+            ("-", "Default"),
+            ("#", "Manual"),
+            (
+                "addons/TechnoLibre_odoo-code-generator-template",
+                "Code generator template",
+            ),
+        ],
+        default="-",
+        required=True,
+        help="Suggestion relative path CG",
+    )
+
+    working_module_template_path_suggestion = fields.Selection(
+        selection=[
+            ("-", "Default"),
+            ("#", "Manual"),
+            (
+                "addons/TechnoLibre_odoo-code-generator-template",
+                "Code generator template",
+            ),
+        ],
+        default="-",
+        required=True,
+        help="Suggestion relative path template",
     )
 
     # TODO select default context from configuration and export it in local environment home configuration
@@ -305,6 +348,14 @@ class DevopsPlanActionWizard(models.TransientModel):
         ),
     )
 
+    use_existing_meta_module = fields.Boolean(
+        help="If False, will create new meta file from uc0."
+    )
+
+    use_existing_meta_module_ucb_only = fields.Boolean(
+        help="Force UcB only from feature use_existing_meta_module"
+    )
+
     system_ssh_connection_status = fields.Boolean(
         related="working_system_id.ssh_connection_status",
         help="Status of test remote working_system_id",
@@ -363,12 +414,70 @@ class DevopsPlanActionWizard(models.TransientModel):
                 rec.ssh_password = rec.working_system_id.ssh_password
 
     @api.multi
-    @api.depends("working_module_path_suggestion", "working_module_path")
+    @api.depends(
+        "working_module_path_suggestion",
+        "working_module_path",
+        "working_module_cg_path_suggestion",
+        "working_module_cg_path",
+        "working_module_template_path_suggestion",
+        "working_module_template_path",
+        "working_module_id",
+        "working_module_name",
+    )
     def _compute_has_configured_path(self):
         for rec in self:
-            rec.has_configured_path = any(
-                [rec.working_module_path_suggestion, rec.working_module_path]
-            )
+            rec.has_configured_path = False
+            # Module
+            if (
+                rec.working_module_path_suggestion == "#"
+                and rec.working_module_path
+            ):
+                rec.has_configured_path = True
+                rec.working_compute_module_path = rec.working_module_path
+            if rec.working_module_path_suggestion != "#":
+                rec.has_configured_path = True
+                rec.working_compute_module_path = (
+                    rec.working_module_path_suggestion
+                )
+            # CG
+            if (
+                rec.working_module_cg_path_suggestion == "#"
+                and not rec.working_module_cg_path
+            ):
+                rec.has_configured_path = False
+            elif (
+                rec.working_module_cg_path_suggestion == "#"
+                and rec.working_module_cg_path
+            ):
+                rec.working_compute_module_cg_path = rec.working_module_cg_path
+            elif rec.working_module_cg_path_suggestion == "-":
+                rec.working_compute_module_cg_path = False
+            else:
+                rec.working_compute_module_cg_path = (
+                    rec.working_module_cg_path_suggestion
+                )
+            # Template
+            if (
+                rec.working_module_template_path_suggestion == "#"
+                and not rec.working_module_template_path
+            ):
+                rec.has_configured_path = False
+            elif (
+                rec.working_module_template_path_suggestion == "#"
+                and rec.working_module_template_path
+            ):
+                rec.working_compute_module_template_path = (
+                    rec.working_module_template_path
+                )
+            elif rec.working_module_template_path_suggestion == "-":
+                rec.working_compute_module_template_path = False
+            else:
+                rec.working_compute_module_template_path = (
+                    rec.working_module_template_path_suggestion
+                )
+            # Module name
+            if not rec.working_module_id and not rec.working_module_name:
+                rec.has_configured_path = False
 
     @api.multi
     @api.depends("working_module_id")
@@ -499,10 +608,10 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def state_goto_code_module_shortcut_autopoieses_code_generator(self):
         self.working_project_name = "Autopoieses - code_generator"
-        self.working_module_cg_path = (
+        self.working_module_cg_path_suggestion = (
             "addons/TechnoLibre_odoo-code-generator-template"
         )
-        self.working_module_template_path = (
+        self.working_module_template_path_suggestion = (
             "addons/TechnoLibre_odoo-code-generator-template"
         )
         return self.goto_autopoiese("code_generator")
@@ -511,6 +620,8 @@ class DevopsPlanActionWizard(models.TransientModel):
         if module_name:
             self.fill_working_module_name_or_id(module_name)
             self.use_external_cg = True
+            self.use_existing_meta_module = True
+            self.use_existing_meta_module_ucb_only = True
             self.is_autopoieses = True
             self.is_remote_cg = True
             self.set_mode_edit_module()
@@ -653,19 +764,20 @@ class DevopsPlanActionWizard(models.TransientModel):
         with self.root_workspace_id.devops_create_exec_bundle(
             "Plan code_module"
         ) as wp_id:
-            module_name = self.working_module_name
-            if self.working_module_path_suggestion:
-                module_path = self.working_module_path_suggestion
-            else:
-                module_path = self.working_module_path
+            # TODO this is a duplicate of action_code_module_generate
+            module_name = (
+                self.working_module_id.name
+                if self.working_module_id
+                else self.working_module_name
+            )
             self.generate_new_model(
                 wp_id,
                 module_name,
                 "New empty module",
                 is_new_module=True,
-                module_path=module_path,
-                module_cg_path=self.working_module_cg_path,
-                module_template_path=self.working_module_template_path,
+                module_path=self.working_compute_module_path,
+                module_cg_path=self.working_compute_module_cg_path,
+                module_template_path=self.working_compute_module_template_path,
                 is_relative_path=True,
             )
             # finally
@@ -778,6 +890,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         with self.root_workspace_id.devops_create_exec_bundle(
             "Code Module - auto-complete module path"
         ) as wp_id:
+            # TODO complete use_existing_meta_module from suggested cg path
             module_name = None
             if self.working_module_id:
                 module_name = self.working_module_id.name
@@ -932,6 +1045,8 @@ class DevopsPlanActionWizard(models.TransientModel):
             "devops_cg_field_ids": [(6, 0, lst_field_id)],
             "stop_execution_if_env_not_clean": not self.force_generate,
             "use_external_cg": self.use_external_cg,
+            "use_existing_meta_module": self.use_existing_meta_module,
+            "use_existing_meta_module_ucb_only": self.use_existing_meta_module_ucb_only,
         }
         # Update configuration self-gen
         if is_autopoiesis:
@@ -1209,18 +1324,13 @@ class DevopsPlanActionWizard(models.TransientModel):
                 if self.working_module_id
                 else self.working_module_name
             )
-            module_path = (
-                self.working_module_path_suggestion
-                if self.working_module_path_suggestion
-                else self.working_module_path
-            )
             self.generate_new_model(
                 wp_id,
                 module_name,
                 self.working_project_name,
-                module_path=module_path,
-                module_cg_path=self.working_module_cg_path,
-                module_template_path=self.working_module_template_path,
+                module_path=self.working_compute_module_path,
+                module_cg_path=self.working_compute_module_cg_path,
+                module_template_path=self.working_compute_module_template_path,
                 is_autopoiesis=self.is_autopoieses,
                 is_new_module=self.is_new_module,
                 is_relative_path=True,

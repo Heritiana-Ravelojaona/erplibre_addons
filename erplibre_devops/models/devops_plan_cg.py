@@ -26,7 +26,15 @@ class DevopsPlanCg(models.Model):
             "If internal, will use same database of devops for build code,"
             " this can interfere. If False, will generate external database"
             " with sandbox."
-        ),
+        )
+    )
+
+    use_existing_meta_module = fields.Boolean(
+        help="If False, will create new meta file from uc0."
+    )
+
+    use_existing_meta_module_ucb_only = fields.Boolean(
+        help="Force UcB only from feature use_existing_meta_module"
     )
 
     code_mode_context_generator = fields.Selection(
@@ -247,11 +255,11 @@ class DevopsPlanCg(models.Model):
     )
 
     last_code_generator_writer = fields.Many2one(
-        comodel_name="code.generator.writer",
+        comodel_name="code.generator.writer"
     )
 
     last_code_generator_module = fields.Many2one(
-        comodel_name="code.generator.module",
+        comodel_name="code.generator.module"
     )
 
     path_code_generator_to_generate = fields.Char(default="addons/addons")
@@ -441,6 +449,8 @@ class DevopsPlanCg(models.Model):
                             "directory_cg": rec.path_code_generator_to_generate_cg,
                             "directory_template": rec.path_code_generator_to_generate_template,
                             "keep_bd_alive": True,
+                            "use_existing_meta_module": rec.use_existing_meta_module,
+                            "use_existing_meta_module_ucb_only": rec.use_existing_meta_module_ucb_only,
                             "devops_workspace": rec_ws.id,
                             "devops_exec_bundle_id": devops_exec_bundle_parent_root_id.id,
                             "stop_execution_if_env_not_clean": rec.stop_execution_if_env_not_clean,

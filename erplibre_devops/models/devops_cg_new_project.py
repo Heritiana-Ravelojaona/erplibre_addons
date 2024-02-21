@@ -133,6 +133,14 @@ class DevopsCgNewProject(models.Model):
         store=True,
     )
 
+    use_existing_meta_module = fields.Boolean(
+        help="If False, will create new meta file from uc0."
+    )
+
+    use_existing_meta_module_ucb_only = fields.Boolean(
+        help="Force UcB only from feature use_existing_meta_module"
+    )
+
     execution_finish = fields.Boolean(
         readonly=True,
         help="Will be True when execution finish correctly.",
@@ -832,6 +840,7 @@ class DevopsCgNewProject(models.Model):
                     stop_exec = True
 
                 # Stage Uc0
+                # This stage will create a new UcA or update it
                 if not stop_exec and rec.stage_id == stage_uc0_id:
                     rec.action_generate_Uc0(rec_ws=rec_ws)
                     count_stage_execute += 1
@@ -995,6 +1004,62 @@ class DevopsCgNewProject(models.Model):
                     "erplibre_devops.devops_cg_new_project_stage_generate_Uc0"
                 )
 
+                # Update configuration
+                config = configparser.ConfigParser()
+                config.read(rec.odoo_config)
+                addons_path = config.get("options", "addons_path")
+                lst_addons_path = addons_path.split(",")
+                lst_directory = list(
+                    {
+                        rec.directory_cg,
+                        rec.directory,
+                        rec.directory_template,
+                    }
+                )
+                has_change = False
+                for new_addons_path in lst_directory:
+                    for actual_addons_path in lst_addons_path:
+                        if not actual_addons_path:
+                            continue
+                        # Validate if not existing and valide is different path
+                        relative_actual_addons_path = os.path.relpath(
+                            actual_addons_path
+                        )
+                        relative_new_addons_path = os.path.relpath(
+                            new_addons_path
+                        )
+                        if (
+                            relative_actual_addons_path
+                            == relative_new_addons_path
+                        ):
+                            break
+                    else:
+                        lst_addons_path.insert(0, new_addons_path)
+                        has_change = True
+                if has_change:
+                    config.set(
+                        "options", "addons_path", ",".join(lst_addons_path)
+                    )
+                temp_file = tempfile.mktemp()
+                with open(temp_file, "w") as configfile:
+                    config.write(configfile)
+                _logger.info(f"Create temporary config file: {temp_file}")
+                rec.config_path = temp_file
+
+                # Check if create/update UcA or only run it
+                if rec.use_existing_meta_module and rec_ws.os_path_exists(
+                    rec.template_path, to_instance=True
+                ):
+                    if rec.use_existing_meta_module_ucb_only:
+                        rec.stage_id = self.env.ref(
+                            "erplibre_devops.devops_cg_new_project_stage_generate_ucb"
+                        )
+                    else:
+                        rec.stage_id = self.env.ref(
+                            "erplibre_devops.devops_cg_new_project_stage_generate_uca"
+                        )
+                    continue
+
                 v_dct_log_error = {
                     "new_project_id": rec.id,
                 }
@@ -1037,49 +1102,8 @@ class DevopsCgNewProject(models.Model):
                         v_dct_log_error=v_dct_log_error,
                     )
                 ):
+                    # TODO create a variable in CG to change path of module generated from uc0
                     return False
-
-                # Update configuration
-                config = configparser.ConfigParser()
-                config.read(rec.odoo_config)
-                addons_path = config.get("options", "addons_path")
-                lst_addons_path = addons_path.split(",")
-                lst_directory = list(
-                    {
-                        rec.directory_cg,
-                        rec.directory,
-                        rec.directory_template,
-                    }
-                )
-                has_change = False
-                for new_addons_path in lst_directory:
-                    for actual_addons_path in lst_addons_path:
-                        if not actual_addons_path:
-                            continue
-                        # Validate if not existing and valide is different path
-                        relative_actual_addons_path = os.path.relpath(
-                            actual_addons_path
-                        )
-                        relative_new_addons_path = os.path.relpath(
-                            new_addons_path
-                        )
-                        if (
-                            relative_actual_addons_path
-                            == relative_new_addons_path
-                        ):
-                            break
-                    else:
-                        lst_addons_path.insert(0, new_addons_path)
-                        has_change = True
-                if has_change:
-                    config.set(
-                        "options", "addons_path", ",".join(lst_addons_path)
-                    )
-                temp_file = tempfile.mktemp()
-                with open(temp_file, "w") as configfile:
-                    config.write(configfile)
-                _logger.info(f"Create temporary config file: {temp_file}")
-                rec.config_path = temp_file
 
                 if not rec.bd_name_demo:
                     rec.bd_name_demo = (
