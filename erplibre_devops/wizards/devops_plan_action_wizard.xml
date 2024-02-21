@@ -276,72 +276,88 @@
                         <field name="working_module_path_suggestion" string="Suggested path" />
                         <field
                             name="working_module_path"
-                            string="Manual path"
+                            string="OR Manual path"
                             attrs="{'invisible': [('working_module_path_suggestion', '!=', False)]}"
                         />
                         <field name="working_module_cg_path" string="Manual path CG" />
                         <field name="working_module_template_path" string="Manual path template" />
                     </group>
-                    <group string="C-Parameter">
+                    <group
+                        string="C-Parameter"
+                        attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
+                    >
                         <field name="use_external_cg" />
                         <field name="is_autopoieses" />
                         <field name="force_generate" />
                         <field name="mode_view_generator" />
                     </group>
                 </group>
-                <group string="D-Model" attrs="{'invisible': [('state', '!=', 'code_module')]}">
+                <group
+                    string="D-Model"
+                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
+                >
                     <field name="model_ids" />
                     <field name="model_to_remove_ids" />
                 </group>
                 <group
                     name="group_code_module_2"
                     string="E-Options"
-                    attrs="{'invisible': [('state', '!=', 'code_module')]}"
+                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
                 >
                     <group string="Snippet">
-                        <field name="mode_view_snippet" />
-                        <field
-                            name="mode_view_snippet_enable_template_website_snippet_view"
-                            attrs="{'invisible': [('mode_view_snippet', '==', 'no_snippet')]}"
-                        />
+                        <field name="mode_view_snippet" string="Mode" />
                         <field
                             name="mode_view_snippet_template_generate_website_snippet_generic_mdl"
                             attrs="{'invisible': [('mode_view_snippet', '==', 'no_snippet')]}"
+                            string="Models"
+                        />
+                        <field
+                            name="mode_view_snippet_enable_template_website_snippet_view"
+                            attrs="{'invisible': [('mode_view_snippet', '==', 'no_snippet')]}"
+                            string="Generate by template"
                         />
                         <field
                             name="mode_view_snippet_template_generate_website_snippet_ctrl_featur"
                             attrs="{'invisible': [('mode_view_snippet', '==', 'no_snippet')]}"
+                            string="Template feature"
                         />
                         <field
                             name="mode_view_snippet_template_generate_website_enable_javascript"
                             attrs="{'invisible': [('mode_view_snippet', '==', 'no_snippet')]}"
+                            string="With Javascript"
                         />
                         <field
                             name="mode_view_snippet_template_generate_website_snippet_type"
                             attrs="{'invisible': [('mode_view_snippet', '==', 'no_snippet')]}"
+                            string="Snippet type"
                         />
                     </group>
                     <group string="Portal" attrs="{'invisible': [('use_external_cg', '==', True)]}">
-                        <field name="mode_view_portal" />
+                        <field name="mode_view_portal" string="Mode" />
                         <field
                             name="mode_view_portal_models"
                             attrs="{'invisible': [('mode_view_portal', '==', 'no_portal')]}"
+                            string="Models"
                         />
                         <field
                             name="mode_view_portal_enable_create"
                             attrs="{'invisible': [('mode_view_portal', '==', 'no_portal')]}"
+                            string="Support create"
                         />
                         <field
                             name="mode_view_portal_enable_read"
                             attrs="{'invisible': [('mode_view_portal', '==', 'no_portal')]}"
+                            string="Support read"
                         />
                         <field
                             name="mode_view_portal_enable_update"
                             attrs="{'invisible': [('mode_view_portal', '==', 'no_portal')]}"
+                            string="Support update"
                         />
                         <field
                             name="mode_view_portal_enable_delete"
                             attrs="{'invisible': [('mode_view_portal', '==', 'no_portal')]}"
+                            string="Support delete"
                         />
                     </group>
                 </group>
@@ -585,36 +601,31 @@
                 <group name="not_supported" attrs="{'invisible': [('state', '!=', 'not_supported')]}">
                     <p>This state is not supported, please go back.</p>
                 </group>
-                <div name="final" attrs="{'invisible': [('state', '!=', 'final'), ('force_show_final', '!=', True)]}">
-                    <p>Your action is done, close this dialog below.</p>
-                    <group>
-                        <field name="plan_cg_id" attrs="{'invisible': [('plan_cg_id', '=', False)]}" />
-                        <field
-                            name="generated_new_project_id"
-                            attrs="{'invisible': [('generated_new_project_id', '=', False)]}"
-                        />
-                        <field
-                            name="create_workspace_id"
-                            attrs="{'invisible': [('create_workspace_id', '=', False)]}"
-                        />
-                        <field name="working_system_id" attrs="{'invisible': [('working_system_id', '=', False)]}" />
-                        <field
-                            name="working_cg_module_id"
-                            attrs="{'invisible': [('working_cg_module_id', '=', False)]}"
-                        />
-                        <field
-                            name="working_cg_writer_id"
-                            attrs="{'invisible': [('working_cg_writer_id', '=', False)]}"
-                        />
-                        <button
-                            name="action_git_commit"
-                            string="Git commit"
-                            type="object"
-                            class="oe_highlight"
-                            attrs="{'invisible': [('plan_cg_id', '=', False)]}"
-                        />
-                    </group>
-                </div>
+                <group
+                    string="Result"
+                    name="final"
+                    attrs="{'invisible': [('state', '!=', 'final'), ('force_show_final', '!=', True)]}"
+                >
+                    <div>
+                        <p>Your action is done, close this dialog below.</p>
+                    </div>
+                    <field name="plan_cg_id" attrs="{'invisible': [('plan_cg_id', '=', False)]}" />
+                    <field
+                        name="generated_new_project_id"
+                        attrs="{'invisible': [('generated_new_project_id', '=', False)]}"
+                    />
+                    <field name="create_workspace_id" attrs="{'invisible': [('create_workspace_id', '=', False)]}" />
+                    <field name="working_system_id" attrs="{'invisible': [('working_system_id', '=', False)]}" />
+                    <field name="working_cg_module_id" attrs="{'invisible': [('working_cg_module_id', '=', False)]}" />
+                    <field name="working_cg_writer_id" attrs="{'invisible': [('working_cg_writer_id', '=', False)]}" />
+                    <button
+                        name="action_git_commit"
+                        string="Git commit"
+                        type="object"
+                        class="oe_highlight"
+                        attrs="{'invisible': [('plan_cg_id', '=', False)]}"
+                    />
+                </group>
             </xpath>
         </field>
     </record>

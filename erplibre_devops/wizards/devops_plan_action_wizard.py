@@ -211,6 +211,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             ("enable_portal", "Enable portal"),
         ],
         default="no_portal",
+        required=True,
         help="Will active feature to generate portal interface",
     )
 
@@ -243,6 +244,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             ("no_snippet", "No snippet"),
             ("enable_snippet", "Enable snippet"),
         ],
+        required=True,
         default="no_snippet",
         help="Will active feature to generate snippet on website interface",
     )
@@ -264,6 +266,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 ("model_show_item_list", "Model show item list"),
             ],
             default="model_show_item_individual",
+            required=True,
             help="Feature for mode_view_snippet",
         )
     )
@@ -284,6 +287,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                 ("structure", "Structure"),
             ],
             default="effect",
+            required=True,
             help="Feature for mode_view_snippet",
         )
     )
@@ -366,7 +370,7 @@ class DevopsPlanActionWizard(models.TransientModel):
     def _compute_is_new_module(self):
         for rec in self:
             if rec.working_module_id:
-                rec.is_new_module = False
+                rec.set_mode_edit_module()
 
     @api.multi
     @api.depends(
@@ -503,8 +507,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             self.fill_working_module_name_or_id(module_name)
             self.use_external_cg = True
             self.is_autopoieses = True
-            self.is_new_module = False
-            self.mode_view_generator = "same_view"
+            self.set_mode_edit_module()
             self.action_code_module_autocomplete_module_path()
         return self.state_goto_code_module()
 
@@ -789,12 +792,12 @@ class DevopsPlanActionWizard(models.TransientModel):
             )
             if exec_id.exec_status:
                 # raise exceptions.Warning(f"Cannot find module '{module_name}'")
-                self.is_new_module = True
+                self.set_mode_new_module()
                 return self._reopen_self()
             path_module = exec_id.log_all.strip()
             if not path_module:
                 # raise exceptions.Warning(f"Cannot find module path.")
-                self.is_new_module = True
+                self.set_mode_new_module()
                 return self._reopen_self()
             # Extract relative path
             dir_name, basename = os.path.split(path_module)
@@ -813,8 +816,16 @@ class DevopsPlanActionWizard(models.TransientModel):
                 self.working_module_path_suggestion = relative_path_module
             else:
                 self.working_module_path = relative_path_module
-            self.is_new_module = False
+            self.set_mode_edit_module()
         return self._reopen_self()
+
+    def set_mode_new_module(self):
+        self.is_new_module = True
+        self.mode_view_generator = "new_view"
+
+    def set_mode_edit_module(self):
+        self.is_new_module = False
+        self.mode_view_generator = "same_view"
 
     def generate_new_model(
         self,
