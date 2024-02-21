@@ -256,6 +256,12 @@ class DevopsPlanCg(models.Model):
 
     path_code_generator_to_generate = fields.Char(default="addons/addons")
 
+    path_code_generator_to_generate_cg = fields.Char(default="addons/addons")
+
+    path_code_generator_to_generate_template = fields.Char(
+        default="addons/addons"
+    )
+
     is_clear_before_cg_demo = fields.Boolean(
         default=True,
         help=(
@@ -432,6 +438,8 @@ class DevopsPlanCg(models.Model):
                         dct_new_project = {
                             "module": module,
                             "directory": rec.path_code_generator_to_generate,
+                            "directory_cg": rec.path_code_generator_to_generate_cg,
+                            "directory_template": rec.path_code_generator_to_generate_template,
                             "keep_bd_alive": True,
                             "devops_workspace": rec_ws.id,
                             "devops_exec_bundle_id": devops_exec_bundle_parent_root_id.id,
@@ -711,7 +719,7 @@ class DevopsPlanCg(models.Model):
             ) as rec_ws:
                 folder = os.path.join(
                     rec.path_working_erplibre,
-                    rec.path_code_generator_to_generate,
+                    rec.path_code_generator_to_generate_cg,
                 )
                 diff = ""
                 status = ""
@@ -832,7 +840,7 @@ class DevopsPlanCg(models.Model):
             ) as rec_ws:
                 folder = os.path.join(
                     rec.path_working_erplibre,
-                    rec.path_code_generator_to_generate,
+                    rec.path_code_generator_to_generate_cg,
                 )
                 rec.workspace_remove_module(
                     "erplibre_devops", folder, remove_module=False

@@ -207,6 +207,8 @@
                         <group string="Configuration">
                             <field name="code_mode_context_generator" />
                             <field name="path_code_generator_to_generate" />
+                            <field name="path_code_generator_to_generate_cg" />
+                            <field name="path_code_generator_to_generate_template" />
                             <field name="path_working_erplibre" />
                         </group>
                     </group>

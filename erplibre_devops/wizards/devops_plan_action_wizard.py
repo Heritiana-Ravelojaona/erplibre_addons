@@ -114,6 +114,20 @@ class DevopsPlanActionWizard(models.TransientModel):
         help="Need it for new module, relative path from folder of workspace."
     )
 
+    working_module_cg_path = fields.Char(
+        help=(
+            "Need it for new module CG, relative path from folder of"
+            " workspace. If empty, will use working_module_path."
+        )
+    )
+
+    working_module_template_path = fields.Char(
+        help=(
+            "Need it for new module template, relative path from folder of"
+            " workspace. If empty, will use working_module_path."
+        )
+    )
+
     system_name = fields.Char(string="System name")
 
     system_method = fields.Selection(related="working_system_id.method")
@@ -476,6 +490,12 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def state_goto_code_module_shortcut_autopoieses_code_generator(self):
         self.working_project_name = "Autopoieses - code_generator"
+        self.working_module_cg_path = (
+            "addons/TechnoLibre_odoo-code-generator-template"
+        )
+        self.working_module_template_path = (
+            "addons/TechnoLibre_odoo-code-generator-template"
+        )
         return self.goto_autopoiese("code_generator")
 
     def goto_autopoiese(self, module_name):
@@ -635,6 +655,8 @@ class DevopsPlanActionWizard(models.TransientModel):
                 "New empty module",
                 is_new_module=True,
                 module_path=module_path,
+                module_cg_path=self.working_module_cg_path,
+                module_template_path=self.working_module_template_path,
                 is_relative_path=True,
             )
             # finally
@@ -801,6 +823,8 @@ class DevopsPlanActionWizard(models.TransientModel):
         project_name,
         is_autopoiesis=False,
         module_path=None,
+        module_cg_path=None,
+        module_template_path=None,
         is_relative_path=False,
         is_new_module=False,
     ):
@@ -830,6 +854,24 @@ class DevopsPlanActionWizard(models.TransientModel):
                 relative_path_module = dir_name
         else:
             relative_path_module = path_module
+        if not module_cg_path:
+            relative_path_module_cg = relative_path_module
+        else:
+            if module_cg_path.startswith(wp_id.folder):
+                relative_path_module_cg = module_cg_path[
+                    len(wp_id.folder) + 1 :
+                ]
+            else:
+                relative_path_module_cg = module_cg_path
+        if not module_template_path:
+            relative_path_module_template = relative_path_module
+        else:
+            if module_template_path.startswith(wp_id.folder):
+                relative_path_module_template = module_template_path[
+                    len(wp_id.folder) + 1 :
+                ]
+            else:
+                relative_path_module_template = module_template_path
 
         # TODO this is a bug, no need that in reality, but action_code_generator_generate_all loop into it
         #  Remove action_code_generator_generate_all
@@ -855,11 +897,15 @@ class DevopsPlanActionWizard(models.TransientModel):
             cg_model_id.devops_workspace_ids = [(6, 0, wp_id.ids)]
         lst_field_id = [b.id for a in self.model_ids for b in a.field_ids]
         # Complete plan to code_generator
+        # TODO the code_generator has path_code_generator_to_generate_cg and path_code_generator_to_generate_template
+        #  into template directory
         plan_cg_value = {
             "workspace_id": wp_id.id,
             "mode_view": self.mode_view_generator,
             "path_working_erplibre": wp_id.folder,
             "path_code_generator_to_generate": relative_path_module,
+            "path_code_generator_to_generate_cg": relative_path_module_cg,
+            "path_code_generator_to_generate_template": relative_path_module_template,
             "devops_cg_ids": [(6, 0, cg_id.ids)],
             "devops_cg_module_ids": [(6, 0, cg_module_id.ids)],
             "devops_cg_model_ids": [(6, 0, self.model_ids.ids)],
@@ -1142,6 +1188,8 @@ class DevopsPlanActionWizard(models.TransientModel):
                 module_name,
                 self.working_project_name,
                 module_path=module_path,
+                module_cg_path=self.working_module_cg_path,
+                module_template_path=self.working_module_template_path,
                 is_autopoiesis=self.is_autopoieses,
                 is_new_module=self.is_new_module,
                 is_relative_path=True,

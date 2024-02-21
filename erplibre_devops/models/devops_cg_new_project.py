@@ -995,6 +995,10 @@ class DevopsCgNewProject(models.Model):
                     "erplibre_devops.devops_cg_new_project_stage_generate_Uc0"
                 )
 
+                v_dct_log_error = {
+                    "new_project_id": rec.id,
+                }
+
                 if not (
                     rec.validate_path_ready_to_be_override(
                         CODE_GENERATOR_DEMO_NAME, CODE_GENERATOR_DIRECTORY, ws
@@ -1016,7 +1020,8 @@ class DevopsCgNewProject(models.Model):
                                 "# path_module_generate ="
                                 " os.path.normpath(os.path.join(os.path.dirname(__file__),"
                                 " '..'))",
-                                f'path_module_generate = "{rec.directory}"',
+                                "path_module_generate ="
+                                f' "{rec.directory_template}"',
                             ),
                             (
                                 '# "path_sync_code": path_module_generate,',
@@ -1029,6 +1034,7 @@ class DevopsCgNewProject(models.Model):
                                 f' = "{rec.directory_cg}"',
                             ),
                         ],
+                        v_dct_log_error=v_dct_log_error,
                     )
                 ):
                     return False
@@ -1175,6 +1181,9 @@ class DevopsCgNewProject(models.Model):
                 rec.stage_id = self.env.ref(
                     "erplibre_devops.devops_cg_new_project_stage_generate_uca"
                 )
+                v_dct_log_error = {
+                    "new_project_id": rec.id,
+                }
                 # Execute all
                 if not rec.bd_name_template:
                     rec.bd_name_template = (
@@ -1361,11 +1370,13 @@ class DevopsCgNewProject(models.Model):
                     self.search_and_replace_file(
                         rec.template_hooks_py,
                         lst_template_hooks_py_replace,
+                        v_dct_log_error=v_dct_log_error,
                     )
                 if lst_template_manifest_py_replace:
                     self.search_and_replace_file(
                         rec.template_manifest_py,
                         lst_template_manifest_py_replace,
+                        v_dct_log_error=v_dct_log_error,
                     )
 
                 # TODO maybe the module exist somewhere else
@@ -1455,6 +1466,9 @@ class DevopsCgNewProject(models.Model):
                 rec.stage_id = self.env.ref(
                     "erplibre_devops.devops_cg_new_project_stage_generate_ucb"
                 )
+                v_dct_log_error = {
+                    "new_project_id": rec.id,
+                }
                 if not rec.bd_name_generator:
                     rec.bd_name_generator = (
                         f"new_project_code_generator_{uuid.uuid4()}"[:63]
@@ -1542,6 +1556,7 @@ class DevopsCgNewProject(models.Model):
                     self.search_and_replace_file(
                         rec.cg_hooks_py,
                         lst_update_cg,
+                        v_dct_log_error=v_dct_log_error,
                     )
 
                 # TODO need pause if ask? and continue if ask
@@ -1710,8 +1725,9 @@ class DevopsCgNewProject(models.Model):
                         " a key to research from file."
                     )
 
-    @staticmethod
-    def search_and_replace_file(filepath, lst_search_and_replace):
+    def search_and_replace_file(
+        self, filepath, lst_search_and_replace, v_dct_log_error
+    ):
         """
         lst_search_and_replace is a list of tuple, first item is search, second is replace
         """
@@ -1721,7 +1737,10 @@ class DevopsCgNewProject(models.Model):
             for search, replace in lst_search_and_replace:
                 if search not in txt:
                     msg_error = f"Cannot find '{search}' in file '{filepath}'"
-                    raise Exception(msg_error)
+                    v_dct_log_error["name"] = msg_error
+                    self.env["devops.log.error"].create(v_dct_log_error)
+                    continue
+                    # raise Exception(msg_error)
                 txt = txt.replace(search, replace)
         with open(filepath, "w") as file:
             file.write(txt)

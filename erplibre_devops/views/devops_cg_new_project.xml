@@ -107,6 +107,8 @@
                             <field name="template_name" />
                             <field name="module" />
                             <field name="directory" />
+                            <field name="directory_cg" />
+                            <field name="directory_template" />
                             <field name="config" />
                             <field name="model_to_remove" />
                             <field name="odoo_config" />

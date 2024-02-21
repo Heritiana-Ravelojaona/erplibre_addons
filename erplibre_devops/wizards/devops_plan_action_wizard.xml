@@ -279,6 +279,8 @@
                             string="Manual path"
                             attrs="{'invisible': [('working_module_path_suggestion', '!=', False)]}"
                         />
+                        <field name="working_module_cg_path" string="Manual path CG" />
+                        <field name="working_module_template_path" string="Manual path template" />
                     </group>
                     <group string="C-Parameter">
                         <field name="use_external_cg" />

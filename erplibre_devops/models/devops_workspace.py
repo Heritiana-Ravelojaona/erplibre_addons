@@ -352,8 +352,18 @@ class DevopsWorkspace(models.Model):
     @api.depends("plan_cg_ids.path_code_generator_to_generate")
     def _compute_path_code_generator_to_generate(self):
         for rec in self:
+            # Append unpack list with cg and template
             lst_path = ["addons/addons"] + [
-                a.path_code_generator_to_generate for a in rec.plan_cg_ids
+                b
+                for c in [
+                    [
+                        a.path_code_generator_to_generate,
+                        a.path_code_generator_to_generate_cg,
+                        a.path_code_generator_to_generate_template,
+                    ]
+                    for a in rec.plan_cg_ids
+                ]
+                for b in c
             ]
             rec.path_code_generator_to_generate = ";".join(set(lst_path))
 
