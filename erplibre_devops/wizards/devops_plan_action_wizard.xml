@@ -451,6 +451,7 @@
                     >
                         <field name="use_external_cg" />
                         <field name="is_autopoieses" />
+                        <field name="is_remote_cg" />
                         <field name="force_generate" />
                         <field name="mode_view_generator" />
                     </group>
@@ -786,7 +787,21 @@
                         string="Git commit"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': [('plan_cg_id', '=', False)]}"
+                        attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', True)]}"
+                    />
+                    <button
+                        name="action_git_commit_remote"
+                        string="Git commit remote"
+                        type="object"
+                        class="oe_highlight"
+                        attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
+                    />
+                    <button
+                        name="action_git_meld_remote"
+                        string="Git meld remote"
+                        type="object"
+                        class="oe_highlight"
+                        attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
                     />
                 </group>
             </xpath>

@@ -657,6 +657,56 @@ class DevopsPlanCg(models.Model):
                 )
 
     @api.multi
+    def action_git_commit_remote(self):
+        for rec in self:
+            with rec.workspace_id.devops_create_exec_bundle(
+                "CG git commit remote"
+            ) as rec_ws:
+                module_name = rec.devops_cg_module_ids[0].exists().name
+                dir1 = os.path.join(
+                    rec.path_code_generator_to_generate,
+                    module_name,
+                )
+                dir2 = os.path.join(
+                    rec.path_code_generator_to_generate_cg,
+                    module_name,
+                )
+                cmd = (
+                    "./script/git/remote_code_generation_git_compare.py"
+                    " --quiet --git_cola --clear --replace_directory"
+                    f" --directory1 {dir1} --directory2 {dir2}"
+                )
+                rec_ws.execute(
+                    cmd=cmd,
+                    force_open_terminal=True,
+                    force_exit=True,
+                    to_instance=True,
+                )
+
+    @api.multi
+    def action_git_meld_remote(self):
+        for rec in self:
+            with rec.workspace_id.devops_create_exec_bundle(
+                "CG git meld remote"
+            ) as rec_ws:
+                module_name = rec.devops_cg_module_ids[0].exists().name
+                dir1 = os.path.join(
+                    rec.path_code_generator_to_generate,
+                    module_name,
+                )
+                dir2 = os.path.join(
+                    rec.path_code_generator_to_generate_cg,
+                    module_name,
+                )
+                cmd = f"meld {dir2} {dir1}"
+                rec_ws.execute(
+                    cmd=cmd,
+                    force_open_terminal=True,
+                    force_exit=True,
+                    to_instance=True,
+                )
+
+    @api.multi
     def action_git_commit_all_generated_module(self):
         for rec in self:
             with rec.workspace_id.devops_create_exec_bundle(

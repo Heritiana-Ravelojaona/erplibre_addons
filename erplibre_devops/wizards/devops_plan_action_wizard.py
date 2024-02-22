@@ -151,6 +151,11 @@ class DevopsPlanActionWizard(models.TransientModel):
         compute="_compute_is_new_or_exist_ssh", store=True
     )
 
+    # TODO compute it, detect when it's remote, when cg path is different working path
+    is_remote_cg = fields.Boolean(
+        help="When it's remote, need tool to copy code with the developers."
+    )
+
     can_search_workspace = fields.Boolean(
         compute="_compute_can_search_workspace", store=True
     )
@@ -507,6 +512,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             self.fill_working_module_name_or_id(module_name)
             self.use_external_cg = True
             self.is_autopoieses = True
+            self.is_remote_cg = True
             self.set_mode_edit_module()
             self.action_code_module_autocomplete_module_path()
         return self.state_goto_code_module()
@@ -1178,6 +1184,20 @@ class DevopsPlanActionWizard(models.TransientModel):
         for rec in self:
             if rec.plan_cg_id:
                 rec.plan_cg_id.action_git_commit()
+        return self._reopen_self()
+
+    @api.multi
+    def action_git_commit_remote(self):
+        for rec in self:
+            if rec.plan_cg_id:
+                rec.plan_cg_id.action_git_commit_remote()
+        return self._reopen_self()
+
+    @api.multi
+    def action_git_meld_remote(self):
+        for rec in self:
+            if rec.plan_cg_id:
+                rec.plan_cg_id.action_git_meld_remote()
         return self._reopen_self()
 
     def action_code_module_generate(self):
