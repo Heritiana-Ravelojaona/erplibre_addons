@@ -41,6 +41,169 @@
                     </group>
                 </group>
                 <group
+                    name="init_context"
+                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', True)]}"
+                    style="background-color: #08a9cb; color: white;"
+                >
+                    <group>
+                        <div>
+                            <h2>2 Code</h2>
+                            <p>
+                                1. Choose an existing module or create a new one.
+                                <br />
+                                2. Press button «Auto-complete» after complete A to detect conflict.
+                                <br />
+                                3. Adjust B to change path, with C for parameters.
+                            </p>
+                        </div>
+                    </group>
+                    <group>
+                        <field name="mode_context" />
+                        <button
+                            name="action_code_module_autocomplete_module_path"
+                            string="Auto-complete"
+                            type="object"
+                            class="btn btn-primary"
+                        />
+                    </group>
+                </group>
+                <group
+                    name="init_context"
+                    attrs="{'invisible': ['|','|',('state', '!=', 'code_module'),('has_configured_path', '==', False),('force_show_final', '==', True)]}"
+                    style="background-color: #08a9cb; color: white;"
+                >
+                    <group>
+                        <div>
+                            <h2>2 Code</h2>
+                            <p style="color: #ccc;">
+                                1. Choose an existing module or create a new one.
+                                <br />
+                                2. Press button «Auto-complete» after complete A to detect conflict.
+                                <br />
+                                3. Adjust B to change path, with C for parameters.
+                            </p>
+                            <p>4. Create models and options.</p>
+                        </div>
+                    </group>
+                    <group>
+                        <field name="mode_context" />
+                        <button
+                            name="action_code_module_autocomplete_module_path"
+                            string="Auto-complete"
+                            type="object"
+                            class="btn btn-default"
+                        />
+                        <button
+                            name="action_code_module_generate"
+                            string="Generate"
+                            type="object"
+                            class="btn btn-primary"
+                        />
+                    </group>
+                </group>
+                <group
+                    name="init_context"
+                    attrs="{'invisible': ['|','|',('state', '!=', 'code_module'),('has_configured_path', '==', False),('force_show_final', '==', False)]}"
+                    style="background-color: #08a9cb; color: white;"
+                >
+                    <group>
+                        <div>
+                            <h2>2 Code</h2>
+                            <p style="color: #ccc;">
+                                1. Choose an existing module or create a new one.
+                                <br />
+                                2. Press button «Auto-complete» after complete A to detect conflict.
+                                <br />
+                                3. Adjust B to change path, with C for parameters.
+                                <br />
+                                4. Create models and options.
+                            </p>
+                            <p>5. Result</p>
+                        </div>
+                    </group>
+                    <group>
+                        <field name="mode_context" />
+                        <button
+                            name="action_code_module_autocomplete_module_path"
+                            string="Auto-complete"
+                            type="object"
+                            class="btn btn-default"
+                        />
+                        <button
+                            name="action_code_module_generate"
+                            string="Generate"
+                            type="object"
+                            class="btn btn-default"
+                        />
+                        <button
+                            name="action_git_commit"
+                            string="Git commit"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', True)]}"
+                        />
+                        <button
+                            name="action_git_commit_remote"
+                            string="Git commit remote"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
+                        />
+                        <button
+                            name="action_git_meld_remote"
+                            string="Git meld remote"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
+                        />
+                    </group>
+                </group>
+                <group
+                    name="init_context"
+                    attrs="{'invisible': [('state', '!=', 'code_shortcut')]}"
+                    style="background-color: #08a9cb; color: white;"
+                >
+                    <group>
+                        <div>
+                            <h2>2 Code</h2>
+                            <p>Fast auto-complete module Odoo code generator.</p>
+                        </div>
+                    </group>
+                    <group>
+                        <field name="mode_context" />
+                    </group>
+                </group>
+                <group
+                    name="init_context"
+                    attrs="{'invisible': [('state', '!=', 'h_run_test')]}"
+                    style="background-color: #04c576; color: white;"
+                >
+                    <group>
+                        <div>
+                            <h2>4 Quality</h2>
+                            Run test
+                        </div>
+                    </group>
+                    <group>
+                        <field name="mode_context" />
+                    </group>
+                </group>
+                <group
+                    name="init_context"
+                    attrs="{'invisible': [('state', '!=', 'i_new_remote_system')]}"
+                    style="background-color: #f7b905; color: white;"
+                >
+                    <group>
+                        <div>
+                            <h2>6 Deploy</h2>
+                            Deploy a system
+                        </div>
+                    </group>
+                    <group>
+                        <field name="mode_context" />
+                    </group>
+                </group>
+                <group
                     name="init_soft_dev"
                     string="Software development"
                     attrs="{'invisible': [('state', '!=', 'init')]}"
