@@ -1315,6 +1315,13 @@ class DevopsPlanActionWizard(models.TransientModel):
                 rec.plan_cg_id.action_git_meld_remote()
         return self._reopen_self()
 
+    @api.multi
+    def action_git_clean_remote(self):
+        for rec in self:
+            if rec.plan_cg_id:
+                rec.plan_cg_id.action_git_clean_remote()
+        return self._reopen_self()
+
     def action_code_module_generate(self):
         with self.root_workspace_id.devops_create_exec_bundle(
             "Action Code Module - Generate"

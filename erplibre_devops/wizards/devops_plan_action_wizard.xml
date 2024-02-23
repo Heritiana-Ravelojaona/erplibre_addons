@@ -156,6 +156,13 @@
                             class="btn btn-primary"
                             attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
                         />
+                        <button
+                            name="action_git_clean_remote"
+                            string="Git clean remote"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
+                        />
                     </group>
                 </group>
                 <group
@@ -826,6 +833,13 @@
                     <button
                         name="action_git_meld_remote"
                         string="Git meld remote"
+                        type="object"
+                        class="oe_highlight"
+                        attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
+                    />
+                    <button
+                        name="action_git_clean_remote"
+                        string="Git clean remote"
                         type="object"
                         class="oe_highlight"
                         attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
