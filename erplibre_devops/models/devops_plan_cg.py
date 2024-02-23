@@ -33,6 +33,14 @@ class DevopsPlanCg(models.Model):
         help="If False, will create new meta file from uc0."
     )
 
+    use_existing_meta_module_uca_only = fields.Boolean(
+        help="Force UcA only from feature use_existing_meta_module"
+    )
+
+    uca_option_with_inherit = fields.Boolean(
+        help="UCA configuration - with inherit"
+    )
+
     use_existing_meta_module_ucb_only = fields.Boolean(
         help="Force UcB only from feature use_existing_meta_module"
     )
@@ -450,6 +458,8 @@ class DevopsPlanCg(models.Model):
                             "directory_template": rec.path_code_generator_to_generate_template,
                             "keep_bd_alive": True,
                             "use_existing_meta_module": rec.use_existing_meta_module,
+                            "use_existing_meta_module_uca_only": rec.use_existing_meta_module_uca_only,
+                            "uca_option_with_inherit": rec.uca_option_with_inherit,
                             "use_existing_meta_module_ucb_only": rec.use_existing_meta_module_ucb_only,
                             "devops_workspace": rec_ws.id,
                             "devops_exec_bundle_id": devops_exec_bundle_parent_root_id.id,

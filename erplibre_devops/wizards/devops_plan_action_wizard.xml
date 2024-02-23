@@ -392,7 +392,13 @@
                         />
                         <button
                             name="state_goto_code_module_shortcut_autopoieses_code_generator"
-                            string="Code Generator"
+                            string="Code Generator UcB"
+                            type="object"
+                            class="btn btn-default"
+                        />
+                        <button
+                            name="state_goto_code_module_shortcut_autopoieses_code_generator_code_generator"
+                            string="Code Generator UcA"
                             type="object"
                             class="btn btn-default"
                         />
@@ -409,6 +415,8 @@
                     <group string="Feature">
                         <field name="use_external_cg" string="CG with metadata" />
                         <field name="use_existing_meta_module" string="Meta module" />
+                        <field name="use_existing_meta_module_uca_only" string="UcA only" />
+                        <field name="uca_option_with_inherit" string="UcA option with inherit" />
                         <field name="use_existing_meta_module_ucb_only" string="UcB only" />
                     </group>
                 </group>
@@ -477,6 +485,16 @@
                         <field
                             name="use_existing_meta_module"
                             string="Meta module"
+                            attrs="{'invisible': [('use_external_cg', '==', False)]}"
+                        />
+                        <field
+                            name="use_existing_meta_module_uca_only"
+                            string="UcA only"
+                            attrs="{'invisible': ['|',('use_external_cg', '==', False),('use_existing_meta_module', '==', False)]}"
+                        />
+                        <field
+                            name="uca_option_with_inherit"
+                            string="UcA option with inherit"
                             attrs="{'invisible': [('use_external_cg', '==', False)]}"
                         />
                         <field

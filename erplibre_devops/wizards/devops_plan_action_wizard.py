@@ -352,6 +352,14 @@ class DevopsPlanActionWizard(models.TransientModel):
         help="If False, will create new meta file from uc0."
     )
 
+    use_existing_meta_module_uca_only = fields.Boolean(
+        help="Force UcA only from feature use_existing_meta_module"
+    )
+
+    uca_option_with_inherit = fields.Boolean(
+        help="UCA configuration - with inherit"
+    )
+
     use_existing_meta_module_ucb_only = fields.Boolean(
         help="Force UcB only from feature use_existing_meta_module"
     )
@@ -614,6 +622,25 @@ class DevopsPlanActionWizard(models.TransientModel):
         self.working_module_template_path_suggestion = (
             "addons/TechnoLibre_odoo-code-generator-template"
         )
+        self.use_existing_meta_module_ucb_only = True
+        self.is_remote_cg = True
+        return self.goto_autopoiese("code_generator")
+
+    def state_goto_code_module_shortcut_autopoieses_code_generator_code_generator(
+        self,
+    ):
+        self.working_project_name = (
+            "Autopoieses - code_generator_code_generator"
+        )
+        self.working_module_cg_path_suggestion = (
+            "addons/TechnoLibre_odoo-code-generator-template"
+        )
+        self.working_module_template_path_suggestion = (
+            "addons/TechnoLibre_odoo-code-generator-template"
+        )
+        self.use_existing_meta_module_uca_only = True
+        self.uca_option_with_inherit = True
+        self.is_remote_cg = True
         return self.goto_autopoiese("code_generator")
 
     def goto_autopoiese(self, module_name):
@@ -621,9 +648,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             self.fill_working_module_name_or_id(module_name)
             self.use_external_cg = True
             self.use_existing_meta_module = True
-            self.use_existing_meta_module_ucb_only = True
             self.is_autopoieses = True
-            self.is_remote_cg = True
             self.set_mode_edit_module()
             self.action_code_module_autocomplete_module_path()
         return self.state_goto_code_module()
@@ -1046,6 +1071,8 @@ class DevopsPlanActionWizard(models.TransientModel):
             "stop_execution_if_env_not_clean": not self.force_generate,
             "use_external_cg": self.use_external_cg,
             "use_existing_meta_module": self.use_existing_meta_module,
+            "use_existing_meta_module_uca_only": self.use_existing_meta_module_uca_only,
+            "uca_option_with_inherit": self.uca_option_with_inherit,
             "use_existing_meta_module_ucb_only": self.use_existing_meta_module_ucb_only,
         }
         # Update configuration self-gen

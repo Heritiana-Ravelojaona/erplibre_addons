@@ -137,6 +137,14 @@ class DevopsCgNewProject(models.Model):
         help="If False, will create new meta file from uc0."
     )
 
+    use_existing_meta_module_uca_only = fields.Boolean(
+        help="Force UcA only from feature use_existing_meta_module"
+    )
+
+    uca_option_with_inherit = fields.Boolean(
+        help="UCA configuration - with inherit"
+    )
+
     use_existing_meta_module_ucb_only = fields.Boolean(
         help="Force UcB only from feature use_existing_meta_module"
     )
@@ -863,7 +871,11 @@ class DevopsCgNewProject(models.Model):
                     stop_exec = True
 
                 # Stage UcB
-                if not stop_exec and rec.stage_id == stage_ucb_id:
+                if (
+                    not rec.use_existing_meta_module_uca_only
+                    and not stop_exec
+                    and rec.stage_id == stage_ucb_id
+                ):
                     rec.action_generate_ucb(rec_ws=rec_ws)
                     count_stage_execute += 1
 
@@ -1047,16 +1059,23 @@ class DevopsCgNewProject(models.Model):
                 rec.config_path = temp_file
 
                 # Check if create/update UcA or only run it
-                if rec.use_existing_meta_module and rec_ws.os_path_exists(
-                    rec.template_path, to_instance=True
+                if (
+                    rec.use_existing_meta_module
+                    and (
+                        rec.use_existing_meta_module_uca_only
+                        or rec.use_existing_meta_module_ucb_only
+                    )
+                    and rec_ws.os_path_exists(
+                        rec.template_path, to_instance=True
+                    )
                 ):
-                    if rec.use_existing_meta_module_ucb_only:
-                        rec.stage_id = self.env.ref(
-                            "erplibre_devops.devops_cg_new_project_stage_generate_ucb"
-                        )
-                    else:
+                    if rec.use_existing_meta_module_uca_only:
                         rec.stage_id = self.env.ref(
                             "erplibre_devops.devops_cg_new_project_stage_generate_uca"
+                        )
+                    elif rec.use_existing_meta_module_ucb_only:
+                        rec.stage_id = self.env.ref(
+                            "erplibre_devops.devops_cg_new_project_stage_generate_ucb"
                         )
                     continue
 
@@ -1245,6 +1264,8 @@ class DevopsCgNewProject(models.Model):
                         "./script/code_generator/search_class_model.py"
                         f" --quiet -d {rec.module_path} -t {rec.template_path}"
                     )
+                    if rec.uca_option_with_inherit:
+                        cmd += " --with_inherit"
                     _logger.info(cmd)
                     exec_id = ws.with_context(
                         devops_cg_new_project=rec.id
