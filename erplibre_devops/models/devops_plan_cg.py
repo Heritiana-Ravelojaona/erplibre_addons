@@ -21,6 +21,30 @@ class DevopsPlanCg(models.Model):
         required=True,
     )
 
+    use_external_cg = fields.Boolean(
+        help=(
+            "If internal, will use same database of devops for build code,"
+            " this can interfere. If False, will generate external database"
+            " with sandbox."
+        )
+    )
+
+    use_existing_meta_module = fields.Boolean(
+        help="If False, will create new meta file from uc0."
+    )
+
+    use_existing_meta_module_uca_only = fields.Boolean(
+        help="Force UcA only from feature use_existing_meta_module"
+    )
+
+    uca_option_with_inherit = fields.Boolean(
+        help="UCA configuration - with inherit"
+    )
+
+    use_existing_meta_module_ucb_only = fields.Boolean(
+        help="Force UcB only from feature use_existing_meta_module"
+    )
+
     code_mode_context_generator = fields.Selection(
         selection=[
             ("default", "Default"),
@@ -125,13 +149,50 @@ class DevopsPlanCg(models.Model):
         help="Mode view, enable rebuild same view or create new view.",
     )
 
+    mode_view_portal = fields.Selection(
+        selection=[
+            ("no_portal", "No portal"),
+            ("enable_portal", "Enable portal"),
+        ],
+        default="no_portal",
+        help=(
+            "Will active feature to generate portal interface, for variable"
+            " enable_generate_portal"
+        ),
+    )
+
+    mode_view_portal_enable_create = fields.Boolean(
+        default=True,
+        help="Feature for portal_enable_create",
+    )
+
+    mode_view_portal_enable_read = fields.Boolean(
+        default=True,
+        help="Feature for portal_enable_read",
+    )
+
+    mode_view_portal_enable_update = fields.Boolean(
+        default=True,
+        help="Feature for portal_enable_update",
+    )
+
+    mode_view_portal_enable_delete = fields.Boolean(
+        default=True,
+        help="Feature for portal_enable_delete",
+    )
+
+    mode_view_portal_models = fields.Char(
+        string="Portal Models",
+        help="Separate models by ;",
+    )
+
     mode_view_snippet = fields.Selection(
         selection=[
             ("no_snippet", "No snippet"),
             ("enable_snippet", "Enable snippet"),
         ],
         default="no_snippet",
-        help="Will active feature to generate snippet",
+        help="Will active feature to generate snippet on website interface",
     )
 
     mode_view_snippet_enable_template_website_snippet_view = fields.Boolean(
@@ -201,7 +262,21 @@ class DevopsPlanCg(models.Model):
         string="Last new project cg",
     )
 
+    last_code_generator_writer = fields.Many2one(
+        comodel_name="code.generator.writer"
+    )
+
+    last_code_generator_module = fields.Many2one(
+        comodel_name="code.generator.module"
+    )
+
     path_code_generator_to_generate = fields.Char(default="addons/addons")
+
+    path_code_generator_to_generate_cg = fields.Char(default="addons/addons")
+
+    path_code_generator_to_generate_template = fields.Char(
+        default="addons/addons"
+    )
 
     is_clear_before_cg_demo = fields.Boolean(
         default=True,
@@ -370,25 +445,23 @@ class DevopsPlanCg(models.Model):
                             rec.workspace_code_remove_module(module_id)
                         model_conf = None
                         if rec.code_mode_context_generator == "autopoiesis":
-                            # TODO this seems outdated, fix by wizard
-                            # TODO found path by this __file__
-                            rec.path_code_generator_to_generate = (
-                                "./addons/ERPLibre_erplibre_addons"
-                            )
-                            module = "erplibre_devops"
-                            project_type = "self"
                             if rec.cg_self_add_config_cg:
                                 model_conf = rec.get_cg_model_config(module_id)
                         else:
                             model_conf = rec.get_cg_model_config(module_id)
-                            module = module_id.name
-                            project_type = "cg"
+                        module = module_id.name
+                        # TODO support portal into external
                         dct_new_project = {
                             "module": module,
                             "directory": rec.path_code_generator_to_generate,
+                            "directory_cg": rec.path_code_generator_to_generate_cg,
+                            "directory_template": rec.path_code_generator_to_generate_template,
                             "keep_bd_alive": True,
+                            "use_existing_meta_module": rec.use_existing_meta_module,
+                            "use_existing_meta_module_uca_only": rec.use_existing_meta_module_uca_only,
+                            "uca_option_with_inherit": rec.uca_option_with_inherit,
+                            "use_existing_meta_module_ucb_only": rec.use_existing_meta_module_ucb_only,
                             "devops_workspace": rec_ws.id,
-                            "project_type": project_type,
                             "devops_exec_bundle_id": devops_exec_bundle_parent_root_id.id,
                             "stop_execution_if_env_not_clean": rec.stop_execution_if_env_not_clean,
                             "mode_view": rec.mode_view,
@@ -398,6 +471,12 @@ class DevopsPlanCg(models.Model):
                             "mode_view_snippet_template_generate_website_snippet_ctrl_featur": rec.mode_view_snippet_template_generate_website_snippet_ctrl_featur,
                             "mode_view_snippet_template_generate_website_enable_javascript": rec.mode_view_snippet_template_generate_website_enable_javascript,
                             "mode_view_snippet_template_generate_website_snippet_type": rec.mode_view_snippet_template_generate_website_snippet_type,
+                            # "mode_view_portal": rec.mode_view_portal,
+                            # "mode_view_portal_enable_create": rec.mode_view_portal_enable_create,
+                            # "mode_view_portal_enable_read": rec.mode_view_portal_enable_read,
+                            # "mode_view_portal_enable_update": rec.mode_view_portal_enable_update,
+                            # "mode_view_portal_enable_delete": rec.mode_view_portal_enable_delete,
+                            # "mode_view_portal_models": rec.mode_view_portal_models,
                             "config_uca_enable_export_data": rec.config_uca_enable_export_data,
                         }
                         # extra_arg = ""
@@ -411,18 +490,20 @@ class DevopsPlanCg(models.Model):
                                     for a in rec.devops_cg_model_to_remove_ids
                                 ]
                             )
-
-                        new_project_id = self.env[
-                            "devops.cg.new_project"
-                        ].create(dct_new_project)
-                        if rec.last_new_project_cg:
-                            new_project_id.last_new_project = (
-                                rec.last_new_project_cg.id
-                            )
-                        rec.last_new_project_cg = new_project_id.id
-                        new_project_id.with_context(
-                            rec_ws._context
-                        ).action_new_project()
+                        if rec.use_external_cg:
+                            new_project_id = self.env[
+                                "devops.cg.new_project"
+                            ].create(dct_new_project)
+                            if rec.last_new_project_cg:
+                                new_project_id.last_new_project = (
+                                    rec.last_new_project_cg.id
+                                )
+                            rec.last_new_project_cg = new_project_id.id
+                            new_project_id.with_context(
+                                rec_ws._context
+                            ).action_new_project()
+                        else:
+                            rec.execute_internal_cg(rec_cg, module_id)
                         # cmd = (
                         #     f"cd {rec.path_working_erplibre};./script/code_generator/new_project.py"
                         #     f" --keep_bd_alive -m {module_name} -d"
@@ -438,6 +519,133 @@ class DevopsPlanCg(models.Model):
                 if rec.devops_cg_ids and rec_ws.mode_exec.value in ["docker"]:
                     rec_ws.action_reboot()
                 # rec_ws.execute(cmd=f"cd {rec.path_working_erplibre};make config_gen_all", to_instance=True)
+
+    @api.multi
+    def execute_internal_cg(self, rec_cg, module_id):
+        for rec in self:
+            path_module_generate = os.path.join(
+                ".", rec.path_code_generator_to_generate
+            )
+            short_name = module_id.name.replace("_", " ").title()
+
+            # Add code generator
+            value = {
+                "shortdesc": short_name,
+                "name": module_id.name,
+                "license": "AGPL-3",
+                "author": "TechnoLibre",
+                "website": "https://technolibre.ca",
+                "application": True,
+                "enable_sync_code": True,
+                "path_sync_code": path_module_generate,
+            }
+
+            value["enable_sync_template"] = True
+            value["ignore_fields"] = ""
+            value["post_init_hook_show"] = False
+            value["uninstall_hook_show"] = False
+            value["post_init_hook_feature_code_generator"] = False
+            value["uninstall_hook_feature_code_generator"] = False
+
+            value[
+                "hook_constant_code"
+            ] = f'module_id.name = "{module_id.name}"'
+
+            code_generator_id = self.env["code.generator.module"].create(value)
+            rec.last_code_generator_module = code_generator_id.id
+
+            # lst_depend_module = ["mail", "portal", "website"]
+            lst_depend_module = []
+            if (
+                rec.mode_view_snippet
+                and rec.mode_view_snippet == "enable_snippet"
+            ):
+                lst_depend_module.append("website")
+            if (
+                rec.mode_view_portal
+                and rec.mode_view_portal == "enable_portal"
+            ):
+                lst_depend_module.append("portal")
+            if lst_depend_module:
+                # Trim for unique item
+                lst_depend_module = list(set(lst_depend_module))
+                code_generator_id.add_module_dependency(lst_depend_module)
+
+            # Add model
+            if (
+                rec.mode_view_portal
+                and rec.mode_view_portal != "no_portal"
+                and rec.mode_view_portal_models
+            ):
+                lst_portal_model = [
+                    a.strip()
+                    for a in rec.mode_view_portal_models.strip().split(";")
+                ]
+            else:
+                lst_portal_model = []
+            for model_model_id in rec.devops_cg_model_ids:
+                lst_depend_model = None
+                if (
+                    lst_portal_model
+                    and model_model_id.name in lst_portal_model
+                ):
+                    lst_depend_model = ["portal.mixin"]
+                code_generator_id.add_update_model(
+                    model_model_id.name,
+                    dct_field=model_model_id.get_field_dct(),
+                    lst_depend_model=lst_depend_model,
+                )
+
+            # Generate view
+            # Action generate view
+            value_view_wizard = {
+                "code_generator_id": code_generator_id.id,
+                "enable_generate_all": False,
+            }
+            if rec.mode_view == "same_view":
+                value_view_wizard["disable_generate_menu"] = True
+                value_view_wizard["disable_generate_access"] = True
+
+            if rec.mode_view_portal and rec.mode_view_portal != "no_portal":
+                value_view_wizard["enable_generate_portal"] = True
+                value_view_wizard[
+                    "mode_view_portal_enable_create"
+                ] = rec.mode_view_portal_enable_create
+                value_view_wizard[
+                    "mode_view_portal_enable_read"
+                ] = rec.mode_view_portal_enable_read
+                value_view_wizard[
+                    "mode_view_portal_enable_update"
+                ] = rec.mode_view_portal_enable_update
+                value_view_wizard[
+                    "mode_view_portal_enable_delete"
+                ] = rec.mode_view_portal_enable_delete
+
+            wizard_view = self.env[
+                "code.generator.generate.views.wizard"
+            ].create(value_view_wizard)
+
+            wizard_view.button_generate_views()
+
+            if rec.mode_view_snippet and rec.mode_view_snippet != "no_snippet":
+                # Generate snippet
+                # TODO addons/TechnoLibre_odoo-code-generator-template/code_generator_demo_portal/hooks.py
+                #  template_generate_website_snippet_controller_feature is not suppose to be here, this field
+                #  is not into code.generator.snippet
+                value_snippet = {
+                    "code_generator_id": code_generator_id.id,
+                    "controller_feature": rec.mode_view_snippet_template_generate_website_snippet_ctrl_featur,
+                    "enable_javascript": rec.mode_view_snippet_template_generate_website_enable_javascript,
+                    "snippet_type": rec.mode_view_snippet_template_generate_website_snippet_type,
+                    "model_name": rec.mode_view_snippet_template_generate_website_snippet_generic_mdl,
+                }
+                self.env["code.generator.snippet"].create(value_snippet)
+
+            # Generate module
+            value = {"code_generator_ids": code_generator_id.ids}
+            cg_writer = self.env["code.generator.writer"].create(value)
+            rec.last_code_generator_writer = cg_writer.id
+            # print(cg_writer_id)
 
     @api.multi
     def workspace_code_remove_module(self, module_id):
@@ -466,6 +674,75 @@ class DevopsPlanCg(models.Model):
                     folder=folder,
                     force_open_terminal=True,
                     force_exit=True,
+                )
+
+    @api.multi
+    def action_git_commit_remote(self):
+        for rec in self:
+            with rec.workspace_id.devops_create_exec_bundle(
+                "CG git commit remote"
+            ) as rec_ws:
+                module_name = rec.devops_cg_module_ids[0].exists().name
+                dir1 = os.path.join(
+                    rec.path_code_generator_to_generate,
+                    module_name,
+                )
+                dir2 = os.path.join(
+                    rec.path_code_generator_to_generate_cg,
+                    module_name,
+                )
+                cmd = (
+                    "./script/git/remote_code_generation_git_compare.py"
+                    " --quiet --git_cola --clear --replace_directory"
+                    f" --directory1 {dir1} --directory2 {dir2}"
+                )
+                rec_ws.execute(
+                    cmd=cmd,
+                    force_open_terminal=True,
+                    force_exit=True,
+                    to_instance=True,
+                )
+
+    @api.multi
+    def action_git_meld_remote(self):
+        for rec in self:
+            with rec.workspace_id.devops_create_exec_bundle(
+                "CG git meld remote"
+            ) as rec_ws:
+                module_name = rec.devops_cg_module_ids[0].exists().name
+                dir1 = os.path.join(
+                    rec.path_code_generator_to_generate,
+                    module_name,
+                )
+                dir2 = os.path.join(
+                    rec.path_code_generator_to_generate_cg,
+                    module_name,
+                )
+                cmd = f"meld {dir2} {dir1}"
+                rec_ws.execute(
+                    cmd=cmd,
+                    force_open_terminal=True,
+                    force_exit=True,
+                    to_instance=True,
+                )
+
+    @api.multi
+    def action_git_clean_remote(self):
+        for rec in self:
+            with rec.workspace_id.devops_create_exec_bundle(
+                "CG git clean remote"
+            ) as rec_ws:
+                module_name = rec.devops_cg_module_ids[0].exists().name
+                dir2 = os.path.join(
+                    rec.path_code_generator_to_generate_cg,
+                    module_name,
+                )
+                cmd = f"rm -r {dir2}"
+                rec_ws.execute(
+                    cmd=cmd,
+                    force_open_terminal=True,
+                    force_exit=True,
+                    to_instance=True,
                 )
 
     @api.multi
@@ -531,7 +808,7 @@ class DevopsPlanCg(models.Model):
             ) as rec_ws:
                 folder = os.path.join(
                     rec.path_working_erplibre,
-                    rec.path_code_generator_to_generate,
+                    rec.path_code_generator_to_generate_cg,
                 )
                 diff = ""
                 status = ""
@@ -652,7 +929,7 @@ class DevopsPlanCg(models.Model):
             ) as rec_ws:
                 folder = os.path.join(
                     rec.path_working_erplibre,
-                    rec.path_code_generator_to_generate,
+                    rec.path_code_generator_to_generate_cg,
                 )
                 rec.workspace_remove_module(
                     "erplibre_devops", folder, remove_module=False

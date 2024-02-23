@@ -24,14 +24,213 @@
                 <field name="is_new_or_exist_ssh" invisible="True" />
                 <field name="can_search_workspace" invisible="True" />
                 <field name="is_force_local_system" invisible="True" />
+                <field name="force_show_final" invisible="True" />
+                <field name="has_configured_path" invisible="True" />
                 <!--                <h1>-->
                 <!--                    <field name="name"-->
                 <!--                           attrs="{'readonly': [('state', '!=', 'start')]}"-->
                 <!--                           class="oe_inline"-->
                 <!--                           placeholder="Name"/>-->
                 <!--                </h1>-->
+                <group name="init_context" attrs="{'invisible': [('state', '!=', 'init')]}">
+                    <group>
+                        <div>Choose an action into the system development life cycle.</div>
+                    </group>
+                    <group>
+                        <field name="mode_context" />
+                    </group>
+                </group>
+                <group
+                    name="init_context"
+                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', True)]}"
+                    style="background-color: #08a9cb; color: white;"
+                >
+                    <group>
+                        <div>
+                            <h2>2 Code</h2>
+                            <p>
+                                1. Choose an existing module or create a new one.
+                                <br />
+                                2. Press button «Auto-complete» after complete A to detect conflict.
+                                <br />
+                                3. Adjust B to change path, with C for parameters.
+                            </p>
+                        </div>
+                    </group>
+                    <group>
+                        <field name="mode_context" />
+                        <button
+                            name="action_code_module_autocomplete_module_path"
+                            string="Auto-complete"
+                            type="object"
+                            class="btn btn-primary"
+                        />
+                    </group>
+                </group>
+                <group
+                    name="init_context"
+                    attrs="{'invisible': ['|','|',('state', '!=', 'code_module'),('has_configured_path', '==', False),('force_show_final', '==', True)]}"
+                    style="background-color: #08a9cb; color: white;"
+                >
+                    <group>
+                        <div>
+                            <h2>2 Code</h2>
+                            <p style="color: #ccc;">
+                                1. Choose an existing module or create a new one.
+                                <br />
+                                2. Press button «Auto-complete» after complete A to detect conflict.
+                                <br />
+                                3. Adjust B to change path, with C for parameters.
+                            </p>
+                            <p>4. Create models and options.</p>
+                        </div>
+                    </group>
+                    <group>
+                        <field name="mode_context" />
+                        <button
+                            name="action_code_module_autocomplete_module_path"
+                            string="Auto-complete"
+                            type="object"
+                            class="btn btn-default"
+                        />
+                        <button
+                            name="action_code_module_generate"
+                            string="Generate"
+                            type="object"
+                            class="btn btn-primary"
+                        />
+                    </group>
+                </group>
+                <group
+                    name="init_context"
+                    attrs="{'invisible': ['|','|',('state', '!=', 'code_module'),('has_configured_path', '==', False),('force_show_final', '==', False)]}"
+                    style="background-color: #08a9cb; color: white;"
+                >
+                    <group>
+                        <div>
+                            <h2>2 Code</h2>
+                            <p style="color: #ccc;">
+                                1. Choose an existing module or create a new one.
+                                <br />
+                                2. Press button «Auto-complete» after complete A to detect conflict.
+                                <br />
+                                3. Adjust B to change path, with C for parameters.
+                                <br />
+                                4. Create models and options.
+                            </p>
+                            <p>5. Result</p>
+                        </div>
+                    </group>
+                    <group>
+                        <field name="mode_context" />
+                        <button
+                            name="action_code_module_autocomplete_module_path"
+                            string="Auto-complete"
+                            type="object"
+                            class="btn btn-default"
+                        />
+                        <button
+                            name="action_code_module_generate"
+                            string="Generate"
+                            type="object"
+                            class="btn btn-default"
+                        />
+                        <button
+                            name="action_git_commit"
+                            string="Git commit"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', True)]}"
+                        />
+                        <button
+                            name="action_git_commit_remote"
+                            string="Git commit remote"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
+                        />
+                        <button
+                            name="action_git_meld_remote"
+                            string="Git meld remote"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
+                        />
+                        <button
+                            name="action_git_clean_remote"
+                            string="Git clean remote"
+                            type="object"
+                            class="btn btn-primary"
+                            attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
+                        />
+                    </group>
+                </group>
+                <group
+                    name="init_context"
+                    attrs="{'invisible': [('state', '!=', 'code_shortcut')]}"
+                    style="background-color: #08a9cb; color: white;"
+                >
+                    <group>
+                        <div>
+                            <h2>2 Code</h2>
+                            <p>Fast auto-complete module Odoo code generator.</p>
+                        </div>
+                    </group>
+                    <group>
+                        <field name="mode_context" />
+                    </group>
+                </group>
+                <group
+                    name="init_context"
+                    attrs="{'invisible': [('state', '!=', 'h_run_test')]}"
+                    style="background-color: #04c576; color: white;"
+                >
+                    <group>
+                        <div>
+                            <h2>4 Quality</h2>
+                            Run test
+                        </div>
+                    </group>
+                    <group>
+                        <field name="mode_context" />
+                    </group>
+                </group>
+                <group
+                    name="init_context"
+                    attrs="{'invisible': [('state', '!=', 'i_new_remote_system')]}"
+                    style="background-color: #f7b905; color: white;"
+                >
+                    <group>
+                        <div>
+                            <h2>6 Deploy</h2>
+                            Deploy a system
+                        </div>
+                    </group>
+                    <group>
+                        <field name="mode_context" />
+                    </group>
+                </group>
+                <group
+                    name="init_soft_dev"
+                    string="Software development"
+                    attrs="{'invisible': [('state', '!=', 'init')]}"
+                >
+                    <div>Iterate between 4 steps and interact with Operates.</div>
+                </group>
                 <group name="init" attrs="{'invisible': [('state', '!=', 'init')]}">
-                    <group string="Project">
+                    <group style="background-color: #057bc2; color: white;">
+                        <div>
+                            <h2>1 Plan</h2>
+                        </div>
+                        <!--                        <button name="requirement" string="Requirement" groups="base.group_no_one" />-->
+                        <div>Requirement</div>
+                        <div>Analyse/Observe/Audit</div>
+                        <div>Conception</div>
+                    </group>
+                    <group style="background-color: #08a9cb; color: white;">
+                        <div>
+                            <h2>2 Code</h2>
+                        </div>
                         <!--                        <button-->
                         <!--                            name="state_goto_g_test_erplibre"-->
                         <!--                            string="Operate"-->
@@ -39,30 +238,19 @@
                         <!--                            class="btn btn-default"-->
                         <!--                        />-->
                         <button
-                            name="state_goto_g_new_module"
-                            string="Create module"
+                            name="state_goto_code_shortcut"
+                            string="Auto-complete module"
                             type="object"
                             class="btn btn-default"
                         />
-                        <button
-                            name="state_goto_c_existing_module"
-                            string="Refactor module"
-                            type="object"
-                            class="btn btn-default"
-                        />
+                        <button name="state_goto_code_module" string="Module" type="object" class="btn btn-default" />
                         <!--                        <button-->
-                        <!--                            name="state_goto_f_new_project_society"-->
-                        <!--                            string="New society"-->
+                        <!--                            name="state_goto_a_autopoiesis_devops"-->
+                        <!--                            string="Autopoiesis"-->
                         <!--                            type="object"-->
                         <!--                            class="btn btn-default"-->
+                        <!--                            attrs="{'invisible': [('root_workspace_id_is_me', '=', False)]}"-->
                         <!--                        />-->
-                        <button
-                            name="state_goto_a_autopoiesis_devops"
-                            string="Autopoiesis"
-                            type="object"
-                            class="btn btn-default"
-                            attrs="{'invisible': [('root_workspace_id_is_me', '=', False)]}"
-                        />
                         <!--                        <button-->
                         <!--                            name="state_goto_not_supported"-->
                         <!--                            string="Import data"-->
@@ -75,8 +263,45 @@
                         <!--                            type="object"-->
                         <!--                            class="btn btn-default"-->
                         <!--                        />-->
+                        <div>Project</div>
                     </group>
-                    <group string="Deploy">
+                    <group style="background-color: #02b5af; color: white;">
+                        <div>
+                            <h2>3 Build</h2>
+                        </div>
+                        <div>Container/Package</div>
+                    </group>
+                    <group style="background-color: #04c576; color: white;">
+                        <div>
+                            <h2>4 Quality</h2>
+                        </div>
+                        <button name="state_goto_h_run_test" string="Test" type="object" class="btn btn-default" />
+                        <!--                        <button-->
+                        <!--                            name="state_goto_not_supported"-->
+                        <!--                            string="Analyse/inspection"-->
+                        <!--                            type="object"-->
+                        <!--                            class="btn btn-default"-->
+                        <!--                        />-->
+                        <div>Inspection</div>
+                    </group>
+                </group>
+                <group name="init_it_ops" string="It operations" attrs="{'invisible': [('state', '!=', 'init')]}">
+                    <div>
+                        Operating automation about usage of the software, create reports and feedback for development.
+                    </div>
+                </group>
+                <group name="init_2" attrs="{'invisible': [('state', '!=', 'init')]}">
+                    <group style="background-color: #9bc604; color: white;">
+                        <div>
+                            <h2>5 Release</h2>
+                        </div>
+                        <div>Documentation</div>
+                        <div>Versioning</div>
+                    </group>
+                    <group style="background-color: #f7b905; color: white;">
+                        <div>
+                            <h2>6 Deploy</h2>
+                        </div>
                         <!--                        <button-->
                         <!--                            name="state_goto_i_new_remote_system"-->
                         <!--                            string="Local system"-->
@@ -95,89 +320,273 @@
                             type="object"
                             class="btn btn-default"
                         />
+                        <div>Migration</div>
+                        <div>Backup/Restoration</div>
+                        <div>Install/Update/Remove</div>
                     </group>
-                    <group string="Quality">
-                        <button name="state_goto_h_run_test" string="Test" type="object" class="btn btn-default" />
-                        <!--                        <button-->
-                        <!--                            name="state_goto_not_supported"-->
-                        <!--                            string="Analyse/inspection"-->
-                        <!--                            type="object"-->
-                        <!--                            class="btn btn-default"-->
-                        <!--                        />-->
+                    <group style="background-color: #dc0527; color: white;">
+                        <div>
+                            <h2>7 Operate</h2>
+                        </div>
+                        <div>Manage problems</div>
+                        <div>Live observation</div>
+                        <div>Configuration</div>
+                    </group>
+                    <group style="background-color: #c01e75; color: white;">
+                        <div>
+                            <h2>8 Monitor</h2>
+                        </div>
+                        <div>Collect data monitoring</div>
+                        <div>Alerts</div>
+                        <div>Performance analysing</div>
+                        <div>Correlate incident</div>
+                        <div>Continuous amelioration</div>
                     </group>
                 </group>
-                <group
-                    name="group_a_autopoiesis_devops"
-                    attrs="{'invisible': [('state', '!=', 'a_autopoiesis_devops')]}"
-                >
-                    <group string="Adding feature">
-                        <button name="state_goto_a_a_model" string="Add model" type="object" class="btn btn-default" />
+                <!--                <group-->
+                <!--                    name="group_a_autopoiesis_devops"-->
+                <!--                    attrs="{'invisible': [('state', '!=', 'a_autopoiesis_devops')]}"-->
+                <!--                >-->
+                <!--                    <group string="Adding feature">-->
+                <!--                        <button name="state_goto_a_a_model" string="Add model" type="object" class="btn btn-default" />-->
+                <!--                        <button-->
+                <!--                            name="state_goto_a_b_field"-->
+                <!--                            string="Add field"-->
+                <!--                            type="object"-->
+                <!--                            class="btn btn-default"-->
+                <!--                            invisible="True"-->
+                <!--                        />-->
+                <!--                        <button-->
+                <!--                            name="state_goto_a_c_action"-->
+                <!--                            string="Add action"-->
+                <!--                            type="object"-->
+                <!--                            class="btn btn-default"-->
+                <!--                            invisible="True"-->
+                <!--                        />-->
+                <!--                        <button-->
+                <!--                            name="state_goto_a_d_view"-->
+                <!--                            string="Add view"-->
+                <!--                            type="object"-->
+                <!--                            class="btn btn-default"-->
+                <!--                            invisible="True"-->
+                <!--                        />-->
+                <!--                    </group>-->
+                <!--                    <group string="Regenerate feature">-->
+                <!--                        &lt;!&ndash;                        <button name="state_goto_a_e_cg_regen" string="Code Generator regenerate" type="object" class="btn btn-default" />&ndash;&gt;-->
+                <!--                        <button-->
+                <!--                            name="state_goto_a_f_devops_regen"-->
+                <!--                            string="DevOps regenerate"-->
+                <!--                            type="object"-->
+                <!--                            class="btn btn-default"-->
+                <!--                        />-->
+                <!--                        &lt;!&ndash;                        <button name="state_goto_a_g_regen" string="Regenerate the choosing module" type="object" class="btn btn-default" />&ndash;&gt;-->
+                <!--                    </group>-->
+                <!--                </group>-->
+                <group name="group_code_shortcut" attrs="{'invisible': [('state', '!=', 'code_shortcut')]}">
+                    <group string="Autopoieses">
                         <button
-                            name="state_goto_a_b_field"
-                            string="Add field"
+                            name="state_goto_code_module_shortcut_autopoieses_devops"
+                            string="DevOps"
                             type="object"
                             class="btn btn-default"
-                            invisible="True"
                         />
                         <button
-                            name="state_goto_a_c_action"
-                            string="Add action"
-                            type="object"
-                            class="btn btn-default"
-                            invisible="True"
-                        />
-                        <button
-                            name="state_goto_a_d_view"
-                            string="Add view"
-                            type="object"
-                            class="btn btn-default"
-                            invisible="True"
-                        />
-                    </group>
-                    <group string="Regenerate feature">
-                        <!--                        <button name="state_goto_a_e_cg_regen" string="Code Generator regenerate" type="object" class="btn btn-default" />-->
-                        <button
-                            name="state_goto_a_f_devops_regen"
-                            string="DevOps regenerate"
+                            name="state_goto_code_module_shortcut_autopoieses_code_generator"
+                            string="Code Generator UcB"
                             type="object"
                             class="btn btn-default"
                         />
-                        <!--                        <button name="state_goto_a_g_regen" string="Regenerate the choosing module" type="object" class="btn btn-default" />-->
+                        <button
+                            name="state_goto_code_module_shortcut_autopoieses_code_generator_code_generator"
+                            string="Code Generator UcA"
+                            type="object"
+                            class="btn btn-default"
+                        />
                     </group>
                 </group>
                 <group
                     name="group_a_a_model"
                     attrs="{'invisible': [('state', '!=', 'a_a_model'),('state', '!=', 'c_a_model')]}"
                 >
-                    <group string="Module" attrs="{'invisible': [('state', '!=', 'c_a_model')]}">
+                    <group string="Module">
                         <field name="working_module_id" />
                         <field name="working_module_name" string="OR Working Module Name" />
                     </group>
-                    <group>
-                        <field name="model_ids" />
-                        <field name="model_to_remove_ids" />
+                    <group string="Feature">
+                        <field name="use_external_cg" string="CG with metadata" />
+                        <field name="use_existing_meta_module" string="Meta module" />
+                        <field name="use_existing_meta_module_uca_only" string="UcA only" />
+                        <field name="uca_option_with_inherit" string="UcA option with inherit" />
+                        <field name="use_existing_meta_module_ucb_only" string="UcB only" />
                     </group>
                 </group>
-                <group name="group_a_f_devops_regen" attrs="{'invisible': [('state', '!=', 'a_f_devops_regen')]}">
-                    <group string="Param">
-                        <field name="force_generate" />
-                    </group>
+                <group
+                    name="group_a_a_model"
+                    string="Model"
+                    attrs="{'invisible': [('state', '!=', 'a_a_model'),('state', '!=', 'c_a_model')]}"
+                >
+                    <field name="model_ids" />
+                    <field name="model_to_remove_ids" />
                 </group>
+                <!--                <group name="group_a_f_devops_regen" attrs="{'invisible': [('state', '!=', 'a_f_devops_regen')]}">-->
+                <!--                    -->
+                <!--                </group>-->
                 <group name="group_g_test_erplibre" attrs="{'invisible': [('state', '!=', 'g_test_erplibre')]}">
                     <group string="Where">
                         <button name="state_goto_g_a_local" string="Local" type="object" class="btn btn-default" />
                     </group>
                 </group>
-                <group name="group_g_new_module" attrs="{'invisible': [('state', '!=', 'g_new_module')]}">
-                    <group string="Information">
-                        <field name="working_module_name" />
-                        <field name="working_module_name_suggestion" />
+                <group name="group_code_module" attrs="{'invisible': [('state', '!=', 'code_module')]}">
+                    <group string="A-Module name">
+                        <field name="working_module_id" string="Existing module" />
                         <field
-                            name="working_module_path"
-                            attrs="{'invisible': [('working_module_name_suggestion', '!=', False)]}"
+                            name="working_module_name"
+                            string="OR module name"
+                            attrs="{'invisible': [('working_module_id', '!=', False)]}"
+                        />
+                        <field name="is_new_module" />
+                        <button
+                            name="action_code_module_autocomplete_module_path"
+                            string="Auto-complete 'B-Module path'"
+                            type="object"
+                            class="btn btn-default"
                         />
                     </group>
-                    <group string="Feature" />
+                    <group string="B-Module path">
+                        <field name="working_module_path_suggestion" string="Suggested path" />
+                        <field
+                            name="working_module_path"
+                            string="OR Manual path"
+                            attrs="{'invisible': [('working_module_path_suggestion', '!=', '#')]}"
+                        />
+                        <field
+                            name="working_module_cg_path_suggestion"
+                            string="Suggested CG path"
+                            attrs="{'invisible': [('use_external_cg', '!=', True)]}"
+                        />
+                        <field
+                            name="working_module_cg_path"
+                            string="OR Manual CG path"
+                            attrs="{'invisible': ['|',('working_module_cg_path_suggestion', '!=', '#'),('use_external_cg', '!=', True)]}"
+                        />
+                        <field
+                            name="working_module_template_path_suggestion"
+                            string="Suggested Template path"
+                            attrs="{'invisible': [('use_external_cg', '!=', True)]}"
+                        />
+                        <field
+                            name="working_module_template_path"
+                            string="OR Manual Template path"
+                            attrs="{'invisible': ['|',('working_module_template_path_suggestion', '!=', '#'),('use_external_cg', '!=', True)]}"
+                        />
+                    </group>
+                    <group string="C-Parameter" attrs="{'invisible': [('state', '!=', 'code_module')]}">
+                        <field name="use_external_cg" string="CG with metadata" />
+                        <field
+                            name="use_existing_meta_module"
+                            string="Meta module"
+                            attrs="{'invisible': [('use_external_cg', '==', False)]}"
+                        />
+                        <field
+                            name="use_existing_meta_module_uca_only"
+                            string="UcA only"
+                            attrs="{'invisible': ['|',('use_external_cg', '==', False),('use_existing_meta_module', '==', False)]}"
+                        />
+                        <field
+                            name="uca_option_with_inherit"
+                            string="UcA option with inherit"
+                            attrs="{'invisible': [('use_external_cg', '==', False)]}"
+                        />
+                        <field
+                            name="use_existing_meta_module_ucb_only"
+                            string="UcB only"
+                            attrs="{'invisible': ['|',('use_external_cg', '==', False),('use_existing_meta_module', '==', False)]}"
+                        />
+                        <field name="is_autopoieses" />
+                        <field name="is_remote_cg" />
+                        <field name="force_generate" />
+                        <field name="mode_view_generator" />
+                    </group>
+                </group>
+                <group
+                    string="D-Model"
+                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
+                >
+                    <field name="model_ids" />
+                    <field name="model_to_remove_ids" />
+                </group>
+                <group
+                    name="group_code_module_2"
+                    string="E-Options"
+                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
+                >
+                    <group string="Snippet">
+                        <field name="mode_view_snippet" string="Mode" />
+                        <field
+                            name="mode_view_snippet_template_generate_website_snippet_generic_mdl"
+                            attrs="{'invisible': [('mode_view_snippet', '==', 'no_snippet')]}"
+                            string="Models"
+                        />
+                        <field
+                            name="mode_view_snippet_enable_template_website_snippet_view"
+                            attrs="{'invisible': [('mode_view_snippet', '==', 'no_snippet')]}"
+                            string="Generate by template"
+                        />
+                        <field
+                            name="mode_view_snippet_template_generate_website_snippet_ctrl_featur"
+                            attrs="{'invisible': [('mode_view_snippet', '==', 'no_snippet')]}"
+                            string="Template feature"
+                        />
+                        <field
+                            name="mode_view_snippet_template_generate_website_enable_javascript"
+                            attrs="{'invisible': [('mode_view_snippet', '==', 'no_snippet')]}"
+                            string="With Javascript"
+                        />
+                        <field
+                            name="mode_view_snippet_template_generate_website_snippet_type"
+                            attrs="{'invisible': [('mode_view_snippet', '==', 'no_snippet')]}"
+                            string="Snippet type"
+                        />
+                    </group>
+                    <group string="Portal" attrs="{'invisible': [('use_external_cg', '==', True)]}">
+                        <field name="mode_view_portal" string="Mode" />
+                        <field
+                            name="mode_view_portal_models"
+                            attrs="{'invisible': [('mode_view_portal', '==', 'no_portal')]}"
+                            string="Models"
+                        />
+                        <field
+                            name="mode_view_portal_enable_create"
+                            attrs="{'invisible': [('mode_view_portal', '==', 'no_portal')]}"
+                            string="Support create"
+                        />
+                        <field
+                            name="mode_view_portal_enable_read"
+                            attrs="{'invisible': [('mode_view_portal', '==', 'no_portal')]}"
+                            string="Support read"
+                        />
+                        <field
+                            name="mode_view_portal_enable_update"
+                            attrs="{'invisible': [('mode_view_portal', '==', 'no_portal')]}"
+                            string="Support update"
+                        />
+                        <field
+                            name="mode_view_portal_enable_delete"
+                            attrs="{'invisible': [('mode_view_portal', '==', 'no_portal')]}"
+                            string="Support delete"
+                        />
+                    </group>
+                </group>
+                <group
+                    string="F-Generate"
+                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
+                >
+                    <button
+                        name="action_code_module_generate"
+                        string="Generate"
+                        type="object"
+                        class="btn btn-default"
+                    />
                 </group>
                 <group name="group_g_a_local" attrs="{'invisible': [('state', '!=', 'g_a_local')]}">
                     <group string="DB">
@@ -203,11 +612,11 @@
                         <button name="state_goto_a_d_view" string="Add view" type="object" class="btn btn-default" />
                     </group>
                 </group>
-                <group name="group_c_existing_module" attrs="{'invisible': [('state', '!=', 'c_existing_module')]}">
-                    <group string="Option">
-                        <button name="state_goto_c_a_model" string="Add model" type="object" class="btn btn-default" />
-                    </group>
-                </group>
+                <!--                <group name="group_c_existing_module" attrs="{'invisible': [('state', '!=', 'c_existing_module')]}">-->
+                <!--                    <group string="Option">-->
+                <!--                        <button name="state_goto_c_a_model" string="Add model" type="object" class="btn btn-default" />-->
+                <!--                    </group>-->
+                <!--                </group>-->
                 <group
                     string="Introduction"
                     name="group_i_new_remote_system"
@@ -408,33 +817,58 @@
                 <group name="not_supported" attrs="{'invisible': [('state', '!=', 'not_supported')]}">
                     <p>This state is not supported, please go back.</p>
                 </group>
-                <div name="final" attrs="{'invisible': [('state', '!=', 'final')]}">
-                    <p>The planification is now configured, close this dialog below.</p>
-                    <group>
-                        <field name="plan_cg_id" attrs="{'invisible': [('plan_cg_id', '=', False)]}" />
-                        <field
-                            name="generated_new_project_id"
-                            attrs="{'invisible': [('generated_new_project_id', '=', False)]}"
-                        />
-                        <field
-                            name="create_workspace_id"
-                            attrs="{'invisible': [('create_workspace_id', '=', False)]}"
-                        />
-                        <button
-                            name="action_git_commit"
-                            string="Git commit"
-                            type="object"
-                            class="oe_highlight"
-                            attrs="{'invisible': [('plan_cg_id', '=', False)]}"
-                        />
-                    </group>
-                </div>
+                <group
+                    string="Result"
+                    name="final"
+                    attrs="{'invisible': [('state', '!=', 'final'), ('force_show_final', '!=', True)]}"
+                >
+                    <div>
+                        <p>Your action is done, close this dialog below.</p>
+                    </div>
+                    <field name="plan_cg_id" attrs="{'invisible': [('plan_cg_id', '=', False)]}" />
+                    <field
+                        name="generated_new_project_id"
+                        attrs="{'invisible': [('generated_new_project_id', '=', False)]}"
+                    />
+                    <field name="create_workspace_id" attrs="{'invisible': [('create_workspace_id', '=', False)]}" />
+                    <field name="working_system_id" attrs="{'invisible': [('working_system_id', '=', False)]}" />
+                    <field name="working_cg_module_id" attrs="{'invisible': [('working_cg_module_id', '=', False)]}" />
+                    <field name="working_cg_writer_id" attrs="{'invisible': [('working_cg_writer_id', '=', False)]}" />
+                    <button
+                        name="action_git_commit"
+                        string="Git commit"
+                        type="object"
+                        class="oe_highlight"
+                        attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', True)]}"
+                    />
+                    <button
+                        name="action_git_commit_remote"
+                        string="Git commit remote"
+                        type="object"
+                        class="oe_highlight"
+                        attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
+                    />
+                    <button
+                        name="action_git_meld_remote"
+                        string="Git meld remote"
+                        type="object"
+                        class="oe_highlight"
+                        attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
+                    />
+                    <button
+                        name="action_git_clean_remote"
+                        string="Git clean remote"
+                        type="object"
+                        class="oe_highlight"
+                        attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
+                    />
+                </group>
             </xpath>
         </field>
     </record>
 
     <record id="devops_plan_action_action" model="ir.actions.act_window">
-        <field name="name">Plan action</field>
+        <field name="name">DEVOPS action</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">devops.plan.action.wizard</field>
         <field name="src_model">devops.workspace</field>

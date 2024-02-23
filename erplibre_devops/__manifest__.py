@@ -13,6 +13,15 @@
     "depends": [
         "mail",
         "multi_step_wizard",
+        "code_generator",
+        "code_generator_portal",
+        "code_generator_cron",
+        "code_generator_hook",
+        "code_generator_db_servers",
+        "code_generator_geoengine",
+        "code_generator_theme_website",
+        "code_generator_website_leaflet",
+        "code_generator_website_snippet",
     ],
     "data": [
         "security/ir.model.access.csv",

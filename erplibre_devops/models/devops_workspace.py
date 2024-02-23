@@ -352,8 +352,18 @@ class DevopsWorkspace(models.Model):
     @api.depends("plan_cg_ids.path_code_generator_to_generate")
     def _compute_path_code_generator_to_generate(self):
         for rec in self:
+            # Append unpack list with cg and template
             lst_path = ["addons/addons"] + [
-                a.path_code_generator_to_generate for a in rec.plan_cg_ids
+                b
+                for c in [
+                    [
+                        a.path_code_generator_to_generate,
+                        a.path_code_generator_to_generate_cg,
+                        a.path_code_generator_to_generate_template,
+                    ]
+                    for a in rec.plan_cg_ids
+                ]
+                for b in c
             ]
             rec.path_code_generator_to_generate = ";".join(set(lst_path))
 
@@ -959,10 +969,7 @@ class DevopsWorkspace(models.Model):
                         dir_name = os.path.dirname(rec.folder)
                         # No such directory
                         exec_id = rec.execute(
-                            cmd=(
-                                "git clone"
-                                f" {rec.git_url}{git_arg}"
-                            ),
+                            cmd=f"git clone {rec.git_url}{git_arg}",
                             folder=dir_name,
                             error_on_status=False,
                         )
@@ -1480,6 +1487,9 @@ sock.close()
             if devops_exec_id:
                 error_value["devops_exec_id"] = devops_exec_id.id
             if parent_root_id.devops_new_project_ids.exists():
+                error_value[
+                    "new_project_id"
+                ] = parent_root_id.devops_new_project_ids[0].id
                 error_value[
                     "stage_new_project_id"
                 ] = parent_root_id.devops_new_project_ids[0].stage_id.id

@@ -107,9 +107,15 @@
                             <field name="template_name" />
                             <field name="module" />
                             <field name="directory" />
+                            <field name="directory_cg" />
+                            <field name="directory_template" />
                             <field name="config" />
                             <field name="model_to_remove" />
                             <field name="odoo_config" />
+                            <field name="use_existing_meta_module" />
+                            <field name="use_existing_meta_module_uca_only" />
+                            <field name="uca_option_with_inherit" />
+                            <field name="use_existing_meta_module_ucb_only" />
                             <field name="new_project_with_code_generator" />
                             <field name="keep_bd_alive" />
                             <field name="bd_name_demo" />
