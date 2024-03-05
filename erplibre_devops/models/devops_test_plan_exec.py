@@ -207,6 +207,98 @@ class DevopsTestPlanExec(models.Model):
                 rec.global_success = False
 
     @api.multi
+    def check_requirement_test_exec_cg(
+        self, rec_ws, test_case_exec_generic_async_id
+    ):
+        exec_id = rec_ws.execute(
+            cmd=f"./.venv/bin/python3 ./odoo/odoo-bin db --list",
+            to_instance=True,
+        )
+        if not exec_id or exec_id.exec_status > 0:
+            self.env["devops.test.result"].create(
+                {
+                    "name": "Cannot execute db list command to ERPLibre.",
+                    "is_finish": True,
+                    "is_pass": False,
+                    "test_case_exec_id": test_case_exec_generic_async_id.id,
+                }
+            )
+            return False
+        lst_bd = exec_id.log_all.split()
+        if "_cache_erplibre_base" not in lst_bd:
+            exec_id = rec_ws.execute(
+                cmd=f"./script/database/db_restore.py --database test",
+                to_instance=True,
+            )
+            if not exec_id or exec_id.exec_status > 0:
+                self.env["devops.test.result"].create(
+                    {
+                        "name": (
+                            "Cannot execute db restore test command to"
+                            " ERPLibre."
+                        ),
+                        "is_finish": True,
+                        "is_pass": False,
+                        "test_case_exec_id": test_case_exec_generic_async_id.id,
+                    }
+                )
+                return False
+            # Validate
+            exec_id = rec_ws.execute(
+                cmd=f"./.venv/bin/python3 ./odoo/odoo-bin db --list",
+                to_instance=True,
+            )
+            if not exec_id or exec_id.exec_status > 0:
+                self.env["devops.test.result"].create(
+                    {
+                        "name": (
+                            "Cannot execute db list second try command to"
+                            " ERPLibre."
+                        ),
+                        "is_finish": True,
+                        "is_pass": False,
+                        "test_case_exec_id": test_case_exec_generic_async_id.id,
+                    }
+                )
+                return False
+            lst_bd = exec_id.log_all.split()
+            if "_cache_erplibre_base" not in lst_bd:
+                self.env["devops.test.result"].create(
+                    {
+                        "name": (
+                            "Restore a database test with default parameters"
+                            " cannot create DB '_cache_erplibre_base'."
+                        ),
+                        "is_finish": True,
+                        "is_pass": False,
+                        "test_case_exec_id": test_case_exec_generic_async_id.id,
+                    }
+                )
+                return False
+            else:
+                self.env["devops.test.result"].create(
+                    {
+                        "name": (
+                            "DB _cache_erplibre_base restored with success and"
+                            " validated!"
+                        ),
+                        "is_finish": True,
+                        "is_pass": True,
+                        "test_case_exec_id": test_case_exec_generic_async_id.id,
+                    }
+                )
+        else:
+            self.env["devops.test.result"].create(
+                {
+                    "name": "DB _cache_erplibre_base already exist.",
+                    "is_finish": True,
+                    "is_pass": True,
+                    "test_case_exec_id": test_case_exec_generic_async_id.id,
+                }
+            )
+        return True
+
+    @api.multi
     def execute_test_action(self, ctx=None):
         lst_test_erplibre_async = []
         ws_id = None
@@ -376,6 +468,12 @@ class DevopsTestPlanExec(models.Model):
                         ).id,
                     }
                 )
+                # Requirement, the test need db cache before run or it crash
+                status = self.check_requirement_test_exec_cg(
+                    rec_ws, test_case_exec_generic_async_id
+                )
+                if not status:
+                    return
                 # TODO store this variable into test plan execution information
                 exec_id = rec_ws.execute(
                     cmd=f"mkdir -p '{path_mkdir_log_external}'"
