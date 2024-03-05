@@ -47,7 +47,7 @@
                 >
                     <group>
                         <div>
-                            <h2>2 Code</h2>
+                            <h2>2 Code - Module generator</h2>
                             <p>
                                 1. Choose an existing module or create a new one.
                                 <br />
@@ -74,7 +74,7 @@
                 >
                     <group>
                         <div>
-                            <h2>2 Code</h2>
+                            <h2>2 Code - Module generator</h2>
                             <p style="color: #ccc;">
                                 1. Choose an existing module or create a new one.
                                 <br />
@@ -108,7 +108,7 @@
                 >
                     <group>
                         <div>
-                            <h2>2 Code</h2>
+                            <h2>2 Code - Module generator</h2>
                             <p style="color: #ccc;">
                                 1. Choose an existing module or create a new one.
                                 <br />
@@ -172,7 +172,7 @@
                 >
                     <group>
                         <div>
-                            <h2>2 Code</h2>
+                            <h2>2 Code - Shortcut</h2>
                             <p>Fast auto-complete module Odoo code generator.</p>
                         </div>
                     </group>
