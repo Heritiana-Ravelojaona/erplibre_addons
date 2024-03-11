@@ -127,6 +127,14 @@
                                         <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
                                     </li>
                                 </ul>
+                                <button
+                                    name="action_search_all"
+                                    type="object"
+                                    class="oe_button bg-success"
+                                    icon="fa-refresh"
+                                >
+                                    <i class="fa fa-fw o_button_icon fa-refresh" />
+                                </button>
                             </div>
                         </div>
                     </t>
