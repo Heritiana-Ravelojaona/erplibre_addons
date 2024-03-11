@@ -81,6 +81,13 @@ class DevopsSystem(models.Model):
         help="The state of the connexion.",
     )
 
+    system_status = fields.Boolean(
+        readonly=True,
+        store=True,
+        compute="_compute_system_status",
+        help="Show up or down for system, depend local or ssh.",
+    )
+
     use_search_cmd = fields.Selection(
         # TODO support mdfind for OSX
         selection=[
@@ -210,11 +217,25 @@ class DevopsSystem(models.Model):
 
     @api.multi
     @api.depends(
+        "ssh_connection_status",
+        "method",
+    )
+    def _compute_system_status(self):
+        for rec in self:
+            rec.system_status = False
+            if rec.method == "local":
+                rec.system_status = True
+            elif rec.method == "ssh":
+                rec.system_status = rec.ssh_connection_status
+
+    @api.multi
+    @api.depends(
         "name_overwrite",
         "ssh_connection_status",
         "ssh_host",
         "ssh_port",
         "ssh_user",
+        "method",
     )
     def _compute_name(self):
         for rec in self:
@@ -665,6 +686,13 @@ class DevopsSystem(models.Model):
                             value
                         )
                         vm_id.vm_exec_last_id = vm_exec_id.id
+
+    @api.multi
+    def action_search_all(self):
+        self.action_search_workspace()
+        self.action_refresh_db_image()
+        self.get_local_system_id_from_ssh_config()
+        self.action_search_vm()
 
     @api.multi
     def action_search_workspace(self):
