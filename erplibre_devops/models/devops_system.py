@@ -579,6 +579,21 @@ class DevopsSystem(models.Model):
             # vanille-gnome-desktop
 
     @api.multi
+    def action_show_security_ssh_keygen(self):
+        for rec in self:
+            cmd = (
+                'for key in ~/.ssh/id_*; do ssh-keygen -l -f "${key}"; done |'
+                " uniq"
+            )
+            log = rec.execute_with_result(cmd, None).strip()
+            msg = (
+                "Security good : 1. No DSA, 2. RSA key size >= 3072, 3. Better"
+                " Ed25519\n"
+                + log
+            )
+            raise exceptions.Warning(msg)
+
+    @api.multi
     def action_search_vm(self):
         for rec in self:
             cmd = "vboxmanage list runningvms"
