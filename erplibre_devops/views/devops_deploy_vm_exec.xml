@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="devops_deploy_vm_exec_view_form" model="ir.ui.view">
+        <field name="name">devops_deploy_vm_exec_form</field>
+        <field name="model">devops.deploy.vm.exec</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                    </group>
+                    <group>
+                        <field name="stage_id" />
+                    </group>
+                    <group>
+                        <field name="vm_id" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="devops_deploy_vm_exec_view_graph" model="ir.ui.view">
+        <field name="name">devops_deploy_vm_exec_graph</field>
+        <field name="model">devops.deploy.vm.exec</field>
+        <field name="arch" type="xml">
+            <graph string="Devops deploy vm exec">
+                <field name="name" type="row" />
+                <field name="stage_id" type="row" />
+                <field name="vm_id" type="row" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="devops_deploy_vm_exec_view_kanban" model="ir.ui.view">
+        <field name="name">devops_deploy_vm_exec_kanban</field>
+        <field name="model">devops.deploy.vm.exec</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <field name="stage_id" />
+                <field name="vm_id" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="stage_id" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="vm_id" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="devops_deploy_vm_exec_view_pivot" model="ir.ui.view">
+        <field name="name">devops_deploy_vm_exec_pivot</field>
+        <field name="model">devops.deploy.vm.exec</field>
+        <field name="arch" type="xml">
+            <pivot string="Devops deploy vm exec">
+                <field name="name" type="row" />
+                <field name="stage_id" type="row" />
+                <field name="vm_id" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="devops_deploy_vm_exec_view_search" model="ir.ui.view">
+        <field name="name">devops_deploy_vm_exec_search</field>
+        <field name="model">devops.deploy.vm.exec</field>
+        <field name="arch" type="xml">
+            <search string="Devops deploy vm exec">
+                <filter domain="[('name','!=',False)]" name="name" string="Name" />
+                <filter domain="[('stage_id','!=',False)]" name="stage_id" string="Stage" />
+                <filter domain="[('vm_id','!=',False)]" name="vm_id" string="Vm" />
+            </search>
+        </field>
+    </record>
+
+    <record id="devops_deploy_vm_exec_view_tree" model="ir.ui.view">
+        <field name="name">devops_deploy_vm_exec_tree</field>
+        <field name="model">devops.deploy.vm.exec</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="stage_id" />
+                <field name="vm_id" />
+            </tree>
+        </field>
+    </record>
+
+    <act_window
+        id="devops_deploy_vm_exec_deploy_vm_exec_action_window"
+        name="Deploy vm exec"
+        res_model="devops.deploy.vm.exec"
+        view_mode="kanban,tree,pivot,graph,form"
+    />
+</odoo>

@@ -129,6 +129,8 @@
 
     <menuitem id="menu_deploy" name="Deploy" sequence="8" parent="menu_erplibre_devops" />
 
+    <menuitem id="menu_deploy_vm_group" name="VM" sequence="1" parent="menu_deploy" />
+
     <menuitem
         id="menu_devops_exec"
         name="Executions"
@@ -301,5 +303,37 @@
         action="action_devops_check_workspace_terminal_conf_form"
         sequence="1"
         parent="menu_workspace_sub"
+    />
+
+    <menuitem
+        id="menu_deploy_vm"
+        name="VM"
+        action="devops_deploy_vm_deploy_vm_action_window"
+        sequence="1"
+        parent="menu_deploy_vm_group"
+    />
+
+    <menuitem
+        id="menu_deploy_vm_exec"
+        name="VM execution"
+        action="devops_deploy_vm_exec_deploy_vm_exec_action_window"
+        sequence="2"
+        parent="menu_deploy_vm_group"
+    />
+
+    <menuitem
+        id="menu_deploy_vm_snapshot"
+        name="VM snapshot"
+        action="devops_deploy_vm_snapshot_deploy_vm_snapshot_action_window"
+        sequence="3"
+        parent="menu_deploy_vm_group"
+    />
+
+    <menuitem
+        id="menu_config_deploy_vm_exec_stage"
+        name="VM execution stage"
+        action="devops_deploy_vm_exec_stage_deploy_vm_exec_stage_action_window"
+        sequence="3"
+        parent="menu_config"
     />
 </odoo>
