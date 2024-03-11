@@ -18,6 +18,7 @@
                         type="object"
                         class="oe_highlight"
                     />
+                    <button name="action_search_vm" string="Search VM" type="object" class="oe_highlight" />
                     <button
                         name="get_local_system_id_from_ssh_config"
                         string="Search sub-system"
@@ -80,9 +81,8 @@
                 </div>
                 <group string="Information">
                     <field name="erplibre_config_path_home_ids" />
-                </group>
-                <group>
                     <field name="devops_workspace_ids" />
+                    <!--                    <field name="devops_deploy_vm_ids" />-->
                 </group>
             </form>
         </field>

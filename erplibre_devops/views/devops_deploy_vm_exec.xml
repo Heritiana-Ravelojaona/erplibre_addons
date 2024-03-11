@@ -7,6 +7,9 @@
             <form string="Titre">
                 <sheet>
                     <group>
+                        <field name="is_running" />
+                    </group>
+                    <group>
                         <field name="name" />
                     </group>
                     <group>
@@ -26,6 +29,7 @@
         <field name="arch" type="xml">
             <graph string="Devops deploy vm exec">
                 <field name="name" type="row" />
+                <field name="is_running" type="row" />
                 <field name="stage_id" type="row" />
                 <field name="vm_id" type="row" />
             </graph>
@@ -38,6 +42,7 @@
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <field name="name" />
+                <field name="is_running" />
                 <field name="stage_id" />
                 <field name="vm_id" />
                 <templates>
@@ -49,6 +54,12 @@
                                         <strong>
                                             <field name="name" />
                                         </strong>
+                                    </li>
+                                    <li class="text-success float-right mb4" t-if="record.is_running.raw_value">
+                                        <i aria-label="Ok" class="fa fa-circle" role="img" title="Ok" />
+                                    </li>
+                                    <li class="text-danger float-right mb4" t-if="!record.is_running.raw_value">
+                                        <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
                                     </li>
                                     <li class="mb4">
                                         <strong>
@@ -75,6 +86,7 @@
         <field name="arch" type="xml">
             <pivot string="Devops deploy vm exec">
                 <field name="name" type="row" />
+                <field name="is_running" type="row" />
                 <field name="stage_id" type="row" />
                 <field name="vm_id" type="row" />
             </pivot>
@@ -87,6 +99,7 @@
         <field name="arch" type="xml">
             <search string="Devops deploy vm exec">
                 <filter domain="[('name','!=',False)]" name="name" string="Name" />
+                <filter domain="[('is_running','=',True)]" name="is_running" string="Is Running" />
                 <filter domain="[('stage_id','!=',False)]" name="stage_id" string="Stage" />
                 <filter domain="[('vm_id','!=',False)]" name="vm_id" string="Vm" />
             </search>
@@ -98,6 +111,7 @@
         <field name="model">devops.deploy.vm.exec</field>
         <field name="arch" type="xml">
             <tree>
+                <field name="is_running" />
                 <field name="name" />
                 <field name="stage_id" />
                 <field name="vm_id" />

@@ -16,3 +16,5 @@ class DevopsDeployVmExec(models.Model):
         comodel_name="devops.deploy.vm",
         string="Vm",
     )
+
+    is_running = fields.Boolean()

@@ -36,6 +36,12 @@ class DevopsSystem(models.Model):
         string="DevOps Workspace",
     )
 
+    # devops_deploy_vm_ids = fields.One2many(
+    #     comodel_name="devops.deploy.vm",
+    #     inverse_name="system_id",
+    #     string="VMs",
+    # )
+
     parent_system_id = fields.Many2one(
         comodel_name="devops.system",
         string="Parent system",
@@ -571,6 +577,79 @@ class DevopsSystem(models.Model):
             # git testing colorized enable color yes y
             # Dev desktop
             # vanille-gnome-desktop
+
+    @api.multi
+    def action_search_vm(self):
+        for rec in self:
+            cmd = "vboxmanage list runningvms"
+            out, status = rec.execute_with_result(
+                cmd, None, return_status=True
+            )
+            lst_identifiant_running = []
+            out = out.strip()
+            if not status and out:
+                for vm_config_short in out.split("\n"):
+                    # Expect "name" {key}
+                    pattern = r'"([^"]*)" \{([^}]*)\}'
+                    matches = re.match(pattern, vm_config_short)
+                    if not matches:
+                        _logger.warning(
+                            'Cannot find regex to find "name" {key} to'
+                            " extract vboxmanage list runningvms :"
+                            f" '{vm_config_short}'."
+                        )
+                        continue
+                    name = matches.group(1)
+                    key = matches.group(2)
+                    lst_identifiant_running.append(key)
+
+            cmd = "vboxmanage list vms"
+            out, status = rec.execute_with_result(
+                cmd, None, return_status=True
+            )
+            out = out.strip()
+            if not status and out:
+                for vm_config_short in out.split("\n"):
+                    # Expect "name" {key}
+                    pattern = r'"([^"]*)" \{([^}]*)\}'
+                    matches = re.match(pattern, vm_config_short)
+                    if not matches:
+                        _logger.warning(
+                            'Cannot find regex to find "name" {key} to'
+                            " extract vboxmanage list vms :"
+                            f" '{vm_config_short}'."
+                        )
+                        continue
+                    name = matches.group(1)
+                    key = matches.group(2)
+                    provider = "VirtualBox"
+                    # Search if exist before create
+                    vm_id = self.env["devops.deploy.vm"].search(
+                        [
+                            ("identifiant", "=", key),
+                            ("system_id", "=", rec.id),
+                            ("provider", "=", provider),
+                        ],
+                        limit=1,
+                    )
+                    if not vm_id:
+                        value = {
+                            "name": name,
+                            "identifiant": key,
+                            "provider": provider,
+                            "system_id": rec.id,
+                        }
+                        vm_id = self.env["devops.deploy.vm"].create(value)
+                    if vm_id and key in lst_identifiant_running:
+                        # TODO need to be somewhere else to check status
+                        value = {
+                            "vm_id": vm_id.id,
+                            "is_running": True,
+                        }
+                        vm_exec_id = self.env["devops.deploy.vm.exec"].create(
+                            value
+                        )
+                        vm_id.vm_exec_last_id = vm_exec_id.id
 
     @api.multi
     def action_search_workspace(self):
