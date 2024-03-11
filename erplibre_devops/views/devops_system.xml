@@ -103,6 +103,58 @@
         </field>
     </record>
 
+    <record id="devops_system_view_kanban" model="ir.ui.view">
+        <field name="name">devops_system_kanban</field>
+        <field name="model">devops.system</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <field name="system_status" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                    <li class="text-success float-right mb4" t-if="record.system_status.raw_value">
+                                        <i aria-label="Ok" class="fa fa-circle" role="img" title="Ok" />
+                                    </li>
+                                    <li class="text-danger float-right mb4" t-if="!record.system_status.raw_value">
+                                        <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="devops_system_view_pivot" model="ir.ui.view">
+        <field name="name">devops_system_pivot</field>
+        <field name="model">devops.system</field>
+        <field name="arch" type="xml">
+            <pivot string="Devops system">
+                <field name="name" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="devops_system_view_graph" model="ir.ui.view">
+        <field name="name">devops_system_graph</field>
+        <field name="model">devops.system</field>
+        <field name="arch" type="xml">
+            <graph string="Devops system">
+                <field name="name" type="row" />
+            </graph>
+        </field>
+    </record>
+
     <act_window
         id="action_devops_check_system_conf_form"
         name="Automated devops_systems"
