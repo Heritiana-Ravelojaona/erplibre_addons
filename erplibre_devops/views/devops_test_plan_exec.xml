@@ -47,24 +47,22 @@
                         <field name="no_parallel" />
                         <field name="debug" />
                         <field name="ignore_init_check_git" />
+                        <field name="run_in_sandbox" />
                         <field name="max_process" />
                     </group>
                 </group>
                 <notebook>
                     <page string="Execution">
-                        <group>
-                            <field name="exec_ids" />
-                        </group>
+                        <field name="exec_ids" />
                     </page>
                     <page string="Result">
-                        <group>
-                            <field name="result_ids" />
-                        </group>
+                        <field name="result_ids" />
+                    </page>
+                    <page string="Summary" attrs="{'invisible': [('summary', '=', False)]}">
+                        <field name="summary" />
                     </page>
                     <page string="Log">
-                        <group>
-                            <field name="log" />
-                        </group>
+                        <field name="log_html" />
                     </page>
                 </notebook>
             </form>
@@ -87,6 +85,7 @@
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <field name="name" />
+                <field name="global_success" />
                 <templates>
                     <t t-name="kanban-box">
                         <div t-attf-class="oe_kanban_global_click">
@@ -96,6 +95,12 @@
                                         <strong>
                                             <field name="name" />
                                         </strong>
+                                    </li>
+                                    <li class="text-success float-right mb4" t-if="record.global_success.raw_value">
+                                        <i class="fa fa-circle" aria-label="Ok" role="img" title="Ok" />
+                                    </li>
+                                    <li class="text-danger float-right mb4" t-if="!record.global_success.raw_value">
+                                        <i class="fa fa-circle" aria-label="Invalid" role="img" title="Invalid" />
                                     </li>
                                 </ul>
                             </div>

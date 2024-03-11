@@ -168,12 +168,14 @@ class DevopsIdePycharm(models.Model):
                     "AssertionError:",
                     "SyntaxError:",
                     "KeyError:",
+                    "psycopg2.errors.UndefinedTable:",
                     "UnboundLocalError:",
                     "FileNotFoundError:",
                     "RuntimeWarning:",
                     "raise ValidationError",
                     "odoo.exceptions.CacheMiss:",
                     "json.decoder.JSONDecodeError:",
+                    "RuntimeError:",
                     "Traceback (most recent call last):",
                 )
                 for exception in lst_exception:

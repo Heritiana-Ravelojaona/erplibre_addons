@@ -41,6 +41,10 @@ class DevopsPlanCg(models.Model):
         help="UCA configuration - with inherit"
     )
 
+    code_generator_name = fields.Char()
+
+    template_name = fields.Char()
+
     use_existing_meta_module_ucb_only = fields.Boolean(
         help="Force UcB only from feature use_existing_meta_module"
     )
@@ -479,6 +483,14 @@ class DevopsPlanCg(models.Model):
                             # "mode_view_portal_models": rec.mode_view_portal_models,
                             "config_uca_enable_export_data": rec.config_uca_enable_export_data,
                         }
+                        if rec.code_generator_name:
+                            dct_new_project[
+                                "code_generator_name"
+                            ] = rec.code_generator_name
+                        if rec.template_name:
+                            dct_new_project[
+                                "template_name"
+                            ] = rec.template_name
                         # extra_arg = ""
                         if model_conf:
                             dct_new_project["config"] = model_conf
@@ -609,16 +621,16 @@ class DevopsPlanCg(models.Model):
             if rec.mode_view_portal and rec.mode_view_portal != "no_portal":
                 value_view_wizard["enable_generate_portal"] = True
                 value_view_wizard[
-                    "mode_view_portal_enable_create"
+                    "portal_enable_create"
                 ] = rec.mode_view_portal_enable_create
                 value_view_wizard[
-                    "mode_view_portal_enable_read"
+                    "portal_enable_read"
                 ] = rec.mode_view_portal_enable_read
                 value_view_wizard[
-                    "mode_view_portal_enable_update"
+                    "portal_enable_update"
                 ] = rec.mode_view_portal_enable_update
                 value_view_wizard[
-                    "mode_view_portal_enable_delete"
+                    "portal_enable_delete"
                 ] = rec.mode_view_portal_enable_delete
 
             wizard_view = self.env[
