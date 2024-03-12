@@ -35,6 +35,9 @@
                         <field name="parent_system_id" />
                         <field name="sub_system_ids" />
                     </group>
+                    <group string="VM">
+                        <field name="devops_deploy_vm_id" />
+                    </group>
                 </group>
                 <div attrs="{'invisible': [('method', '!=', 'ssh')]}">
                     <div class="bg-warning">
@@ -45,6 +48,7 @@
                         </div>
                     </div>
                     <group string="SSH Settings">
+                        <field name="ssh_host_name" />
                         <field name="ssh_host" placeholder="ssh.example.com" />
                         <field name="ssh_use_sshpass" />
                         <field name="ssh_port" />
@@ -110,6 +114,8 @@
             <kanban class="o_kanban_mobile">
                 <field name="name" />
                 <field name="system_status" />
+                <!--                <field name="is_vm" />-->
+                <field name="devops_deploy_vm_id" />
                 <templates>
                     <t t-name="kanban-box">
                         <div t-attf-class="oe_kanban_global_click">
@@ -128,10 +134,29 @@
                                     </li>
                                 </ul>
                                 <button
+                                    name="action_vm_power"
+                                    type="object"
+                                    class="oe_button bg-success"
+                                    icon="fa-refresh"
+                                    attrs="{'invisible':['|',('devops_deploy_vm_id','=',False),('system_status','=',True)]}"
+                                >
+                                    <i class="fa fa-fw o_button_icon fa-power-off" />
+                                </button>
+                                <button
+                                    name="action_vm_power"
+                                    type="object"
+                                    class="oe_button bg-danger"
+                                    icon="fa-refresh"
+                                    attrs="{'invisible':['|',('devops_deploy_vm_id','=',False),('system_status','=',False)]}"
+                                >
+                                    <i class="fa fa-fw o_button_icon fa-power-off" />
+                                </button>
+                                <button
                                     name="action_search_all"
                                     type="object"
                                     class="oe_button bg-success"
                                     icon="fa-refresh"
+                                    attrs="{'invisible':[('system_status','=',False)]}"
                                 >
                                     <i class="fa fa-fw o_button_icon fa-refresh" />
                                 </button>

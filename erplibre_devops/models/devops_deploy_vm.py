@@ -1,8 +1,13 @@
 import logging
+import time
 
 from odoo import _, api, fields, models
 
 _logger = logging.getLogger(__name__)
+try:
+    import paramiko
+except ImportError:  # pragma: no cover
+    _logger.debug("Cannot import paramiko")
 
 
 class DevopsDeployVm(models.Model):
@@ -12,6 +17,12 @@ class DevopsDeployVm(models.Model):
     name = fields.Char()
 
     identifiant = fields.Char()
+
+    vm_ssh_host = fields.Char()
+
+    vm_info = fields.Char()
+
+    vm_description_json = fields.Char()
 
     os = fields.Char()
 
@@ -66,6 +77,40 @@ class DevopsDeployVm(models.Model):
                 }
                 vm_exec_id = self.env["devops.deploy.vm.exec"].create(value)
                 rec.vm_exec_last_id = vm_exec_id.id
+                # Find associate system if exist
+                # TODO use one2many instead? Not existing, crash with CG
+                system_vm_id = self.env["devops.system"].search(
+                    [("devops_deploy_vm_id", "=", rec.id)], limit=1
+                )
+                if system_vm_id:
+                    max_timeout_total = 60
+                    max_timeout_system = 5
+                    max_timeout = max_timeout_total - max_timeout_system
+                    _logger.info(
+                        "Waiting system ssh connection test, max"
+                        f" {max_timeout_total} seconds."
+                    )
+                    # Sleep to give time to start network bridge
+                    time.sleep(max_timeout_system)
+                    # Start a SSH test
+                    try:
+                        # Just open and close the connection
+                        with system_vm_id.ssh_connection(timeout=max_timeout):
+                            _logger.info(
+                                "Succeed to open system name"
+                                f" {system_vm_id.name}"
+                            )
+                    except paramiko.AuthenticationException as e:
+                        _logger.error(
+                            f"Fail to open system name {system_vm_id.name},"
+                            " need good authentification."
+                        )
+                        _logger.error(e)
+                    except Exception as e:
+                        _logger.error(
+                            f"Fail to open system name {system_vm_id.name}"
+                        )
+                        _logger.error(e)
 
     def action_stop_vm(self):
         for rec in self:
@@ -90,3 +135,10 @@ class DevopsDeployVm(models.Model):
                 _logger.info(f"VM stop: {out}")
                 if rec.vm_exec_last_id:
                     rec.vm_exec_last_id.is_running = False
+                # Find associate system if exist
+                # TODO use one2many instead? Not existing, crash with CG
+                system_vm_id = self.env["devops.system"].search(
+                    [("devops_deploy_vm_id", "=", rec.id)], limit=1
+                )
+                if system_vm_id:
+                    system_vm_id.ssh_connection_status = False

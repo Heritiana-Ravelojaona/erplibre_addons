@@ -23,6 +23,15 @@
                         <field name="identifiant" />
                     </group>
                     <group>
+                        <field name="vm_ssh_host" />
+                    </group>
+                    <group>
+                        <field name="vm_info" />
+                    </group>
+                    <group>
+                        <field name="vm_description_json" />
+                    </group>
+                    <group>
                         <field name="os" />
                     </group>
                     <group>
@@ -63,6 +72,7 @@
                 <field name="name" />
                 <field name="has_vm_exec_running" />
                 <field name="identifiant" />
+                <field name="vm_ssh_host" />
                 <field name="os" />
                 <field name="provider" />
                 <field name="system_id" />
@@ -93,6 +103,11 @@
                                     <li class="mb4">
                                         <strong>
                                             <field name="identifiant" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="vm_ssh_host" />
                                         </strong>
                                     </li>
                                     <li class="mb4">
