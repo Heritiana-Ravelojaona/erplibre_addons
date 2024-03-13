@@ -41,7 +41,10 @@ class DevopsSystem(models.Model):
         string="Associate VM",
     )
 
-    is_vm = fields.Boolean(store=True, compute="_compute_is_vm")
+    is_vm = fields.Boolean(
+        compute="_compute_is_vm",
+        store=True,
+    )
 
     ssh_host_name = fields.Char()
 
@@ -91,9 +94,8 @@ class DevopsSystem(models.Model):
     )
 
     system_status = fields.Boolean(
-        readonly=True,
-        store=True,
         compute="_compute_system_status",
+        store=True,
         help="Show up or down for system, depend local or ssh.",
     )
 
@@ -225,10 +227,7 @@ class DevopsSystem(models.Model):
         return result
 
     @api.multi
-    @api.depends(
-        "ssh_connection_status",
-        "method",
-    )
+    @api.depends("ssh_connection_status", "method")
     def _compute_system_status(self):
         for rec in self:
             rec.system_status = False

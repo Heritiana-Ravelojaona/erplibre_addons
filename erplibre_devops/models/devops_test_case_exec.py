@@ -67,7 +67,10 @@ class DevopsTestCaseExec(models.Model):
 
     log = fields.Text(help="Log for the test")
 
-    log_html = fields.Html(store=True, compute="_compute_log_html")
+    log_html = fields.Html(
+        compute="_compute_log_html",
+        store=True,
+    )
 
     test_plan_exec_id = fields.Many2one(
         comodel_name="devops.test.plan.exec",
@@ -94,7 +97,8 @@ class DevopsTestCaseExec(models.Model):
     )
 
     has_devops_action = fields.Boolean(
-        store=True, compute="_compute_has_devops_action"
+        compute="_compute_has_devops_action",
+        store=True,
     )
 
     @api.multi

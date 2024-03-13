@@ -107,7 +107,10 @@ class DevopsTestPlanExec(models.Model):
 
     log = fields.Text()
 
-    log_html = fields.Html(store=True, compute="_compute_log_html")
+    log_html = fields.Html(
+        compute="_compute_log_html",
+        store=True,
+    )
 
     result_ids = fields.One2many(
         comodel_name="devops.test.result",
@@ -141,7 +144,10 @@ class DevopsTestPlanExec(models.Model):
         required=True,
     )
 
-    summary = fields.Html(compute="_compute_log_html", store=True)
+    summary = fields.Html(
+        compute="_compute_log_html",
+        store=True,
+    )
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -39,7 +39,8 @@ class DevopsDeployVm(models.Model):
     )
 
     has_vm_exec_running = fields.Boolean(
-        compute="_compute_has_vm_exec_running", store=True
+        compute="_compute_has_vm_exec_running",
+        store=True,
     )
 
     vm_exec_last_id = fields.Many2one(
