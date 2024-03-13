@@ -53,7 +53,10 @@ class DevopsTestResult(models.Model):
 
     log = fields.Text(readonly=True)
 
-    log_html = fields.Html(store=True, compute="_compute_log_html")
+    log_html = fields.Html(
+        compute="_compute_log_html",
+        store=True,
+    )
 
     is_finish = fields.Boolean(readonly=True)
 

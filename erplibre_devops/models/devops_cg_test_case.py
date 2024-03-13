@@ -110,13 +110,13 @@ class DevopsCgTestCase(models.Model):
             ("gen_uca", "Generate UcA"),
             ("run_c", "Run module"),
         ],
-        help=(
-            "Type of test to run. "
-            "gen_uca : Execute a template to generate a code generator module."
-            "gen_ucb : Execute code generator to generate a module."
-            "run_c : Run module to check to execution error."
-        ),
         default="run_c",
+        help=(
+            "Type of test to run. gen_uca : Execute a template to generate a"
+            " code generator module.gen_ucb : Execute code generator to"
+            " generate a module.run_c : Run module to check to execution"
+            " error."
+        ),
     )
 
     sequence_test = fields.Integer(

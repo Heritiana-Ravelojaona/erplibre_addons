@@ -36,6 +36,24 @@ class DevopsSystem(models.Model):
         string="DevOps Workspace",
     )
 
+    devops_deploy_vm_id = fields.Many2one(
+        comodel_name="devops.deploy.vm",
+        string="Associate VM",
+    )
+
+    is_vm = fields.Boolean(
+        compute="_compute_is_vm",
+        store=True,
+    )
+
+    ssh_host_name = fields.Char()
+
+    # devops_deploy_vm_ids = fields.One2many(
+    #     comodel_name="devops.deploy.vm",
+    #     inverse_name="system_id",
+    #     string="VMs",
+    # )
+
     parent_system_id = fields.Many2one(
         comodel_name="devops.system",
         string="Parent system",
@@ -73,6 +91,12 @@ class DevopsSystem(models.Model):
     ssh_connection_status = fields.Boolean(
         readonly=True,
         help="The state of the connexion.",
+    )
+
+    system_status = fields.Boolean(
+        compute="_compute_system_status",
+        store=True,
+        help="Show up or down for system, depend local or ssh.",
     )
 
     use_search_cmd = fields.Selection(
@@ -203,12 +227,29 @@ class DevopsSystem(models.Model):
         return result
 
     @api.multi
+    @api.depends("ssh_connection_status", "method")
+    def _compute_system_status(self):
+        for rec in self:
+            rec.system_status = False
+            if rec.method == "local":
+                rec.system_status = True
+            elif rec.method == "ssh":
+                rec.system_status = rec.ssh_connection_status
+
+    @api.multi
+    @api.depends("devops_deploy_vm_id")
+    def _compute_is_vm(self):
+        for rec in self:
+            rec.is_vm = bool(rec.devops_deploy_vm_id)
+
+    @api.multi
     @api.depends(
         "name_overwrite",
         "ssh_connection_status",
         "ssh_host",
         "ssh_port",
         "ssh_user",
+        "method",
     )
     def _compute_name(self):
         for rec in self:
@@ -481,7 +522,7 @@ class DevopsSystem(models.Model):
             raise exceptions.Warning(_("Connection Test Failed!"))
 
     @api.model
-    def ssh_connection(self):
+    def ssh_connection(self, timeout=5):
         """Return a new SSH connection with found parameters."""
         self.ensure_one()
 
@@ -503,7 +544,7 @@ class DevopsSystem(models.Model):
             port=self.ssh_port,
             username=None if not self.ssh_user else self.ssh_user,
             password=None if not self.ssh_password else self.ssh_password,
-            timeout=5,
+            timeout=timeout,
         )
         # params = {
         #     "host": self.ssh_host,
@@ -571,6 +612,182 @@ class DevopsSystem(models.Model):
             # git testing colorized enable color yes y
             # Dev desktop
             # vanille-gnome-desktop
+
+    @api.multi
+    def action_show_security_ssh_keygen(self):
+        for rec in self:
+            cmd = (
+                'for key in ~/.ssh/id_*; do ssh-keygen -l -f "${key}"; done |'
+                " uniq"
+            )
+            log = rec.execute_with_result(cmd, None).strip()
+            msg = (
+                "Security good : 1. No DSA, 2. RSA key size >= 3072, 3. Better"
+                " Ed25519\n"
+                + log
+            )
+            raise exceptions.Warning(msg)
+
+    @api.multi
+    def action_search_vm(self):
+        for rec in self:
+            dct_vm_identifiant = {}
+            cmd = "vboxmanage list runningvms"
+            out, status = rec.execute_with_result(
+                cmd, None, return_status=True
+            )
+            lst_identifiant_running = []
+            out = out.strip()
+            if not status and out:
+                for vm_config_short in out.split("\n"):
+                    # Expect "name" {key}
+                    pattern = r'"([^"]*)" \{([^}]*)\}'
+                    matches = re.match(pattern, vm_config_short)
+                    if not matches:
+                        _logger.warning(
+                            'Cannot find regex to find "name" {key} to'
+                            " extract vboxmanage list runningvms :"
+                            f" '{vm_config_short}'."
+                        )
+                        continue
+                    name = matches.group(1)
+                    key = matches.group(2)
+                    lst_identifiant_running.append(key)
+
+            cmd = "vboxmanage list vms"
+            out, status = rec.execute_with_result(
+                cmd, None, return_status=True
+            )
+            out = out.strip()
+            if not status and out:
+                for vm_config_short in out.split("\n"):
+                    # Expect "name" {key}
+                    pattern = r'"([^"]*)" \{([^}]*)\}'
+                    matches = re.match(pattern, vm_config_short)
+                    if not matches:
+                        _logger.warning(
+                            'Cannot find regex to find "name" {key} to'
+                            " extract vboxmanage list vms :"
+                            f" '{vm_config_short}'."
+                        )
+                        continue
+                    name = matches.group(1)
+                    key = matches.group(2)
+                    provider = "VirtualBox"
+                    # Search if exist before create
+                    vm_id = self.env["devops.deploy.vm"].search(
+                        [
+                            ("identifiant", "=", key),
+                            ("system_id", "=", rec.id),
+                            ("provider", "=", provider),
+                        ],
+                        limit=1,
+                    )
+                    if not vm_id:
+                        value = {
+                            "name": name,
+                            "identifiant": key,
+                            "provider": provider,
+                            "system_id": rec.id,
+                        }
+                        vm_id = self.env["devops.deploy.vm"].create(value)
+                    if vm_id and key in lst_identifiant_running:
+                        # TODO need to be somewhere else to check status
+                        value = {
+                            "vm_id": vm_id.id,
+                            "is_running": True,
+                        }
+                        vm_exec_id = self.env["devops.deploy.vm.exec"].create(
+                            value
+                        )
+                        vm_id.vm_exec_last_id = vm_exec_id.id
+
+                    cmd = f"VBoxManage showvminfo {vm_id.identifiant}"
+                    out, status = rec.execute_with_result(
+                        cmd, None, return_status=True
+                    )
+                    out = out.strip()
+                    if not status and out:
+                        # Extract Description
+                        vm_id.vm_info = out
+                        key_desc = "Description:"
+                        key_guest = "Guest:"
+                        idx_desc = out.find(key_desc)
+                        idx_guest = out.find(key_guest)
+                        if idx_desc >= 0 and idx_guest >= 0:
+                            desc_str = out[
+                                idx_desc + len(key_desc) : idx_guest
+                            ].strip()
+                            if desc_str:
+                                vm_id.vm_description_json = desc_str
+                                # Search datastructure {} from Description
+                                key_first = "{"
+                                key_last = "}"
+                                idx_first = desc_str.find(key_first)
+                                idx_last = desc_str.find(key_last)
+                                if idx_first >= 0 and idx_last >= 0:
+                                    datastructure = desc_str[
+                                        idx_first : idx_last + len(key_last)
+                                    ].strip()
+                                    if datastructure:
+                                        obj_vm_desc = json.loads(datastructure)
+                                        ssh_host = obj_vm_desc.get("ssh_host")
+                                        if ssh_host:
+                                            vm_id.vm_ssh_host = ssh_host
+                                            # Find an associate system
+                                            system_vm_id = self.env[
+                                                "devops.system"
+                                            ].search(
+                                                [
+                                                    (
+                                                        "ssh_host_name",
+                                                        "=",
+                                                        ssh_host,
+                                                    )
+                                                ]
+                                            )
+                                            if system_vm_id:
+                                                system_vm_id.devops_deploy_vm_id = (
+                                                    vm_id.id
+                                                )
+                        # vm_id.vm_description_json = out
+                    dct_vm_identifiant[key] = vm_id
+
+            # cmd = "vboxmanage list bridgedifs"
+            # out, status = rec.execute_with_result(
+            #     cmd, None, return_status=True
+            # )
+            # out = out.strip()
+            # if not status and out:
+            #     dct_vm_net_info = {}
+            #     for info_group in out.split("\n\n"):
+            #         dct_net_info = {}
+            #         for vm_net in info_group.split("\n"):
+            #             key, value = vm_net.split(":", 1)
+            #             dct_net_info[key.strip()] = value.strip()
+            #         vm_uid = dct_net_info.get("GUID")
+            #         if vm_uid:
+            #             dct_vm_net_info[vm_uid] = dct_net_info
+            #     for guid, dct_net in dct_vm_net_info.items():
+            #         print("ok")
+
+    @api.multi
+    def action_search_all(self):
+        self.action_search_workspace()
+        self.action_refresh_db_image()
+        self.get_local_system_id_from_ssh_config()
+        self.action_search_vm()
+
+    @api.multi
+    def action_vm_power(self):
+        for rec in self:
+            if rec.devops_deploy_vm_id:
+                if rec.devops_deploy_vm_id.has_vm_exec_running:
+                    rec.devops_deploy_vm_id.action_stop_vm()
+                else:
+                    rec.devops_deploy_vm_id.action_start_vm()
+            else:
+                _logger.warning("Not action VM power.")
 
     @api.multi
     def action_search_workspace(self):
@@ -819,6 +1036,7 @@ class DevopsSystem(models.Model):
                         "method": "ssh",
                         "name_overwrite": name,
                         "ssh_host": dev_config.get("hostname"),
+                        "ssh_host_name": host,
                         # "ssh_password": dev_config.get("password"),
                     }
                     if "port" in dev_config.keys():

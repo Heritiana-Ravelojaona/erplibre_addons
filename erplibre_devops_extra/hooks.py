@@ -19,14 +19,18 @@ def post_init_hook(cr, e):
         action_system_view = env.ref(
             "erplibre_devops.action_devops_check_system_conf_form"
         )
+        action_vm_view = env.ref(
+            "erplibre_devops.devops_deploy_vm_deploy_vm_action_window"
+        )
         arch = f"""
 <form string="Mon tableau de bord">
     <board style="2-1">
         <column>
-            <action name="{action_workspace_view.id}" string="Workspace ME" view_mode="list" context="{{'lang': 'fr_CA', 'tz': 'America/Montreal', 'uid': 2, 'group_by': [], 'orderedBy': [], 'dashboard_merge_domains_contexts': False}}" domain="[['is_me', '=', True]]" modifiers="{{}}" id="action_0_1"></action>
-            <action name="{action_workspace_view.id}" string="Working workspace" view_mode="list" context="{{'lang': 'fr_CA', 'tz': 'America/Montreal', 'uid': 2, 'group_by': ['system_id'], 'orderedBy': [], 'dashboard_merge_domains_contexts': False}}" domain="[['is_me', '!=', True]]" modifiers="{{}}" id="action_0_2"></action>
+            <action name="{action_workspace_view.id}" string="Workspace ME" view_mode="list" context="{{'lang': 'fr_CA', 'tz': 'America/Montreal', 'uid': 2, 'group_by': [], 'orderedBy': [], 'dashboard_merge_domains_contexts': False}}" domain="[['is_me', '=', True]]" modifiers="{{}}"></action>
+            <action name="{action_workspace_view.id}" string="Working workspace" view_mode="list" context="{{'lang': 'fr_CA', 'tz': 'America/Montreal', 'uid': 2, 'group_by': ['system_id'], 'orderedBy': [], 'dashboard_merge_domains_contexts': False}}" domain="[['is_me', '!=', True]]" modifiers="{{}}"></action>
+            <action name="{action_vm_view.id}" string="Deploy vm" view_mode="list" context="{{'lang': 'fr_CA', 'tz': 'America/Montreal', 'uid': 2, 'group_by': ['system_id'], 'orderedBy': [], 'dashboard_merge_domains_contexts': False}}" domain="[]"></action>
         </column><column>
-            <action name="{action_system_view.id}" string="System" view_mode="kanban" context="{{'lang': 'fr_CA', 'tz': 'America/Montreal', 'uid': 2, 'params': {{'action': {action_system_view.id}, 'model': 'devops.system', 'view_type': 'list', 'menu_id': {menu_board.id}}}, 'group_by': [], 'dashboard_merge_domains_contexts': False}}" domain="" modifiers="{{}}" id="action_1_0"></action>
+            <action name="{action_system_view.id}" string="System" view_mode="kanban" context="{{'lang': 'fr_CA', 'tz': 'America/Montreal', 'uid': 2, 'params': {{'action': {action_system_view.id}, 'model': 'devops.system', 'view_type': 'list', 'menu_id': {menu_board.id}}}, 'group_by': [], 'dashboard_merge_domains_contexts': False}}" domain="" modifiers="{{}}"></action>
         </column><column>
         </column>
     </board>

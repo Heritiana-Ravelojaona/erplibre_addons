@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="devops_deploy_vm_snapshot_view_form" model="ir.ui.view">
+        <field name="name">devops_deploy_vm_snapshot_form</field>
+        <field name="model">devops.deploy.vm.snapshot</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="devops_deploy_vm_snapshot_view_graph" model="ir.ui.view">
+        <field name="name">devops_deploy_vm_snapshot_graph</field>
+        <field name="model">devops.deploy.vm.snapshot</field>
+        <field name="arch" type="xml">
+            <graph string="Devops deploy vm snapshot">
+                <field name="name" type="row" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="devops_deploy_vm_snapshot_view_kanban" model="ir.ui.view">
+        <field name="name">devops_deploy_vm_snapshot_kanban</field>
+        <field name="model">devops.deploy.vm.snapshot</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="devops_deploy_vm_snapshot_view_pivot" model="ir.ui.view">
+        <field name="name">devops_deploy_vm_snapshot_pivot</field>
+        <field name="model">devops.deploy.vm.snapshot</field>
+        <field name="arch" type="xml">
+            <pivot string="Devops deploy vm snapshot">
+                <field name="name" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="devops_deploy_vm_snapshot_view_search" model="ir.ui.view">
+        <field name="name">devops_deploy_vm_snapshot_search</field>
+        <field name="model">devops.deploy.vm.snapshot</field>
+        <field name="arch" type="xml">
+            <search string="Devops deploy vm snapshot">
+                <filter domain="[('name','!=',False)]" name="name" string="Name" />
+            </search>
+        </field>
+    </record>
+
+    <record id="devops_deploy_vm_snapshot_view_tree" model="ir.ui.view">
+        <field name="name">devops_deploy_vm_snapshot_tree</field>
+        <field name="model">devops.deploy.vm.snapshot</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+
+    <act_window
+        id="devops_deploy_vm_snapshot_deploy_vm_snapshot_action_window"
+        name="Deploy vm snapshot"
+        res_model="devops.deploy.vm.snapshot"
+        view_mode="kanban,tree,pivot,graph,form"
+    />
+</odoo>

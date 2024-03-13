@@ -6,30 +6,13 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button
-                        name="action_refresh_db_image"
-                        string="Reload db image"
-                        type="object"
-                        class="oe_highlight"
-                    />
-                    <button
-                        name="action_search_workspace"
-                        string="Search workspace"
-                        type="object"
-                        class="oe_highlight"
-                    />
-                    <button
-                        name="get_local_system_id_from_ssh_config"
-                        string="Search sub-system"
-                        type="object"
-                        class="oe_highlight"
-                    />
-                    <button
-                        name="action_install_dev_system"
-                        string="Install dev system"
-                        type="object"
-                        class="oe_highlight"
-                    />
+                    <button name="action_search_all" string="Search ALL" type="object" class="oe_highlight" />
+                    <button name="action_refresh_db_image" string="Reload db image" type="object" />
+                    <button name="action_search_workspace" string="Search workspace" type="object" />
+                    <button name="action_search_vm" string="Search VM" type="object" />
+                    <button name="action_show_security_ssh_keygen" string="Show SSH key security" type="object" />
+                    <button name="get_local_system_id_from_ssh_config" string="Search sub-system" type="object" />
+                    <button name="action_install_dev_system" string="Install dev system" type="object" />
                 </header>
                 <div class="oe_title">
                     <h1>
@@ -52,6 +35,9 @@
                         <field name="parent_system_id" />
                         <field name="sub_system_ids" />
                     </group>
+                    <group string="VM">
+                        <field name="devops_deploy_vm_id" />
+                    </group>
                 </group>
                 <div attrs="{'invisible': [('method', '!=', 'ssh')]}">
                     <div class="bg-warning">
@@ -62,6 +48,7 @@
                         </div>
                     </div>
                     <group string="SSH Settings">
+                        <field name="ssh_host_name" />
                         <field name="ssh_host" placeholder="ssh.example.com" />
                         <field name="ssh_use_sshpass" />
                         <field name="ssh_port" />
@@ -80,9 +67,8 @@
                 </div>
                 <group string="Information">
                     <field name="erplibre_config_path_home_ids" />
-                </group>
-                <group>
                     <field name="devops_workspace_ids" />
+                    <!--                    <field name="devops_deploy_vm_ids" />-->
                 </group>
             </form>
         </field>
@@ -118,6 +104,87 @@
                 <field name="terminal" />
                 <field name="use_search_cmd" />
             </tree>
+        </field>
+    </record>
+
+    <record id="devops_system_view_kanban" model="ir.ui.view">
+        <field name="name">devops_system_kanban</field>
+        <field name="model">devops.system</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <field name="system_status" />
+                <!--                <field name="is_vm" />-->
+                <field name="devops_deploy_vm_id" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                    <li class="text-success float-right mb4" t-if="record.system_status.raw_value">
+                                        <i aria-label="Ok" class="fa fa-circle" role="img" title="Ok" />
+                                    </li>
+                                    <li class="text-danger float-right mb4" t-if="!record.system_status.raw_value">
+                                        <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
+                                    </li>
+                                </ul>
+                                <button
+                                    name="action_vm_power"
+                                    type="object"
+                                    class="oe_button bg-success"
+                                    icon="fa-refresh"
+                                    attrs="{'invisible':['|',('devops_deploy_vm_id','=',False),('system_status','=',True)]}"
+                                >
+                                    <i class="fa fa-fw o_button_icon fa-power-off" />
+                                </button>
+                                <button
+                                    name="action_vm_power"
+                                    type="object"
+                                    class="oe_button bg-danger"
+                                    icon="fa-refresh"
+                                    attrs="{'invisible':['|',('devops_deploy_vm_id','=',False),('system_status','=',False)]}"
+                                >
+                                    <i class="fa fa-fw o_button_icon fa-power-off" />
+                                </button>
+                                <button
+                                    name="action_search_all"
+                                    type="object"
+                                    class="oe_button bg-success"
+                                    icon="fa-refresh"
+                                    attrs="{'invisible':[('system_status','=',False)]}"
+                                >
+                                    <i class="fa fa-fw o_button_icon fa-refresh" />
+                                </button>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="devops_system_view_pivot" model="ir.ui.view">
+        <field name="name">devops_system_pivot</field>
+        <field name="model">devops.system</field>
+        <field name="arch" type="xml">
+            <pivot string="Devops system">
+                <field name="name" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="devops_system_view_graph" model="ir.ui.view">
+        <field name="name">devops_system_graph</field>
+        <field name="model">devops.system</field>
+        <field name="arch" type="xml">
+            <graph string="Devops system">
+                <field name="name" type="row" />
+            </graph>
         </field>
     </record>
 
