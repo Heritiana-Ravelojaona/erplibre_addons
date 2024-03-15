@@ -7,11 +7,18 @@
             <form string="Titre">
                 <header>
                     <button
-                        name="execute_test_action"
+                        name="action_execute_test"
                         string="Execute"
                         type="object"
                         class="oe_highlight"
                         attrs="{'invisible': [('execution_is_launched', '=', True)]}"
+                    />
+                    <button
+                        name="action_rerun_fail_testcase"
+                        string="Rerun failed test only"
+                        type="object"
+                        class="oe_highlight"
+                        attrs="{'invisible': ['|','|',('execution_is_launched', '=', False),('execution_is_finished', '=', False),('global_success', '=', True)]}"
                     />
                 </header>
                 <field name="has_configuration" invisible="True" />

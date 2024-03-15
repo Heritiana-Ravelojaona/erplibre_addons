@@ -322,7 +322,34 @@ class DevopsTestPlanExec(models.Model):
         return True
 
     @api.multi
-    def execute_test_action(self, ctx=None):
+    def action_rerun_fail_testcase(self, ctx=None):
+        for rec in self:
+            lst_testcase = list(
+                set(
+                    [
+                        a.test_case_id.id
+                        for a in rec.exec_ids
+                        if not a.is_pass
+                        and a.test_case_id
+                        and not a.test_case_id.is_system_test
+                    ]
+                )
+            )
+            if not lst_testcase:
+                raise exceptions.Warning("Missing failed testcase to execute.")
+            return {
+                "type": "ir.actions.act_window",
+                "res_model": self._name,
+                "context": {
+                    "default_workspace_id": rec.workspace_id.id,
+                    "default_test_case_ids": lst_testcase,
+                },
+                "view_mode": "form",
+                "target": "current",
+            }
+
+    @api.multi
+    def action_execute_test(self, ctx=None):
         lst_test_erplibre_async = []
         ws_id = None
         self.exec_start_date = fields.Datetime.now(self)
@@ -612,11 +639,12 @@ class DevopsTestPlanExec(models.Model):
                     self.env["devops.test.result"].create(
                         {
                             "name": (
-                                f"Test result '{test_name}' - {time_exec_sec}s"
-                                f" - {date_log} - {test_result}"
+                                f"Test result '{test_name}' - {test_result}"
                             ),
                             "log": exec_id.log_all.strip(),
                             "is_finish": True,
+                            "time_duration_seconds": time_exec_sec,
+                            "date_log": date_log,
                             "is_pass": not status,
                             "test_case_exec_id": test_case_exec_id.id,
                         }

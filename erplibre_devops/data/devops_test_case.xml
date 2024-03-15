@@ -10,6 +10,7 @@
             <field name="name">Async execution setup</field>
             <field name="test_plan_id" ref="devops_test_plan_cg" />
             <field name="active" eval="False" />
+            <field name="is_system_test" eval="True" />
             <field name="note">Async process execution</field>
         </record>
         <record id="devops_test_case_cg_helloworld_test" model="devops.test.case">

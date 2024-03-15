@@ -112,6 +112,8 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
+                <field name="date_log" />
+                <field name="time_duration_seconds" />
                 <field name="is_finish" />
                 <field name="is_pass" />
             </tree>
