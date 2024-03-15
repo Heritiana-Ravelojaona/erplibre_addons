@@ -29,11 +29,14 @@
                         <field name="name" />
                         <field name="workspace_id" />
                     </group>
-                    <group string="Status">
-                        <field name="global_success" />
-                        <field name="execution_is_launched" />
-                        <field name="execution_is_finished" />
+                    <group string="Status execution">
+                        <field name="global_success" string="Global PASS" />
+                        <field name="execution_is_launched" string="Launched" />
+                        <field name="execution_is_finished" string="Finished" />
                         <field name="exec_id" />
+                        <field name="exec_start_date" string="Start" />
+                        <field name="exec_stop_date" string="End" />
+                        <field name="time_exec_time_duration" string="Duration" />
                     </group>
                 </group>
                 <group string="Test">

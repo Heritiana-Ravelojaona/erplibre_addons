@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import uuid
+from datetime import timedelta
 
 import pytz
 from colorama import Fore, Style
@@ -67,8 +68,24 @@ class DevopsTestPlanExec(models.Model):
         ),
     )
 
-    time_execution = fields.Float(
-        help="Delay of execution, empty and execution is not finish."
+    exec_start_date = fields.Datetime(
+        string="Execution start date", readonly=True
+    )
+
+    exec_stop_date = fields.Datetime(
+        string="Execution stop date", readonly=True
+    )
+
+    exec_time_duration = fields.Float(
+        string="Execution time duration",
+        compute="_compute_exec_time_duration",
+        store=True,
+    )
+
+    time_exec_time_duration = fields.Char(
+        string="Execution time duration second",
+        compute="_compute_exec_time_duration",
+        store=True,
     )
 
     execution_is_launched = fields.Boolean(
@@ -308,6 +325,7 @@ class DevopsTestPlanExec(models.Model):
     def execute_test_action(self, ctx=None):
         lst_test_erplibre_async = []
         ws_id = None
+        self.exec_start_date = fields.Datetime.now(self)
         for rec in self:
             if not ws_id:
                 ws_id = rec.workspace_id
@@ -553,6 +571,7 @@ class DevopsTestPlanExec(models.Model):
                         .lower()
                     )
                     path_log = os.path.join(path_mkdir_log_external, test_name)
+                    # TODO check file before exist, test «file log not exist»
                     exec_id = rec_ws.execute(
                         cmd=f"cat {path_log}",
                     )
@@ -602,4 +621,24 @@ class DevopsTestPlanExec(models.Model):
                             "test_case_exec_id": test_case_exec_id.id,
                         }
                     )
-        pass
+        self.exec_stop_date = fields.Datetime.now(self)
+
+    @api.depends("exec_start_date", "exec_stop_date")
+    def _compute_exec_time_duration(self):
+        for rec in self:
+            if rec.exec_start_date and rec.exec_stop_date:
+                rec.exec_time_duration = (
+                    rec.exec_stop_date - rec.exec_start_date
+                ).total_seconds()
+                td_str = str(timedelta(seconds=rec.exec_time_duration))
+                x = td_str.split(":")
+                time_s = ""
+                if x[0] != "0":
+                    time_s = f"{x[0]} Hours "
+                if x[1] != "00":
+                    time_s += f"{x[1]} Minutes "
+                time_s += f"{x[2]} Seconds"
+                rec.time_exec_time_duration = time_s
+            else:
+                rec.exec_time_duration = False
+                rec.time_exec_time_duration = False
