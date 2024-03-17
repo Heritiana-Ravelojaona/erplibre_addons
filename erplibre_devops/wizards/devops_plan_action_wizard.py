@@ -323,6 +323,14 @@ class DevopsPlanActionWizard(models.TransientModel):
         )
     )
 
+    config_uca_enable_export_data = fields.Boolean(
+        default=True,
+        help=(
+            "Will enable option nonmenclator in CG to export data associate to"
+            " models."
+        ),
+    )
+
     mode_view_snippet_template_generate_website_enable_javascript = (
         fields.Boolean(
             default=True,
@@ -657,6 +665,7 @@ class DevopsPlanActionWizard(models.TransientModel):
         if module_name:
             self.fill_working_module_name_or_id(module_name)
             self.use_external_cg = True
+            self.config_uca_enable_export_data = False
             self.use_existing_meta_module = True
             self.is_autopoieses = True
             self.set_mode_edit_module()
@@ -1090,6 +1099,12 @@ class DevopsPlanActionWizard(models.TransientModel):
         if is_autopoiesis:
             plan_cg_value["cg_self_add_config_cg"] = True
             plan_cg_value["code_mode_context_generator"] = "autopoiesis"
+        # Support data
+        plan_cg_value[
+            "config_uca_enable_export_data"
+        ] = self.config_uca_enable_export_data
+
+        # Support snippet
         if self.mode_view_snippet and self.mode_view_snippet != "no_snippet":
             plan_cg_value["mode_view_snippet"] = self.mode_view_snippet
             plan_cg_value[
