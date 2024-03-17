@@ -8,7 +8,7 @@
                 <header>
                     <button
                         name="open_file_ide"
-                        string="Open into PyCharm"
+                        string="Open into IDE"
                         type="object"
                         class="oe_highlight"
                         attrs="{'invisible': [('filename', '=', False)]}"
@@ -144,7 +144,7 @@
                 <field name="condition_var_method_name" />
                 <button
                     name="open_file_ide"
-                    string="Open file"
+                    string="Open into IDE"
                     type="object"
                     class="oe_stat_button"
                     icon="fa-play-circle text-success"

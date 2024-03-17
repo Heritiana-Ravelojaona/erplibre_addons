@@ -93,6 +93,13 @@
                         attrs="{'invisible': ['|', ('is_installed', '=', False), ('is_conflict_mode_exec', '=', True)]}"
                     />
                     <button
+                        name="action_parse_code"
+                        string="Parse code"
+                        type="object"
+                        class="oe_highlight"
+                        attrs="{'invisible': ['|', ('is_installed', '=', False), ('is_conflict_mode_exec', '=', True)]}"
+                    />
+                    <button
                         name="action_install_workspace"
                         string="Re-install"
                         type="object"
@@ -153,6 +160,16 @@
                         attrs="{'invisible': [('devops_test_plan_exec_count', '==', 0)]}"
                     >
                         <field name="devops_test_plan_exec_count" string="Test plan executions" widget="statinfo" />
+                    </button>
+                    <button
+                        name="%(erplibre_devops.devops_code_todo_code_todo_action_window)d"
+                        type="action"
+                        class="oe_stat_button"
+                        icon="fa-building-o"
+                        context="{'search_default_workspace_id': active_id}"
+                        attrs="{'invisible': [('devops_code_todo_count', '==', 0)]}"
+                    >
+                        <field name="devops_code_todo_count" string="Code TODO" widget="statinfo" />
                     </button>
                     <button
                         name="%(erplibre_devops.devops_test_result_test_result_action_window)d"

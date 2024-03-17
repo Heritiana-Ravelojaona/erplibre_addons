@@ -55,6 +55,18 @@ class DevopsWorkspace(models.Model):
         store=True,
     )
 
+    devops_code_todo_ids = fields.One2many(
+        comodel_name="devops.code.todo",
+        inverse_name="workspace_id",
+        string="Code TODO",
+    )
+
+    devops_code_todo_count = fields.Integer(
+        string="Test code TODO count",
+        compute="_compute_devops_code_todo_count",
+        store=True,
+    )
+
     devops_test_plan_exec_ids = fields.One2many(
         comodel_name="devops.test.plan.exec",
         inverse_name="workspace_id",
@@ -400,6 +412,14 @@ class DevopsWorkspace(models.Model):
         for rec in self:
             rec.devops_test_plan_exec_count = self.env[
                 "devops.test.plan.exec"
+            ].search_count([("workspace_id", "=", rec.id)])
+
+    @api.multi
+    @api.depends("devops_code_todo_ids", "devops_code_todo_ids.active")
+    def _compute_devops_code_todo_count(self):
+        for rec in self:
+            rec.devops_code_todo_count = self.env[
+                "devops.code.todo"
             ].search_count([("workspace_id", "=", rec.id)])
 
     @api.multi
@@ -834,6 +854,12 @@ class DevopsWorkspace(models.Model):
                 rec.action_format_erplibre_devops()
                 rec.action_update_erplibre_devops()
                 rec.action_reboot()
+
+    @api.multi
+    def action_parse_code(self, ctx=None):
+        for rec_o in self:
+            with rec_o.devops_create_exec_bundle("Parse code") as rec:
+                self.env["devops.code.todo"].parse_workspace(rec)
 
     @api.multi
     def action_open_local_view(self, ctx=None, url_instance=None):

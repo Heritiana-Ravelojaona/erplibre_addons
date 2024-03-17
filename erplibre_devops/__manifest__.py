@@ -50,6 +50,7 @@
         "views/devops_cg_new_project.xml",
         "views/devops_cg_new_project_stage.xml",
         "views/devops_cg_test_case.xml",
+        "views/devops_code_todo.xml",
         "views/devops_db_image.xml",
         "views/devops_deploy_vm.xml",
         "views/devops_deploy_vm_exec.xml",

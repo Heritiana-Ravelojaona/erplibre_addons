@@ -27,9 +27,11 @@
 
     <menuitem id="menu_test" name="Test" sequence="6" parent="menu_erplibre_devops" />
 
-    <menuitem id="menu_code_cg" name="CG" sequence="1" parent="menu_code" />
+    <menuitem id="menu_code_cg" name="CG" sequence="2" parent="menu_code" />
 
-    <menuitem id="menu_code_ide" name="IDE" sequence="2" parent="menu_code" />
+    <menuitem id="menu_code_ide" name="IDE" sequence="3" parent="menu_code" />
+
+    <menuitem id="menu_code_quality" name="Quality" sequence="4" parent="menu_code" />
 
     <menuitem id="menu_deploy_vm_group" name="VM" sequence="1" parent="menu_deploy" />
 
@@ -111,8 +113,16 @@
         id="menu_code_log_makefile_target"
         name="Makefile target"
         action="devops_log_makefile_target_action_window"
-        sequence="3"
+        sequence="1"
         parent="menu_code"
+    />
+
+    <menuitem
+        id="menu_code_quality_todo"
+        name="TODO"
+        action="devops_code_todo_code_todo_action_window"
+        sequence="1"
+        parent="menu_code_quality"
     />
 
     <menuitem
