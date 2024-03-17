@@ -953,11 +953,13 @@ class DevopsPlanActionWizard(models.TransientModel):
                 run_into_workspace=True,
                 error_on_status=False,
             )
-            if exec_id.exec_status:
+            path_module = exec_id.log_all.strip()
+            if exec_id.exec_status == 2:
+                raise exceptions.Warning(f"The module '{module_name}' is duplicated : \n{path_module}")
+            elif exec_id.exec_status:
                 # raise exceptions.Warning(f"Cannot find module '{module_name}'")
                 self.set_mode_new_module()
                 return self._reopen_self()
-            path_module = exec_id.log_all.strip()
             if not path_module:
                 # raise exceptions.Warning(f"Cannot find module path.")
                 self.set_mode_new_module()
