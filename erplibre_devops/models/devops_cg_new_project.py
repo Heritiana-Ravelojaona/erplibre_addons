@@ -1331,6 +1331,17 @@ class DevopsCgNewProject(models.Model):
                             f" res.groups'",
                         )
                     )
+                else:
+                    lst_template_hooks_py_replace.append(
+                        (
+                            'value["enable_template_website_snippet_view"] ='
+                            " False",
+                            f'value["enable_template_website_snippet_view"] ='
+                            f" False\n       "
+                            f' value["template_ignore_export_data"] ='
+                            f" True",
+                        )
+                    )
                 if rec.mode_view_snippet in ["enable_snippet"]:
                     lst_template_hooks_py_replace.append(
                         (
