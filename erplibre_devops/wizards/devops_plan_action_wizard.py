@@ -1357,14 +1357,10 @@ class DevopsPlanActionWizard(models.TransientModel):
     def action_git_commit(self):
         for rec in self:
             if rec.plan_cg_id:
-                rec.plan_cg_id.action_git_commit()
-        return self._reopen_self()
-
-    @api.multi
-    def action_git_commit_remote(self):
-        for rec in self:
-            if rec.plan_cg_id:
-                rec.plan_cg_id.action_git_commit_remote()
+                if not rec.is_remote_cg:
+                    rec.plan_cg_id.action_git_commit()
+                else:
+                    rec.plan_cg_id.action_git_commit_remote()
         return self._reopen_self()
 
     @api.multi

@@ -63,7 +63,7 @@
                             name="action_code_module_autocomplete_module_path"
                             string="Auto-complete"
                             type="object"
-                            class="btn btn-primary"
+                            class="btn btn-success"
                         />
                     </group>
                 </group>
@@ -97,7 +97,7 @@
                             name="action_code_module_generate"
                             string="Generate"
                             type="object"
-                            class="btn btn-primary"
+                            class="btn btn-success"
                         />
                     </group>
                 </group>
@@ -139,28 +139,28 @@
                             name="action_git_commit"
                             string="Git commit"
                             type="object"
-                            class="btn btn-primary"
+                            class="btn btn-success"
                             attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', True)]}"
                         />
                         <button
                             name="action_git_commit_remote"
                             string="Git commit remote"
                             type="object"
-                            class="btn btn-primary"
+                            class="btn btn-success"
                             attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
                         />
                         <button
                             name="action_git_meld_remote"
                             string="Git meld remote"
                             type="object"
-                            class="btn btn-primary"
+                            class="btn btn-success"
                             attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
                         />
                         <button
                             name="action_git_clean_remote"
                             string="Git clean remote"
                             type="object"
-                            class="btn btn-primary"
+                            class="btn btn-success"
                             attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
                         />
                     </group>
@@ -853,28 +853,21 @@
                     <field name="working_cg_writer_id" attrs="{'invisible': [('working_cg_writer_id', '=', False)]}" />
                     <button
                         name="action_git_commit"
-                        string="Git commit"
+                        string="Git commit module"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', True)]}"
+                        attrs="{'invisible': [('plan_cg_id', '=', False)]}"
                     />
                     <button
-                        name="action_git_commit_remote"
-                        string="Git commit remote"
-                        type="object"
-                        class="oe_highlight"
-                        attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
-                    />
-                    <button
-                        name="action_git_meld_remote"
-                        string="Git meld remote"
+                        name="action_git_meld"
+                        string="Git meld module"
                         type="object"
                         class="oe_highlight"
                         attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
                     />
                     <button
-                        name="action_git_clean_remote"
-                        string="Git clean remote"
+                        name="action_git_clean"
+                        string="Git clean module"
                         type="object"
                         class="oe_highlight"
                         attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
