@@ -595,6 +595,7 @@ class DevopsPlanCg(models.Model):
                 ]
             else:
                 lst_portal_model = []
+            # TODO reorder the model from dependency inter model, ignore one2many
             for model_model_id in rec.devops_cg_model_ids:
                 lst_depend_model = None
                 if (
