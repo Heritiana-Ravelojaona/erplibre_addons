@@ -73,8 +73,6 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     working_project_name = fields.Char()
 
-    is_autopoieses = fields.Boolean()
-
     is_new_module = fields.Boolean(
         compute="_compute_is_new_module", store=True, readonly=False
     )
@@ -667,7 +665,6 @@ class DevopsPlanActionWizard(models.TransientModel):
             self.use_external_cg = True
             self.config_uca_enable_export_data = False
             self.use_existing_meta_module = True
-            self.is_autopoieses = True
             self.set_mode_edit_module()
             self.action_code_module_autocomplete_module_path()
         return self.state_goto_code_module()
@@ -955,7 +952,10 @@ class DevopsPlanActionWizard(models.TransientModel):
             )
             path_module = exec_id.log_all.strip()
             if exec_id.exec_status == 2:
-                raise exceptions.Warning(f"The module '{module_name}' is duplicated : \n{path_module}")
+                raise exceptions.Warning(
+                    f"The module '{module_name}' is duplicated :"
+                    f" \n{path_module}"
+                )
             elif exec_id.exec_status:
                 # raise exceptions.Warning(f"Cannot find module '{module_name}'")
                 self.set_mode_new_module()
@@ -1397,7 +1397,6 @@ class DevopsPlanActionWizard(models.TransientModel):
                 module_path=self.working_compute_module_path,
                 module_cg_path=self.working_compute_module_cg_path,
                 module_template_path=self.working_compute_module_template_path,
-                is_autopoiesis=self.is_autopoieses,
                 is_new_module=self.is_new_module,
                 is_relative_path=True,
             )
