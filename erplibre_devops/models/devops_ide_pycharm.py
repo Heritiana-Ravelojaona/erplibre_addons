@@ -109,7 +109,9 @@ class DevopsIdePycharm(models.Model):
     def action_pycharm_open(
         rec_ws, folder=None, filename=None, pycharm_arg=None
     ):
+        # TODO auto-search pycharm binary
         cmd = "~/.local/share/JetBrains/Toolbox/scripts/pycharm"
+        # cmd = "/snap/bin/pycharm-community"
         if pycharm_arg:
             cmd += f" {pycharm_arg}"
         if folder:
