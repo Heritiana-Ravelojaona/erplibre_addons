@@ -10,9 +10,29 @@
                     <button name="action_refresh_db_image" string="Reload db image" type="object" />
                     <button name="action_search_workspace" string="Search workspace" type="object" />
                     <button name="action_search_vm" string="Search VM" type="object" />
+                    <button name="action_search_docker" string="Search Docker" type="object" />
                     <button name="action_show_security_ssh_keygen" string="Show SSH key security" type="object" />
                     <button name="get_local_system_id_from_ssh_config" string="Search sub-system" type="object" />
                     <button name="action_install_dev_system" string="Install dev system" type="object" />
+                    <button
+                        name="action_install_docker"
+                        string="Install docker"
+                        type="object"
+                        attrs="{'invisible': [('docker_has_check','=',False)]}"
+                    />
+                    <button
+                        name="action_check_docker"
+                        string="Check docker"
+                        type="object"
+                        class="btn-success"
+                        attrs="{'invisible': [('docker_has_check','=',True)]}"
+                    />
+                    <button
+                        name="action_check_docker"
+                        string="Check docker"
+                        type="object"
+                        attrs="{'invisible': [('docker_has_check','=',False)]}"
+                    />
                 </header>
                 <div class="oe_title">
                     <h1>
@@ -65,6 +85,11 @@
                         />
                     </group>
                 </div>
+                <group string="Docker">
+                    <field name="docker_has_check" />
+                    <field name="docker_is_installed" />
+                    <field name="docker_daemon_is_running" />
+                </group>
                 <group string="Information">
                     <field name="erplibre_config_path_home_ids" />
                     <field name="devops_workspace_ids" />

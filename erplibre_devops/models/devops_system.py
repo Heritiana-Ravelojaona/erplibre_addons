@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import subprocess
+import time
 
 from odoo import _, api, exceptions, fields, models
 
@@ -45,6 +46,18 @@ class DevopsSystem(models.Model):
         compute="_compute_is_vm",
         store=True,
     )
+
+    docker_has_check = fields.Boolean(
+        readonly=True,
+        help=(
+            "Need to be False when system restart. Compare last time check"
+            " with uptime machine."
+        ),
+    )
+
+    docker_is_installed = fields.Boolean(readonly=True)
+
+    docker_daemon_is_running = fields.Boolean(readonly=True)
 
     ssh_host_name = fields.Char()
 
@@ -328,6 +341,8 @@ class DevopsSystem(models.Model):
         """
         engine can be bash, python or sh
         """
+        result = ""
+        status = None
         if folder:
             cmd = f"cd {folder};{cmd}"
         if engine == "python":
@@ -344,14 +359,13 @@ class DevopsSystem(models.Model):
                 status = None
             else:
                 result, status = rec._execute_process(cmd, return_status=True)
-            if len(self) == 1:
-                if not return_status:
-                    return result
-                else:
-                    return result, status
-            lst_result.append(result)
         for rec in self.filtered(lambda r: r.method == "ssh"):
             with rec.ssh_connection() as ssh_client:
+                if not rec.ssh_connection_status:
+                    _logger.error(
+                        "Ignore SSH command, ssh connection is down."
+                    )
+                    continue
                 status = 0
                 cmd += ";echo $?"
                 stdin, stdout, stderr = ssh_client.exec_command(cmd)
@@ -381,12 +395,12 @@ class DevopsSystem(models.Model):
                 result += stdout_log
                 if add_stderr_log:
                     result += stderr.read().decode("utf-8")
-                if len(self) == 1:
-                    if not return_status:
-                        return result
-                    else:
-                        return result, status
-                lst_result.append(result)
+        if len(self) == 1:
+            if not return_status:
+                return result
+            else:
+                return result, status
+        lst_result.append(result)
         return lst_result
 
     def execute_terminal_gui(
@@ -510,7 +524,7 @@ class DevopsSystem(models.Model):
         """Check if the SSH settings are correct."""
         try:
             # Just open and close the connection
-            with self.ssh_connection():
+            with self.ssh_connection(force_exception=True):
                 raise exceptions.Warning(_("Connection Test Succeeded!"))
         except (
             paramiko.AuthenticationException,
@@ -522,10 +536,11 @@ class DevopsSystem(models.Model):
             raise exceptions.Warning(_("Connection Test Failed!"))
 
     @api.model
-    def ssh_connection(self, timeout=5):
+    def ssh_connection(self, timeout=5, force_exception=False):
         """Return a new SSH connection with found parameters."""
         self.ensure_one()
 
+        has_error = False
         self.ssh_connection_status = False
 
         ssh_client = paramiko.SSHClient()
@@ -539,13 +554,18 @@ class DevopsSystem(models.Model):
             ssh_client.get_host_keys().add(
                 hostname=self.ssh_host, keytype="ssh-rsa", key=key
             )
-        ssh_client.connect(
-            hostname=self.ssh_host,
-            port=self.ssh_port,
-            username=None if not self.ssh_user else self.ssh_user,
-            password=None if not self.ssh_password else self.ssh_password,
-            timeout=timeout,
-        )
+        try:
+            ssh_client.connect(
+                hostname=self.ssh_host,
+                port=self.ssh_port,
+                username=None if not self.ssh_user else self.ssh_user,
+                password=None if not self.ssh_password else self.ssh_password,
+                timeout=timeout,
+            )
+        except paramiko.ssh_exception.NoValidConnectionsError as e:
+            if force_exception:
+                raise e
+            has_error = True
         # params = {
         #     "host": self.ssh_host,
         #     "username": self.ssh_user,
@@ -576,9 +596,54 @@ class DevopsSystem(models.Model):
         # return pysftp.Connection(**params, cnopts=cnopts)
 
         # Because, offline will raise an exception
-        self.ssh_connection_status = True
+        if not has_error:
+            self.ssh_connection_status = True
 
         return ssh_client
+
+    @api.multi
+    def action_check_docker(self):
+        for rec in self:
+            # 1. check if is installed
+            cmd = "which docker"
+            out, status = rec.execute_with_result(
+                cmd, None, return_status=True
+            )
+            rec.docker_is_installed = status == 0
+            if rec.docker_is_installed:
+                # 2. check status, else force start it
+                cmd = "docker info"
+                out, status = rec.execute_with_result(
+                    cmd, None, return_status=True
+                )
+                if status != 0:
+                    # Suppose got error :
+                    # Cannot connect to the Docker daemon at unix:///var/run/docker.sock.
+                    # Is the docker daemon running?
+                    out = rec.execute_terminal_gui(
+                        cmd="sudo systemctl start docker"
+                    )
+                    time.sleep(5)
+                    cmd = "docker info"
+                    out, status = rec.execute_with_result(
+                        cmd, None, return_status=True
+                    )
+                rec.docker_daemon_is_running = status == 0
+            rec.docker_has_check = True
+
+    @api.multi
+    def action_install_docker(self):
+        for rec in self:
+            if not rec.docker_has_check:
+                continue
+            # Install it
+            cmd_dev = (
+                "curl -fsSL https://get.docker.com | sudo sh && sudo apt-get"
+                " install -y uidmap && dockerd-rootless-setuptool.sh install"
+            )
+            cmd_prod = "curl -fsSL https://get.docker.com | sudo sh"
+            cmd = cmd_dev
+            rec.execute_terminal_gui(cmd=cmd)
 
     @api.multi
     def action_install_dev_system(self):
@@ -591,8 +656,8 @@ class DevopsSystem(models.Model):
             # zlib1g-dev libreadline-dev libbz2-dev libffi-dev libssl-dev libldap2-dev wget
             out = rec.execute_terminal_gui(
                 cmd=(
-                    "sudo apt update;sudo apt install -y git make curl which"
-                    " parallel  plocate vim tree watch git-cola htop tig"
+                    "sudo apt update;sudo apt install -y git make curl"
+                    " parallel plocate vim tree watch git-cola htop tig"
                     " build-essential zlib1g-dev libreadline-dev libbz2-dev"
                     " libffi-dev libssl-dev libldap2-dev wget"
                 ),
@@ -627,6 +692,15 @@ class DevopsSystem(models.Model):
                 + log
             )
             raise exceptions.Warning(msg)
+
+    @api.multi
+    def action_search_docker(self):
+        for rec in self:
+            dct_vm_identifiant = {}
+            cmd = "vboxmanage list runningvms"
+            out, status = rec.execute_with_result(
+                cmd, None, return_status=True
+            )
 
     @api.multi
     def action_search_vm(self):
@@ -774,9 +848,14 @@ class DevopsSystem(models.Model):
     @api.multi
     def action_search_all(self):
         self.action_search_workspace()
+        # TODO maybe check system_status before continue
+        if not all([a.system_status for a in self]):
+            return
         self.action_refresh_db_image()
         self.get_local_system_id_from_ssh_config()
         self.action_search_vm()
+        self.action_check_docker()
+        self.action_search_docker()
 
     @api.multi
     def action_vm_power(self):
