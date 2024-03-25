@@ -676,6 +676,14 @@
                             class="btn btn-default"
                             attrs="{'invisible': [('working_system_id', '=', False)]}"
                         />
+                        <field name="working_system_can_be_power_on" invisible="True" />
+                        <button
+                            name="working_system_id_power"
+                            string="Power the system"
+                            type="object"
+                            class="btn btn-success"
+                            attrs="{'invisible': [('working_system_can_be_power_on', '=', False)]}"
+                        />
                     </group>
                 </group>
                 <span

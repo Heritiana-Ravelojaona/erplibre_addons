@@ -228,6 +228,14 @@ class DevopsPlanActionWizard(models.TransientModel):
         string="New/Existing system",
     )
 
+    working_system_can_be_power_on = fields.Boolean(
+        related="working_system_id.is_vm"
+    )
+
+    working_system_status = fields.Boolean(
+        related="working_system_id.system_status"
+    )
+
     working_cg_module_id = fields.Many2one(
         comodel_name="code.generator.module",
         string="CG code builder",
@@ -579,6 +587,11 @@ class DevopsPlanActionWizard(models.TransientModel):
             ("not_supported", "Not supported"),
             ("final", "Final"),
         ]
+
+    def working_system_id_power(self):
+        if self.working_system_id:
+            self.working_system_id.action_vm_power()
+        return self._reopen_self()
 
     def clear_working_system_id(self):
         self.working_system_id = False
