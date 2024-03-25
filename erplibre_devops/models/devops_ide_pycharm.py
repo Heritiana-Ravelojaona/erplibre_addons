@@ -167,6 +167,7 @@ class DevopsIdePycharm(models.Model):
                     "TypeError:",
                     "AttributeError:",
                     "ValueError:",
+                    "OSError:",
                     "AssertionError:",
                     "SyntaxError:",
                     "KeyError:",
