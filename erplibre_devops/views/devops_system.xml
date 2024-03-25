@@ -57,7 +57,6 @@
                         <group>
                             <field name="erplibre_config_path_home_ids" />
                             <field name="devops_workspace_ids" />
-                            <!--                    <field name="devops_deploy_vm_ids" />-->
                         </group>
                     </page>
                     <page string="System">
@@ -191,6 +190,16 @@
         </field>
     </record>
 
+    <record id="devops_system_view_graph" model="ir.ui.view">
+        <field name="name">devops_system_graph</field>
+        <field name="model">devops.system</field>
+        <field name="arch" type="xml">
+            <graph string="Devops system">
+                <field name="name" type="row" />
+            </graph>
+        </field>
+    </record>
+
     <record id="devops_system_view_kanban" model="ir.ui.view">
         <field name="name">devops_system_kanban</field>
         <field name="model">devops.system</field>
@@ -198,7 +207,6 @@
             <kanban class="o_kanban_mobile">
                 <field name="name" />
                 <field name="system_status" />
-                <!--                <field name="is_vm" />-->
                 <field name="devops_deploy_vm_id" />
                 <templates>
                     <t t-name="kanban-box">
@@ -211,10 +219,10 @@
                                         </strong>
                                     </li>
                                     <li class="text-success float-right mb4" t-if="record.system_status.raw_value">
-                                        <i aria-label="Ok" class="fa fa-circle" role="img" title="Ok" />
+                                        <i class="fa fa-circle" aria-label="Ok" role="img" title="Ok" />
                                     </li>
                                     <li class="text-danger float-right mb4" t-if="!record.system_status.raw_value">
-                                        <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
+                                        <i class="fa fa-circle" aria-label="Invalid" role="img" title="Invalid" />
                                     </li>
                                 </ul>
                                 <button
@@ -259,16 +267,6 @@
             <pivot string="Devops system">
                 <field name="name" type="row" />
             </pivot>
-        </field>
-    </record>
-
-    <record id="devops_system_view_graph" model="ir.ui.view">
-        <field name="name">devops_system_graph</field>
-        <field name="model">devops.system</field>
-        <field name="arch" type="xml">
-            <graph string="Devops system">
-                <field name="name" type="row" />
-            </graph>
         </field>
     </record>
 
