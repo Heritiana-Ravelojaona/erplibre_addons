@@ -99,9 +99,26 @@
                     </page>
                     <page string="Docker">
                         <group>
-                            <field name="docker_has_check" />
-                            <field name="docker_is_installed" />
-                            <field name="docker_daemon_is_running" />
+                            <group>
+                                <field name="docker_has_check" string="Has check" />
+                                <field name="docker_is_installed" string="Is installed" />
+                                <field name="docker_daemon_is_running" string="Is running" />
+                                <field name="docker_version_engine" string="Version engine" />
+                                <field name="docker_compose_version" string="Compose version" />
+                                <field name="docker_stats_total_ram_use" string="Total RAM use" />
+                            </group>
+                            <group>
+                                <field name="docker_stats" string="Stats" />
+                                <field name="docker_system_df" string="Disk space" />
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="docker_system_info" string="System info" />
+                            </group>
+                            <group>
+                                <field name="docker_version" string="Version" />
+                            </group>
                         </group>
                     </page>
                 </notebook>
@@ -116,12 +133,44 @@
             <search>
                 <field name="name" />
                 <field name="ssh_host" />
+                <filter
+                    name="docker_is_installed"
+                    string="Docker is installed"
+                    domain="[('docker_is_installed', '=', True)]"
+                />
+                <filter
+                    name="docker_is_not_installed"
+                    string="Docker is not installed"
+                    domain="[('docker_is_installed', '=', False)]"
+                />
+                <filter
+                    name="docker_daemon_is_running"
+                    string="Docker daemon is running"
+                    domain="[('docker_daemon_is_running', '=', True)]"
+                />
+                <filter
+                    name="docker_daemon_is_not_running"
+                    string="Docker daemon is not running"
+                    domain="[('docker_daemon_is_running', '=', False)]"
+                />
+                <filter name="is_vm" string="Is VM" domain="[('is_vm', '=', True)]" />
+                <filter name="is_not_vm" string="Is not VM" domain="[('is_vm', '=', False)]" />
                 <group string="Group By" expand="1">
                     <filter name="method" string="Method" context="{'group_by':'method'}" />
                     <filter name="parent_system_id" string="Parent system" context="{'group_by':'parent_system_id'}" />
                     <filter name="terminal" string="Terminal" context="{'group_by':'terminal'}" />
                     <filter name="use_search_cmd" string="Searching command" context="{'group_by':'use_search_cmd'}" />
                     <filter name="path_home" string="Path home" context="{'group_by':'path_home'}" />
+                    <filter
+                        name="docker_is_installed"
+                        string="Docker is installed"
+                        context="{'group_by':'docker_is_installed'}"
+                    />
+                    <filter
+                        name="docker_daemon_is_running"
+                        string="Docker daemon is running"
+                        context="{'group_by':'docker_daemon_is_running'}"
+                    />
                 </group>
             </search>
         </field>

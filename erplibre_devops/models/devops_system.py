@@ -59,6 +59,20 @@ class DevopsSystem(models.Model):
 
     docker_daemon_is_running = fields.Boolean(readonly=True)
 
+    docker_version = fields.Text(readonly=True)
+
+    docker_version_engine = fields.Char(readonly=True)
+
+    docker_compose_version = fields.Char(readonly=True)
+
+    docker_system_info = fields.Text(readonly=True)
+
+    docker_system_df = fields.Text(readonly=True)
+
+    docker_stats = fields.Text(readonly=True)
+
+    docker_stats_total_ram_use = fields.Char(readonly=True)
+
     ssh_host_name = fields.Char()
 
     # devops_deploy_vm_ids = fields.One2many(
@@ -604,14 +618,57 @@ class DevopsSystem(models.Model):
     @api.multi
     def action_check_docker(self):
         for rec in self:
-            # 1. check if is installed
+            # 1. Check if is installed
             cmd = "which docker"
             out, status = rec.execute_with_result(
                 cmd, None, return_status=True
             )
             rec.docker_is_installed = status == 0
             if rec.docker_is_installed:
-                # 2. check status, else force start it
+                # 2. Get version
+                # Docker version
+                cmd = "docker version"
+                out, status = rec.execute_with_result(
+                    cmd, None, return_status=True
+                )
+                if status == 0:
+                    rec.docker_version = out
+                cmd = "docker version -f json"
+                out, status = rec.execute_with_result(
+                    cmd, None, return_status=True
+                )
+                if status == 0:
+                    try:
+                        dct_docker_version = json.loads(out)
+                        docker_client_version = dct_docker_version.get(
+                            "Client"
+                        ).get("Version")
+                        docker_server_version = dct_docker_version.get(
+                            "Server"
+                        ).get("Version")
+                        if docker_client_version != docker_server_version:
+                            _logger.warning(
+                                f"System {rec.name} has docker client version"
+                                f" {docker_client_version} and docker serveur"
+                                f" version {docker_server_version}"
+                            )
+                        rec.docker_version_engine = docker_server_version
+                    except Exception as e:
+                        # TODO need sudo to run docker or wrong version
+                        #  system cannot support sudo command for now
+                        _logger.warning(e)
+                cmd = "docker compose version"
+                out, status = rec.execute_with_result(
+                    cmd, None, return_status=True
+                )
+                if status == 0:
+                    rec.docker_compose_version = out
+                # Docker system info
+                # cmd = "docker system info"
+                # out, status = rec.execute_with_result(
+                #     cmd, None, return_status=True
+                # )
+                # 3. Check status, else force start it
                 cmd = "docker info"
                 out, status = rec.execute_with_result(
                     cmd, None, return_status=True
@@ -629,6 +686,66 @@ class DevopsSystem(models.Model):
                         cmd, None, return_status=True
                     )
                 rec.docker_daemon_is_running = status == 0
+                rec.docker_system_info = out
+                # 4. Metric system
+                # TODO maybe move this into action_check_docker_advance
+                cmd = "docker system df"
+                out, status = rec.execute_with_result(
+                    cmd, None, return_status=True
+                )
+                if status == 0:
+                    rec.docker_system_df = out
+                cmd = "docker stats -a --no-stream"
+                out, status = rec.execute_with_result(
+                    cmd, None, return_status=True
+                )
+                if status == 0:
+                    rec.docker_stats = out
+                cmd = "docker stats -a --no-stream --format json"
+                out, status = rec.execute_with_result(
+                    cmd, None, return_status=True
+                )
+                if status == 0:
+                    total_memory_usage = 0.0
+                    for stat_line in out.splitlines():
+                        dct_docker_stat = json.loads(stat_line)
+                        mem_usage = (
+                            dct_docker_stat.get("MemUsage")
+                            .split("/")[0]
+                            .strip()
+                        )
+                        if mem_usage.endswith("KiB"):
+                            total_memory_usage += float(mem_usage[:-3]) * 1024
+                        elif mem_usage.endswith("MiB"):
+                            total_memory_usage += (
+                                float(mem_usage[:-3]) * 1024 * 1024
+                            )
+                        elif mem_usage.endswith("GiB"):
+                            total_memory_usage += (
+                                float(mem_usage[:-3]) * 1024 * 1024 * 1024
+                            )
+                        else:
+                            _logger.error(
+                                "Cannot support docker check MemUsage :"
+                                f" {mem_usage}"
+                            )
+                    unit_count_kilo = 0
+                    lst_unit_str = [
+                        "B",
+                        "KiB",
+                        "MiB",
+                        "GiB",
+                        "TiB",
+                        "PiB",
+                        "EiB",
+                    ]
+                    while total_memory_usage > 1024:
+                        unit_count_kilo += 1
+                        total_memory_usage = total_memory_usage / 1024.0
+                    unit_str = lst_unit_str[unit_count_kilo]
+                    rec.docker_stats_total_ram_use = (
+                        f"{total_memory_usage:.3f}{unit_str}"
+                    )
             rec.docker_has_check = True
 
     @api.multi
