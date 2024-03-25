@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="devops_deploy_docker_compose_view_form" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_compose_form</field>
+        <field name="model">devops.deploy.docker.compose</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                    </group>
+                    <group>
+                        <field name="system_id" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="devops_deploy_docker_compose_view_graph" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_compose_graph</field>
+        <field name="model">devops.deploy.docker.compose</field>
+        <field name="arch" type="xml">
+            <graph string="Devops deploy docker compose">
+                <field name="name" type="row" />
+                <field name="system_id" type="row" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="devops_deploy_docker_compose_view_kanban" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_compose_kanban</field>
+        <field name="model">devops.deploy.docker.compose</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <field name="system_id" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="system_id" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="devops_deploy_docker_compose_view_pivot" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_compose_pivot</field>
+        <field name="model">devops.deploy.docker.compose</field>
+        <field name="arch" type="xml">
+            <pivot string="Devops deploy docker compose">
+                <field name="name" type="row" />
+                <field name="system_id" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="devops_deploy_docker_compose_view_search" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_compose_search</field>
+        <field name="model">devops.deploy.docker.compose</field>
+        <field name="arch" type="xml">
+            <search string="Devops deploy docker compose">
+                <filter domain="[('name','!=',False)]" name="name" string="Name" />
+                <filter domain="[('system_id','!=',False)]" name="system_id" string="System" />
+            </search>
+        </field>
+    </record>
+
+    <record id="devops_deploy_docker_compose_view_tree" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_compose_tree</field>
+        <field name="model">devops.deploy.docker.compose</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="system_id" />
+            </tree>
+        </field>
+    </record>
+
+    <act_window
+        id="devops_deploy_docker_compose_deploy_docker_compose_action_window"
+        name="Deploy docker compose"
+        res_model="devops.deploy.docker.compose"
+        view_mode="kanban,tree,pivot,graph,form"
+    />
+</odoo>
