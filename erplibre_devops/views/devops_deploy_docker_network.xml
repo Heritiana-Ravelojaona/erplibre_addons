@@ -6,12 +6,34 @@
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" icon="fa-archive" name="toggle_active" type="object">
+                            <field name="active" widget="boolean_button" />
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
                     <group>
-                        <field name="name" />
-                    </group>
-                    <group>
+                        <field name="created_at" />
+                        <field name="driver" />
+                        <field name="id_network" />
+                        <field name="id_short_network" />
+                        <field name="internal" />
+                        <field name="ipv6" />
+                        <field name="labels" />
+                        <field name="scope" />
                         <field name="system_id" />
                     </group>
+                    <notebook>
+                        <page string="Inspect">
+                            <group>
+                                <field name="inspect_full" />
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
@@ -23,6 +45,15 @@
         <field name="arch" type="xml">
             <graph string="Devops deploy docker network">
                 <field name="name" type="row" />
+                <field name="created_at" type="row" />
+                <field name="driver" type="row" />
+                <field name="id_network" type="row" />
+                <field name="id_short_network" type="row" />
+                <field name="inspect_full" type="row" />
+                <field name="internal" type="row" />
+                <field name="ipv6" type="row" />
+                <field name="labels" type="row" />
+                <field name="scope" type="row" />
                 <field name="system_id" type="row" />
             </graph>
         </field>
@@ -34,6 +65,15 @@
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <field name="name" />
+                <field name="created_at" />
+                <field name="driver" />
+                <field name="id_network" />
+                <field name="id_short_network" />
+                <field name="inspect_full" />
+                <field name="internal" />
+                <field name="ipv6" />
+                <field name="labels" />
+                <field name="scope" />
                 <field name="system_id" />
                 <templates>
                     <t t-name="kanban-box">
@@ -43,6 +83,41 @@
                                     <li class="mb4">
                                         <strong>
                                             <field name="name" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="created_at" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="driver" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="id_short_network" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="internal" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="ipv6" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="labels" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="scope" />
                                         </strong>
                                     </li>
                                     <li class="mb4">
@@ -65,6 +140,15 @@
         <field name="arch" type="xml">
             <pivot string="Devops deploy docker network">
                 <field name="name" type="row" />
+                <field name="created_at" type="row" />
+                <field name="driver" type="row" />
+                <field name="id_network" type="row" />
+                <field name="id_short_network" type="row" />
+                <field name="inspect_full" type="row" />
+                <field name="internal" type="row" />
+                <field name="ipv6" type="row" />
+                <field name="labels" type="row" />
+                <field name="scope" type="row" />
                 <field name="system_id" type="row" />
             </pivot>
         </field>
@@ -75,8 +159,13 @@
         <field name="model">devops.deploy.docker.network</field>
         <field name="arch" type="xml">
             <search string="Devops deploy docker network">
-                <filter domain="[('name','!=',False)]" name="name" string="Name" />
-                <filter domain="[('system_id','!=',False)]" name="system_id" string="System" />
+                <field name="name" />
+                <field name="system_id" />
+                <filter name="active" string="Active" domain="[('active','=',True)]" help="Show active" />
+                <filter name="inactive" string="Inactive" domain="[('active','=',False)]" help="Show inactive" />
+                <group string="Group By" expand="1">
+                    <filter name="group_by_system_id" string="System" context="{'group_by':'system_id'}" />
+                </group>
             </search>
         </field>
     </record>
@@ -86,6 +175,15 @@
         <field name="model">devops.deploy.docker.network</field>
         <field name="arch" type="xml">
             <tree>
+                <field name="created_at" />
+                <field name="driver" />
+                <field name="id_network" />
+                <field name="id_short_network" />
+                <field name="inspect_full" />
+                <field name="internal" />
+                <field name="ipv6" />
+                <field name="labels" />
+                <field name="scope" />
                 <field name="name" />
                 <field name="system_id" />
             </tree>
@@ -93,9 +191,17 @@
     </record>
 
     <act_window
+        id="devops_deploy_docker_network_deploy_docker_network_group_action_window"
+        name="Deploy docker group network"
+        res_model="devops.deploy.docker.network"
+        view_mode="kanban,tree,pivot,graph,form"
+        context="{'search_default_group_by_system_id': True}"
+    />
+
+    <act_window
         id="devops_deploy_docker_network_deploy_docker_network_action_window"
         name="Deploy docker network"
         res_model="devops.deploy.docker.network"
-        view_mode="kanban,tree,pivot,graph,form"
+        view_mode="tree,kanban,pivot,graph,form"
     />
 </odoo>

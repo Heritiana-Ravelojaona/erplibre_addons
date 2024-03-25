@@ -26,6 +26,8 @@ class DevopsSystem(models.Model):
         store=True,
     )
 
+    active = fields.Boolean(default=True)
+
     name_overwrite = fields.Char(
         string="Overwrite name",
         help="Overwrite existing name",
@@ -157,6 +159,66 @@ class DevopsSystem(models.Model):
             "xterm block the process, not gnome-terminal. xterm not work on"
             " osx, use osascript instead."
         ),
+    )
+
+    docker_compose_ids = fields.One2many(
+        comodel_name="devops.deploy.docker.compose",
+        inverse_name="system_id",
+        string="Docker compose",
+    )
+
+    docker_compose_count = fields.Integer(
+        string="Docker compose count",
+        compute="_compute_docker_compose_count",
+        store=True,
+    )
+
+    docker_volume_ids = fields.One2many(
+        comodel_name="devops.deploy.docker.volume",
+        inverse_name="system_id",
+        string="Docker volume",
+    )
+
+    docker_volume_count = fields.Integer(
+        string="Docker volume count",
+        compute="_compute_docker_volume_count",
+        store=True,
+    )
+
+    docker_image_ids = fields.Many2many(
+        comodel_name="devops.deploy.docker.image",
+        relation="deploy_docker_image_system_ids_rel",
+        string="Docker image",
+    )
+
+    docker_image_count = fields.Integer(
+        string="Docker image count",
+        compute="_compute_docker_image_count",
+        store=True,
+    )
+
+    docker_network_ids = fields.One2many(
+        comodel_name="devops.deploy.docker.network",
+        inverse_name="system_id",
+        string="Docker network",
+    )
+
+    docker_network_count = fields.Integer(
+        string="Docker network count",
+        compute="_compute_docker_network_count",
+        store=True,
+    )
+
+    docker_container_ids = fields.One2many(
+        comodel_name="devops.deploy.docker.container",
+        inverse_name="system_id",
+        string="Docker container",
+    )
+
+    docker_container_count = fields.Integer(
+        string="Docker container count",
+        compute="_compute_docker_container_count",
+        store=True,
     )
 
     ssh_host = fields.Char(
@@ -292,6 +354,46 @@ class DevopsSystem(models.Model):
                     rec.name = f"SSH {addr}"
                 # Add state if name_overwrite
                 rec.name += f" {state}"
+
+    @api.multi
+    @api.depends("docker_compose_ids", "docker_compose_ids.active")
+    def _compute_docker_compose_count(self):
+        for rec in self:
+            rec.docker_compose_count = self.env[
+                "devops.deploy.docker.compose"
+            ].search_count([("system_id", "=", rec.id)])
+
+    @api.multi
+    @api.depends("docker_volume_ids", "docker_volume_ids.active")
+    def _compute_docker_volume_count(self):
+        for rec in self:
+            rec.docker_volume_count = self.env[
+                "devops.deploy.docker.volume"
+            ].search_count([("system_id", "=", rec.id)])
+
+    @api.multi
+    @api.depends("docker_image_ids", "docker_image_ids.active")
+    def _compute_docker_image_count(self):
+        for rec in self:
+            rec.docker_image_count = self.env[
+                "devops.deploy.docker.image"
+            ].search_count([("system_ids", "in", [rec.id])])
+
+    @api.multi
+    @api.depends("docker_network_ids", "docker_network_ids.active")
+    def _compute_docker_network_count(self):
+        for rec in self:
+            rec.docker_network_count = self.env[
+                "devops.deploy.docker.network"
+            ].search_count([("system_id", "=", rec.id)])
+
+    @api.multi
+    @api.depends("docker_container_ids", "docker_container_ids.active")
+    def _compute_docker_container_count(self):
+        for rec in self:
+            rec.docker_container_count = self.env[
+                "devops.deploy.docker.container"
+            ].search_count([("system_id", "=", rec.id)])
 
     def get_ssh_address(self):
         # TODO is unique
@@ -714,7 +816,10 @@ class DevopsSystem(models.Model):
                             .split("/")[0]
                             .strip()
                         )
-                        if mem_usage.endswith("KiB"):
+                        if mem_usage == "0B":
+                            # Ignore
+                            pass
+                        elif mem_usage.endswith("KiB"):
                             total_memory_usage += float(mem_usage[:-3]) * 1024
                         elif mem_usage.endswith("MiB"):
                             total_memory_usage += (
@@ -724,6 +829,8 @@ class DevopsSystem(models.Model):
                             total_memory_usage += (
                                 float(mem_usage[:-3]) * 1024 * 1024 * 1024
                             )
+                        elif mem_usage.endswith("B"):
+                            total_memory_usage += float(mem_usage[:-1])
                         else:
                             _logger.error(
                                 "Cannot support docker check MemUsage :"
@@ -747,6 +854,376 @@ class DevopsSystem(models.Model):
                         f"{total_memory_usage:.3f}{unit_str}"
                     )
             rec.docker_has_check = True
+
+    @api.multi
+    def action_search_docker(self):
+        for rec in self:
+            # Debug, force clean all before
+            debug = True
+            if debug:
+                self.env["devops.deploy.docker.compose"].search(
+                    [
+                        ("system_id", "=", rec.id),
+                    ],
+                    limit=1,
+                ).write({"active": False})
+                self.env["devops.deploy.docker.volume"].search(
+                    [
+                        ("system_id", "=", rec.id),
+                    ],
+                    limit=1,
+                ).write({"active": False})
+                self.env["devops.deploy.docker.image"].search(
+                    [
+                        ("system_ids", "in", rec.ids),
+                    ],
+                    limit=1,
+                ).write({"active": False})
+                self.env["devops.deploy.docker.network"].search(
+                    [
+                        ("system_id", "=", rec.id),
+                    ],
+                    limit=1,
+                ).write({"active": False})
+                self.env["devops.deploy.docker.container"].search(
+                    [
+                        ("system_id", "=", rec.id),
+                    ],
+                    limit=1,
+                ).write({"active": False})
+            dct_compose_name_id = {}
+            dct_volume_name_id = {}
+            dct_image_name_id = {}
+            dct_network_name_id = {}
+            dct_container_name_id = {}
+
+            # 1. Compose
+            cmd = "docker compose ls --format json"
+            out, status = rec.execute_with_result(
+                cmd, None, return_status=True
+            )
+            if status != 0:
+                continue
+            lst_compose = json.loads(out)
+            for dct_compose in lst_compose:
+                compose_name = dct_compose.get("Name")
+                deploy_docker_compose_id = self.env[
+                    "devops.deploy.docker.compose"
+                ].search(
+                    [
+                        ("name", "=", compose_name),
+                        ("system_id", "=", rec.id),
+                    ],
+                    limit=1,
+                )
+                if not deploy_docker_compose_id:
+                    is_running = dct_compose.get("Status") == "running(2)"
+                    compose_value = {
+                        "name": compose_name,
+                        "system_id": rec.id,
+                        "config_file_path": dct_compose.get("ConfigFiles"),
+                        "is_running": is_running,
+                    }
+                    # # Show compose config
+                    # cmd = f"docker compose config {id_image}"
+                    # out, status = rec.execute_with_result(
+                    #     cmd, None, return_status=True
+                    # )
+                    # if status == 0:
+                    #     deploy_image_value["history_full"] = out
+                    deploy_docker_compose_id = self.env[
+                        "devops.deploy.docker.compose"
+                    ].create(compose_value)
+                dct_compose_name_id[compose_name] = deploy_docker_compose_id
+
+            # 2. Volume
+            cmd = "docker volume ls -q"
+            out, status = rec.execute_with_result(
+                cmd, None, return_status=True
+            )
+            if status != 0:
+                continue
+            lst_volume = out.splitlines()
+            if lst_volume:
+                str_volumes = " ".join(lst_volume)
+                cmd = f"docker volume inspect {str_volumes}"
+                out, status = rec.execute_with_result(
+                    cmd, None, return_status=True
+                )
+                if status == 0:
+                    lst_volume_inspect = json.loads(out)
+                    for volume_inspect in lst_volume_inspect:
+                        volume_name = volume_inspect.get("Name")
+                        deploy_docker_volume_id = self.env[
+                            "devops.deploy.docker.volume"
+                        ].search(
+                            [
+                                ("name", "=", volume_name),
+                                ("system_id", "=", rec.id),
+                            ],
+                            limit=1,
+                        )
+                        if not deploy_docker_volume_id:
+                            deploy_volume_value = {
+                                "name": volume_name,
+                                "system_id": rec.id,
+                                "mountpoint": volume_inspect.get("Mountpoint"),
+                                "created_at_date": volume_inspect.get(
+                                    "CreatedAt"
+                                ),
+                                "driver": volume_inspect.get("Driver"),
+                            }
+                            # Associate docker compose with docker volume
+                            dct_labels = volume_inspect.get("Labels")
+                            if dct_labels:
+                                docker_compose_project_name = dct_labels.get(
+                                    "com.docker.compose.project"
+                                )
+                                if (
+                                    docker_compose_project_name
+                                    and docker_compose_project_name
+                                    in dct_compose_name_id.keys()
+                                ):
+                                    compose_id = dct_compose_name_id.get(
+                                        docker_compose_project_name
+                                    )
+                                    deploy_volume_value[
+                                        "compose_id"
+                                    ] = compose_id.id
+                            deploy_docker_volume_id = self.env[
+                                "devops.deploy.docker.volume"
+                            ].create(deploy_volume_value)
+                        dct_volume_name_id[
+                            volume_name
+                        ] = deploy_docker_volume_id
+            # 3. Image
+            # cmd = "docker container ls --no-trunc -a --format json"
+            cmd = "docker image ls -a --no-trunc --format json"
+            out, status = rec.execute_with_result(
+                cmd, None, return_status=True
+            )
+            # TODO cmd 1 : docker image history hash
+            # cmd 2 : docker image inspect hash
+            if status != 0:
+                continue
+            lst_json_image = out.splitlines()
+            for json_image in lst_json_image:
+                dct_image = json.loads(json_image)
+                id_image = dct_image.get("ID")
+                str_ignore_id_image = "sha256:"
+                id_short_image = (
+                    id_image[
+                        len(str_ignore_id_image) : 12
+                        + len(str_ignore_id_image)
+                    ]
+                    if id_image.startswith(str_ignore_id_image)
+                    else id_image[:12]
+                )
+                deploy_docker_image_id = self.env[
+                    "devops.deploy.docker.image"
+                ].search(
+                    [
+                        ("id_image", "=", id_image),
+                    ],
+                    limit=1,
+                )
+                if not deploy_docker_image_id:
+                    deploy_image_value = {
+                        "system_ids": [(6, 0, rec.ids)],
+                        "id_image": id_image,
+                        "id_short_image": id_short_image,
+                        "tag": dct_image.get("Tag"),
+                        "size_human": dct_image.get("Size"),
+                        "size_virtual_human": dct_image.get("VirtualSize"),
+                        "created_at": dct_image.get("CreatedAt"),
+                        "created_since": dct_image.get("CreatedSince"),
+                        "repository": dct_image.get("Repository"),
+                    }
+                    cmd = f"docker image history {id_image}"
+                    out, status = rec.execute_with_result(
+                        cmd, None, return_status=True
+                    )
+                    if status == 0:
+                        deploy_image_value["history_full"] = out
+                    cmd = f"docker image inspect {id_image}"
+                    out, status = rec.execute_with_result(
+                        cmd, None, return_status=True
+                    )
+                    if status == 0:
+                        deploy_image_value["inspect_full"] = out
+                    deploy_docker_image_id = self.env[
+                        "devops.deploy.docker.image"
+                    ].create(deploy_image_value)
+                elif (
+                    not deploy_docker_image_id.system_ids
+                    or rec.id not in deploy_docker_image_id.system_ids.ids
+                ):
+                    # Update image associate to this system
+                    deploy_docker_image_id.system_ids = [(4, rec.id)]
+                dct_image_name_id[
+                    deploy_docker_image_id.name
+                ] = deploy_docker_image_id
+            # 4. Network
+            cmd = "docker network ls --no-trunc --format json"
+            out, status = rec.execute_with_result(
+                cmd, None, return_status=True
+            )
+            if status != 0:
+                continue
+            lst_json_network = out.splitlines()
+            for json_network in lst_json_network:
+                dct_network = json.loads(json_network)
+                id_network = dct_network.get("ID")
+                id_short_network = id_network[:12]
+                deploy_docker_network_id = self.env[
+                    "devops.deploy.docker.network"
+                ].search(
+                    [
+                        ("id_network", "=", id_network),
+                        ("system_id", "=", rec.id),
+                    ],
+                    limit=1,
+                )
+                if not deploy_docker_network_id:
+                    network_value = {
+                        "name": dct_network.get("Name"),
+                        "system_id": rec.id,
+                        "created_at": dct_network.get("CreatedAt"),
+                        "driver": dct_network.get("Driver"),
+                        "id_network": id_network,
+                        "id_short_network": id_short_network,
+                        "ipv6": dct_network.get("IPv6"),
+                        "internal": dct_network.get("Internal"),
+                        "labels": dct_network.get("Labels"),
+                        "scope": dct_network.get("Scope"),
+                    }
+                    cmd = f"docker network inspect {id_network} -v"
+                    out, status = rec.execute_with_result(
+                        cmd, None, return_status=True
+                    )
+                    if status == 0:
+                        network_value["inspect_full"] = out
+                    deploy_docker_network_id = self.env[
+                        "devops.deploy.docker.network"
+                    ].create(network_value)
+                    dct_network_name_id[
+                        deploy_docker_network_id.name
+                    ] = deploy_docker_network_id
+            # 5. Container
+            cmd = "docker container ls --no-trunc -a --format json"
+            out, status = rec.execute_with_result(
+                cmd, None, return_status=True
+            )
+            if status != 0:
+                continue
+            lst_json_container = out.splitlines()
+            for json_container in lst_json_container:
+                dct_container = json.loads(json_container)
+                id_container = dct_container.get("ID")
+                deploy_docker_container_id = self.env[
+                    "devops.deploy.docker.container"
+                ].search(
+                    [
+                        ("id_container", "=", id_container),
+                    ],
+                    limit=1,
+                )
+                if not deploy_docker_container_id:
+                    container_value = {
+                        "name": dct_container.get("Names"),
+                        "system_id": rec.id,
+                        "command": dct_container.get("Command"),
+                        "create_at": dct_container.get("CreatedAt"),
+                        "id_container": id_container,
+                        "id_short_container": id_container[:12],
+                        "mounts_full": dct_container.get("Mounts"),
+                        "ports_full": dct_container.get("Ports"),
+                        "running_for": dct_container.get("RunningFor"),
+                        "size_human": dct_container.get("Size"),
+                        "state_container": dct_container.get("State"),
+                        "status_container": dct_container.get("Status"),
+                    }
+                    # TODO interesting information into dct_labels for docker.compose, like his services to get with config
+                    image_key = dct_container.get("Image")
+                    image_id = dct_image_name_id.get(image_key, False)
+                    if image_id:
+                        container_value["image_id"] = image_id.id
+                    # TODO networks, you means, multiple network?
+                    network_key = dct_container.get("Networks")
+                    network_id = dct_network_name_id.get(network_key, False)
+                    if network_id:
+                        container_value["network_id"] = network_id.id
+                    volume_key = dct_container.get("Mounts")
+                    lst_mount = volume_key.split(",")
+                    if lst_mount:
+                        lst_match_key = list(
+                            set(dct_volume_name_id).intersection(
+                                set(lst_mount)
+                            )
+                        )
+                        lst_id_volume_ids = [
+                            dct_volume_name_id.get(a).id for a in lst_match_key
+                        ]
+                        if lst_id_volume_ids:
+                            container_value["volume_ids"] = [
+                                (6, 0, lst_id_volume_ids)
+                            ]
+                    # TODO associate mount_id with workspace_id and with addons_path
+                    # TODO create addons_path like erplibre_config_path_home_ids from system, but for workspace
+                    # TODO long with diff/logs
+                    cmd = f"docker container inspect {id_container}"
+                    out, status = rec.execute_with_result(
+                        cmd, None, return_status=True
+                    )
+                    if status == 0:
+                        container_value["inspect_full"] = out
+                        dct_container_inspect = json.loads(out)[0]
+                        compose_key = (
+                            dct_container_inspect.get("Config")
+                            .get("Labels")
+                            .get("com.docker.compose.project", False)
+                        )
+                        if compose_key:
+                            compose_id = dct_compose_name_id.get(
+                                compose_key, False
+                            )
+                            if compose_id:
+                                container_value["compose_id"] = compose_id.id
+                    # str_labels = dct_container.get("Labels")
+                    # dct_labels = dict(
+                    #     [a.split("=", 1) for a in str_labels.split(",")]
+                    # )
+                    # compose_key = dct_labels.get("com.docker.compose.project")
+                    # compose_id = dct_compose_name_id.get(compose_key, False)
+                    # if compose_id:
+                    #     container_value["compose_id"] = compose_id.id
+
+                    deploy_docker_container_id = self.env[
+                        "devops.deploy.docker.container"
+                    ].create(container_value)
+
+                dct_container_name_id[
+                    id_container
+                ] = deploy_docker_container_id
+            for compose_id in dct_compose_name_id.values():
+                workspace_ids = rec.devops_workspace_ids.filtered(
+                    lambda r: r.folder == compose_id.folder_root
+                )
+                if not workspace_ids:
+                    continue
+                for ws_id in workspace_ids:
+                    mode_docker_id = self.env.ref(
+                        "erplibre_devops.erplibre_mode_source_docker"
+                    )
+                    if (
+                        ws_id.deploy_docker_compose_id
+                        and ws_id.erplibre_mode.mode_source != mode_docker_id
+                    ):
+                        continue
+                    ws_id.deploy_docker_compose_id = compose_id.id
+                    if not ws_id.is_installed:
+                        # Can install it!
+                        ws_id.action_install_workspace()
 
     @api.multi
     def action_install_docker(self):
@@ -809,15 +1286,6 @@ class DevopsSystem(models.Model):
                 + log
             )
             raise exceptions.Warning(msg)
-
-    @api.multi
-    def action_search_docker(self):
-        for rec in self:
-            dct_vm_identifiant = {}
-            cmd = "vboxmanage list runningvms"
-            out, status = rec.execute_with_result(
-                cmd, None, return_status=True
-            )
 
     @api.multi
     def action_search_vm(self):
@@ -935,7 +1403,8 @@ class DevopsSystem(models.Model):
                                                         "=",
                                                         ssh_host,
                                                     )
-                                                ]
+                                                ],
+                                                limit=1,
                                             )
                                             if system_vm_id:
                                                 system_vm_id.devops_deploy_vm_id = (
@@ -1223,15 +1692,16 @@ class DevopsSystem(models.Model):
             lst_host = [a for a in config.get_hostnames() if a != "*"]
             for host in lst_host:
                 dev_config = config.lookup(host)
+                hostname = dev_config.get("hostname")
                 system_id = self.env["devops.system"].search(
-                    [("name", "=", dev_config.get("hostname"))], limit=1
+                    [("ssh_host", "=", hostname)], limit=1
                 )
                 if not system_id:
-                    name = f"{host}[{dev_config.get('hostname')}]"
+                    name = f"{host}[{hostname}]"
                     value = {
                         "method": "ssh",
                         "name_overwrite": name,
-                        "ssh_host": dev_config.get("hostname"),
+                        "ssh_host": hostname,
                         "ssh_host_name": host,
                         # "ssh_password": dev_config.get("password"),
                     }

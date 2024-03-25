@@ -6,12 +6,47 @@
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" icon="fa-archive" name="toggle_active" type="object">
+                            <field name="active" widget="boolean_button" />
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
                     <group>
-                        <field name="name" />
+                        <group>
+                            <field name="created_at" />
+                            <field name="created_since" />
+                        </group>
+                        <group>
+                            <field name="system_ids" widget="many2many_tags" />
+                        </group>
+                        <group>
+                            <field name="id_short_image" />
+                            <field name="id_image" />
+                        </group>
+                        <group>
+                            <field name="repository" />
+                            <field name="size_human" />
+                            <field name="size_virtual_human" />
+                            <field name="tag" />
+                        </group>
                     </group>
-                    <group>
-                        <field name="system_id" />
-                    </group>
+                    <notebook>
+                        <page string="inspect">
+                            <group>
+                                <field name="inspect_full" />
+                            </group>
+                        </page>
+                        <page string="History">
+                            <group>
+                                <field name="history_full" />
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
@@ -23,7 +58,15 @@
         <field name="arch" type="xml">
             <graph string="Devops deploy docker image">
                 <field name="name" type="row" />
-                <field name="system_id" type="row" />
+                <field name="created_at" type="row" />
+                <field name="created_since" type="row" />
+                <field name="history_full" type="row" />
+                <field name="id_image" type="row" />
+                <field name="inspect_full" type="row" />
+                <field name="repository" type="row" />
+                <field name="size_human" type="row" />
+                <field name="size_virtual_human" type="row" />
+                <field name="tag" type="row" />
             </graph>
         </field>
     </record>
@@ -34,7 +77,17 @@
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <field name="name" />
-                <field name="system_id" />
+                <field name="created_at" />
+                <field name="created_since" />
+                <field name="history_full" />
+                <field name="id_image" />
+                <field name="id_short_image" />
+                <field name="inspect_full" />
+                <field name="repository" />
+                <field name="size_human" />
+                <field name="size_virtual_human" />
+                <field name="tag" />
+                <field name="system_ids" />
                 <templates>
                     <t t-name="kanban-box">
                         <div t-attf-class="oe_kanban_global_click">
@@ -47,7 +100,27 @@
                                     </li>
                                     <li class="mb4">
                                         <strong>
-                                            <field name="system_id" />
+                                            <field name="created_at" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="created_since" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="id_short_image" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="size_virtual_human" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="system_ids" widget="many2many_tags" />
                                         </strong>
                                     </li>
                                 </ul>
@@ -65,7 +138,15 @@
         <field name="arch" type="xml">
             <pivot string="Devops deploy docker image">
                 <field name="name" type="row" />
-                <field name="system_id" type="row" />
+                <field name="created_at" type="row" />
+                <field name="created_since" type="row" />
+                <field name="history_full" type="row" />
+                <field name="id_image" type="row" />
+                <field name="inspect_full" type="row" />
+                <field name="repository" type="row" />
+                <field name="size_human" type="row" />
+                <field name="size_virtual_human" type="row" />
+                <field name="tag" type="row" />
             </pivot>
         </field>
     </record>
@@ -75,8 +156,12 @@
         <field name="model">devops.deploy.docker.image</field>
         <field name="arch" type="xml">
             <search string="Devops deploy docker image">
-                <filter domain="[('name','!=',False)]" name="name" string="Name" />
-                <filter domain="[('system_id','!=',False)]" name="system_id" string="System" />
+                <field name="name" />
+                <field name="id_image" />
+                <field name="system_ids" filter_domain="[('system_ids.name', '=', self)]" string="Systems" />
+                <group string="Group By" expand="1">
+                    <filter name="group_by_repository" string="Repository" context="{'group_by':'repository'}" />
+                </group>
             </search>
         </field>
     </record>
@@ -87,15 +172,29 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
-                <field name="system_id" />
+                <field name="created_at" />
+                <field name="created_since" />
+                <field name="id_short_image" />
+                <field name="size_virtual_human" />
+                <field name="system_ids" widget="many2many_tags" />
+                <field name="tag" />
+                <field name="repository" />
             </tree>
         </field>
     </record>
 
     <act_window
-        id="devops_deploy_docker_image_deploy_docker_image_action_window"
+        id="devops_deploy_docker_image_deploy_docker_image_group_action_window"
         name="Deploy docker image"
         res_model="devops.deploy.docker.image"
         view_mode="kanban,tree,pivot,graph,form"
+        context="{'search_default_group_by_repository': True}"
+    />
+
+    <act_window
+        id="devops_deploy_docker_image_deploy_docker_image_action_window"
+        name="Deploy docker image"
+        res_model="devops.deploy.docker.image"
+        view_mode="tree,kanban,pivot,graph,form"
     />
 </odoo>

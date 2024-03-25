@@ -238,7 +238,6 @@
                 </div>
                 <field name="is_conflict_mode_exec" invisible="True" />
                 <field name="is_installed" invisible="True" />
-                <field name="is_running" invisible="True" />
                 <field name="is_me" invisible="True" />
                 <field name="is_robot" invisible="True" />
                 <field name="mode_exec" invisible="True" />
@@ -247,6 +246,7 @@
                         <field name="system_id" />
                         <field name="folder" />
                         <field name="erplibre_mode" />
+                        <field name="is_running" />
                     </group>
                     <group string="Execution">
                         <field name="is_debug_log" />
@@ -289,6 +289,7 @@
                     </group>
                     <group string="Docker" attrs="{'invisible': [('is_installed', '=', False)]}">
                         <field name="workspace_docker_id" />
+                        <field name="deploy_docker_compose_id" />
                     </group>
                     <group string="Action">
                         <button name="action_open_terminal" string="Terminal" type="object" class="oe_highlight" />
@@ -363,6 +364,11 @@
                 <field name="folder" />
                 <filter string="Is me" name="is_me" domain="[('is_me','=',True)]" />
                 <filter string="Is robot" name="is_robot" domain="[('is_robot','=',True)]" />
+                <filter
+                    string="Has deploy docker compose"
+                    name="has_deploy_docker_compose"
+                    domain="[('deploy_docker_compose_id','!=',False)]"
+                />
                 <group string="Group By" expand="1">
                     <filter name="system_id" string="System" context="{'group_by':'system_id'}" />
                     <filter name="folder" string="Folder" context="{'group_by':'folder'}" />

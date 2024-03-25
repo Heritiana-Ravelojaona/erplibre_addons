@@ -6,10 +6,38 @@
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" icon="fa-archive" name="toggle_active" type="object">
+                            <field name="active" widget="boolean_button" />
+                        </button>
+                        <button
+                            name="%(erplibre_devops.devops_deploy_docker_container_deploy_docker_container_action_window)d"
+                            type="action"
+                            class="oe_stat_button"
+                            icon="fa-tasks"
+                            context="{'search_default_compose_id': [active_id]}"
+                            help="Open associate docker container"
+                            string="Docker container"
+                        />
+                        <button
+                            name="%(erplibre_devops.devops_deploy_docker_volume_deploy_docker_volume_action_window)d"
+                            type="action"
+                            class="oe_stat_button"
+                            icon="fa-tasks"
+                            context="{'search_default_compose_id': [active_id]}"
+                            help="Open associate docker volume"
+                            string="Docker volume"
+                        />
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
                     <group>
-                        <field name="name" />
-                    </group>
-                    <group>
+                        <field name="config_file_path" />
+                        <field name="folder_root" />
+                        <field name="is_running" />
                         <field name="system_id" />
                     </group>
                 </sheet>
@@ -23,6 +51,8 @@
         <field name="arch" type="xml">
             <graph string="Devops deploy docker compose">
                 <field name="name" type="row" />
+                <field name="config_file_path" type="row" />
+                <field name="is_running" type="row" />
                 <field name="system_id" type="row" />
             </graph>
         </field>
@@ -34,6 +64,8 @@
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <field name="name" />
+                <field name="config_file_path" />
+                <field name="is_running" />
                 <field name="system_id" />
                 <templates>
                     <t t-name="kanban-box">
@@ -44,6 +76,17 @@
                                         <strong>
                                             <field name="name" />
                                         </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="config_file_path" />
+                                        </strong>
+                                    </li>
+                                    <li class="text-success float-right mb4" t-if="record.is_running.raw_value">
+                                        <i aria-label="Ok" class="fa fa-circle" role="img" title="Ok" />
+                                    </li>
+                                    <li class="text-danger float-right mb4" t-if="!record.is_running.raw_value">
+                                        <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
                                     </li>
                                     <li class="mb4">
                                         <strong>
@@ -65,6 +108,8 @@
         <field name="arch" type="xml">
             <pivot string="Devops deploy docker compose">
                 <field name="name" type="row" />
+                <field name="config_file_path" type="row" />
+                <field name="is_running" type="row" />
                 <field name="system_id" type="row" />
             </pivot>
         </field>
@@ -75,8 +120,13 @@
         <field name="model">devops.deploy.docker.compose</field>
         <field name="arch" type="xml">
             <search string="Devops deploy docker compose">
-                <filter domain="[('name','!=',False)]" name="name" string="Name" />
-                <filter domain="[('system_id','!=',False)]" name="system_id" string="System" />
+                <field name="name" />
+                <field name="system_id" />
+                <filter name="active" string="Active" domain="[('active','=',True)]" help="Show active" />
+                <filter name="inactive" string="Inactive" domain="[('active','=',False)]" help="Show inactive" />
+                <group string="Group By" expand="1">
+                    <filter name="group_by_system_id" string="System" context="{'group_by':'system_id'}" />
+                </group>
             </search>
         </field>
     </record>
@@ -87,15 +137,25 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
+                <field name="is_running" />
+                <field name="config_file_path" />
                 <field name="system_id" />
             </tree>
         </field>
     </record>
 
     <act_window
-        id="devops_deploy_docker_compose_deploy_docker_compose_action_window"
+        id="devops_deploy_docker_compose_deploy_docker_compose_group_action_window"
         name="Deploy docker compose"
         res_model="devops.deploy.docker.compose"
         view_mode="kanban,tree,pivot,graph,form"
+        context="{'search_default_group_by_system_id': True}"
+    />
+
+    <act_window
+        id="devops_deploy_docker_compose_deploy_docker_compose_action_window"
+        name="Deploy docker compose"
+        res_model="devops.deploy.docker.compose"
+        view_mode="tree,kanban,pivot,graph,form"
     />
 </odoo>

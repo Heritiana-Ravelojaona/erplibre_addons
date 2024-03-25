@@ -10,7 +10,6 @@
                     <button name="action_refresh_db_image" string="Reload db image" type="object" />
                     <button name="action_search_workspace" string="Search workspace" type="object" />
                     <button name="action_search_vm" string="Search VM" type="object" />
-                    <button name="action_search_docker" string="Search Docker" type="object" />
                     <button name="action_show_security_ssh_keygen" string="Show SSH key security" type="object" />
                     <button name="get_local_system_id_from_ssh_config" string="Search sub-system" type="object" />
                     <button name="action_install_dev_system" string="Install dev system" type="object" />
@@ -33,7 +32,72 @@
                         type="object"
                         attrs="{'invisible': [('docker_has_check','=',False)]}"
                     />
+                    <button
+                        name="action_search_docker"
+                        string="Search Docker"
+                        type="object"
+                        attrs="{'invisible': [('docker_has_check','=',False)]}"
+                    />
                 </header>
+                <div name="button_box" class="oe_button_box">
+                    <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                        <field
+                            name="active"
+                            widget="boolean_button"
+                            options="{&quot;terminology&quot;: &quot;archive&quot;}"
+                        />
+                    </button>
+                    <button
+                        name="%(erplibre_devops.devops_deploy_docker_compose_deploy_docker_compose_action_window)d"
+                        type="action"
+                        class="oe_stat_button"
+                        icon="fa-tasks"
+                        context="{'search_default_system_id': active_id}"
+                        attrs="{'invisible': [('docker_compose_count', '==', 0)]}"
+                    >
+                        <field name="docker_compose_count" string="Docker Compose" widget="statinfo" />
+                    </button>
+                    <button
+                        name="%(erplibre_devops.devops_deploy_docker_volume_deploy_docker_volume_action_window)d"
+                        type="action"
+                        class="oe_stat_button"
+                        icon="fa-tasks"
+                        context="{'search_default_system_id': active_id}"
+                        attrs="{'invisible': [('docker_volume_count', '==', 0)]}"
+                    >
+                        <field name="docker_volume_count" string="Docker Volume" widget="statinfo" />
+                    </button>
+                    <button
+                        name="%(erplibre_devops.devops_deploy_docker_image_deploy_docker_image_action_window)d"
+                        type="action"
+                        class="oe_stat_button"
+                        icon="fa-tasks"
+                        context="{'search_default_system_ids': name}"
+                        attrs="{'invisible': [('docker_image_count', '==', 0)]}"
+                    >
+                        <field name="docker_image_count" string="Docker Image" widget="statinfo" />
+                    </button>
+                    <button
+                        name="%(erplibre_devops.devops_deploy_docker_network_deploy_docker_network_action_window)d"
+                        type="action"
+                        class="oe_stat_button"
+                        icon="fa-tasks"
+                        context="{'search_default_system_id': active_id}"
+                        attrs="{'invisible': [('docker_network_count', '==', 0)]}"
+                    >
+                        <field name="docker_network_count" string="Docker Network" widget="statinfo" />
+                    </button>
+                    <button
+                        name="%(erplibre_devops.devops_deploy_docker_container_deploy_docker_container_action_window)d"
+                        type="action"
+                        class="oe_stat_button"
+                        icon="fa-tasks"
+                        context="{'search_default_system_id': active_id}"
+                        attrs="{'invisible': [('docker_container_count', '==', 0)]}"
+                    >
+                        <field name="docker_container_count" string="Docker container" widget="statinfo" />
+                    </button>
+                </div>
                 <div class="oe_title">
                     <h1>
                         <field name="name" />
@@ -154,6 +218,8 @@
                 />
                 <filter name="is_vm" string="Is VM" domain="[('is_vm', '=', True)]" />
                 <filter name="is_not_vm" string="Is not VM" domain="[('is_vm', '=', False)]" />
+                <filter name="active" string="Active" domain="[('active','=',True)]" help="Show active" />
+                <filter name="inactive" string="Inactive" domain="[('active','=',False)]" help="Show inactive" />
                 <group string="Group By" expand="1">
                     <filter name="method" string="Method" context="{'group_by':'method'}" />
                     <filter name="parent_system_id" string="Parent system" context="{'group_by':'parent_system_id'}" />
