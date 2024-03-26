@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="devops_deploy_docker_container_view_form" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_container_form</field>
+        <field name="model">devops.deploy.docker.container</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <div name="button_box" class="oe_button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" />
+                        </button>
+                    </div>
+                    <group>
+                        <field name="create_at" />
+                        <field name="running_for" />
+                        <field name="size_human" />
+                        <field name="state_container" />
+                        <field name="status_container" />
+                        <field name="system_id" />
+                        <field name="image_id" />
+                        <field name="network_id" />
+                        <field name="compose_id" />
+                        <field name="volume_ids" widget="many2many_tags" />
+                    </group>
+                    <group>
+                        <field name="command" />
+                        <field name="id_container" />
+                        <field name="id_short_container" />
+                        <field name="mounts_full" />
+                        <field name="ports_full" />
+                        <field name="label_full" />
+                    </group>
+                    <notebook>
+                        <page string="Inspect">
+                            <group>
+                                <field name="inspect_full" />
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="devops_deploy_docker_container_view_graph" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_container_graph</field>
+        <field name="model">devops.deploy.docker.container</field>
+        <field name="arch" type="xml">
+            <graph string="Devops deploy docker container">
+                <field name="name" type="row" />
+                <field name="command" type="row" />
+                <field name="create_at" type="row" />
+                <field name="id_container" type="row" />
+                <field name="inspect_full" type="row" />
+                <field name="label_full" type="row" />
+                <field name="mounts_full" type="row" />
+                <field name="ports_full" type="row" />
+                <field name="running_for" type="row" />
+                <field name="size_human" type="row" />
+                <field name="state_container" type="row" />
+                <field name="status_container" type="row" />
+                <field name="system_id" type="row" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="devops_deploy_docker_container_view_kanban" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_container_kanban</field>
+        <field name="model">devops.deploy.docker.container</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <field name="command" />
+                <field name="create_at" />
+                <field name="id_container" />
+                <field name="id_short_container" />
+                <field name="inspect_full" />
+                <field name="label_full" />
+                <field name="mounts_full" />
+                <field name="ports_full" />
+                <field name="running_for" />
+                <field name="size_human" />
+                <field name="state_container" />
+                <field name="status_container" />
+                <field name="system_id" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="command" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="create_at" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="id_short_container" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="label_full" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="mounts_full" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="ports_full" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="running_for" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="size_human" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="state_container" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="status_container" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="system_id" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="devops_deploy_docker_container_view_pivot" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_container_pivot</field>
+        <field name="model">devops.deploy.docker.container</field>
+        <field name="arch" type="xml">
+            <pivot string="Devops deploy docker container">
+                <field name="name" type="row" />
+                <field name="command" type="row" />
+                <field name="create_at" type="row" />
+                <field name="id_container" type="row" />
+                <field name="inspect_full" type="row" />
+                <field name="label_full" type="row" />
+                <field name="mounts_full" type="row" />
+                <field name="ports_full" type="row" />
+                <field name="running_for" type="row" />
+                <field name="size_human" type="row" />
+                <field name="state_container" type="row" />
+                <field name="status_container" type="row" />
+                <field name="system_id" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="devops_deploy_docker_container_view_search" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_container_search</field>
+        <field name="model">devops.deploy.docker.container</field>
+        <field name="arch" type="xml">
+            <search string="Devops deploy docker container">
+                <field name="name" />
+                <field name="system_id" />
+                <field name="compose_id" />
+                <filter name="active" string="Active" domain="[('active','=',True)]" help="Show active" />
+                <filter name="inactive" string="Inactive" domain="[('active','=',False)]" help="Show inactive" />
+                <group string="Group By" expand="1">
+                    <filter name="group_by_system_id" string="System" context="{'group_by':'system_id'}" />
+                    <filter name="group_by_compose_id" string="Composante" context="{'group_by':'compose_id'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="devops_deploy_docker_container_view_tree" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_container_tree</field>
+        <field name="model">devops.deploy.docker.container</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="command" />
+                <field name="create_at" />
+                <field name="id_short_container" />
+                <field name="label_full" />
+                <field name="mounts_full" />
+                <field name="ports_full" />
+                <field name="running_for" />
+                <field name="size_human" />
+                <field name="state_container" />
+                <field name="status_container" />
+                <field name="system_id" />
+                <field name="image_id" />
+                <field name="network_id" />
+                <field name="compose_id" />
+                <field name="volume_ids" widget="many2many_tags" />
+            </tree>
+        </field>
+    </record>
+
+    <act_window
+        id="devops_deploy_docker_container_deploy_docker_container_group_action_window"
+        name="Deploy docker group container"
+        res_model="devops.deploy.docker.container"
+        view_mode="tree,kanban,pivot,graph,form"
+        context="{'search_default_group_by_system_id': True}"
+    />
+
+    <act_window
+        id="devops_deploy_docker_container_deploy_docker_container_action_window"
+        name="Deploy docker container"
+        res_model="devops.deploy.docker.container"
+        view_mode="tree,kanban,pivot,graph,form"
+    />
+</odoo>

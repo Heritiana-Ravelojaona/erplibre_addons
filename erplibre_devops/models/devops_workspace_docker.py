@@ -183,7 +183,7 @@ volumes:
             if "db_host" not in result:
                 # TODO remove this information from executable of docker
                 result += (
-                    "db_host = db\ndb_port = 5432\ndb_user ="
+                    "\ndb_host = db\ndb_port = 5432\ndb_user ="
                     " odoo\ndb_password = mysecretpassword\n"
                 )
             if "admin_passwd" not in result:
@@ -319,7 +319,10 @@ volumes:
             result = exec_id.log_all
             # rec.docker_compose_ps = f"\n{result}"
             rec.docker_is_running = bool(result)
-            rec.workspace_id.is_running = rec.docker_is_running
+            if rec.workspace_id.deploy_docker_compose_id:
+                rec.workspace_id.deploy_docker_compose_id.is_running = (
+                    rec.docker_is_running
+                )
 
     @api.multi
     def action_docker_logs(self):

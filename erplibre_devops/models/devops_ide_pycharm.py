@@ -109,7 +109,9 @@ class DevopsIdePycharm(models.Model):
     def action_pycharm_open(
         rec_ws, folder=None, filename=None, pycharm_arg=None
     ):
+        # TODO auto-search pycharm binary
         cmd = "~/.local/share/JetBrains/Toolbox/scripts/pycharm"
+        # cmd = "/snap/bin/pycharm-community"
         if pycharm_arg:
             cmd += f" {pycharm_arg}"
         if folder:
@@ -165,9 +167,11 @@ class DevopsIdePycharm(models.Model):
                     "TypeError:",
                     "AttributeError:",
                     "ValueError:",
+                    "OSError:",
                     "AssertionError:",
                     "SyntaxError:",
                     "KeyError:",
+                    "psycopg2.errors.NotNullViolation:",
                     "psycopg2.errors.UndefinedTable:",
                     "UnboundLocalError:",
                     "FileNotFoundError:",

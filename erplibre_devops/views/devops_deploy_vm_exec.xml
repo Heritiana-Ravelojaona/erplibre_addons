@@ -56,10 +56,10 @@
                                         </strong>
                                     </li>
                                     <li class="text-success float-right mb4" t-if="record.is_running.raw_value">
-                                        <i aria-label="Ok" class="fa fa-circle" role="img" title="Ok" />
+                                        <i class="fa fa-circle" aria-label="Ok" role="img" title="Ok" />
                                     </li>
                                     <li class="text-danger float-right mb4" t-if="!record.is_running.raw_value">
-                                        <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
+                                        <i class="fa fa-circle" aria-label="Invalid" role="img" title="Invalid" />
                                     </li>
                                     <li class="mb4">
                                         <strong>
@@ -98,10 +98,10 @@
         <field name="model">devops.deploy.vm.exec</field>
         <field name="arch" type="xml">
             <search string="Devops deploy vm exec">
-                <filter domain="[('name','!=',False)]" name="name" string="Name" />
-                <filter domain="[('is_running','=',True)]" name="is_running" string="Is Running" />
-                <filter domain="[('stage_id','!=',False)]" name="stage_id" string="Stage" />
-                <filter domain="[('vm_id','!=',False)]" name="vm_id" string="Vm" />
+                <filter name="name" string="Name" domain="[('name','!=',False)]" />
+                <filter name="is_running" string="Is Running" domain="[('is_running','=',True)]" />
+                <filter name="stage_id" string="Stage" domain="[('stage_id','!=',False)]" />
+                <filter name="vm_id" string="Vm" domain="[('vm_id','!=',False)]" />
             </search>
         </field>
     </record>

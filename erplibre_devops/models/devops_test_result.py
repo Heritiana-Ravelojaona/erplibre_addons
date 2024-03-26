@@ -51,6 +51,10 @@ class DevopsTestResult(models.Model):
 
     active = fields.Boolean(default=True)
 
+    time_duration_seconds = fields.Integer()
+
+    date_log = fields.Datetime()
+
     log = fields.Text(readonly=True)
 
     log_html = fields.Html(

@@ -24,7 +24,7 @@
                     <button name="action_debug_new_project" string="Debug" type="object" class="btn-warning" />
                     <button
                         name="open_file_ide"
-                        string="Open into PyCharm"
+                        string="Open into IDE"
                         type="object"
                         class="oe_highlight"
                         attrs="{'invisible': [('ide_breakpoint', '=', False)]}"
@@ -68,6 +68,7 @@
                             <field name="ide_breakpoint" />
                             <field name="exec_filename" />
                             <field name="exec_keyword" />
+                            <field name="exec_method" />
                             <field name="exec_line_number" />
                         </group>
                         <group string="Date">
@@ -188,7 +189,7 @@
                 <field name="ide_breakpoint" invisible="True" />
                 <button
                     name="open_file_ide"
-                    string="Open file"
+                    string="Open into IDE"
                     type="object"
                     class="oe_stat_button"
                     icon="fa-play-circle text-success"

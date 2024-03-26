@@ -13,11 +13,95 @@
                     <button name="action_show_security_ssh_keygen" string="Show SSH key security" type="object" />
                     <button name="get_local_system_id_from_ssh_config" string="Search sub-system" type="object" />
                     <button name="action_install_dev_system" string="Install dev system" type="object" />
+                    <button
+                        name="action_install_docker"
+                        string="Install docker"
+                        type="object"
+                        attrs="{'invisible': [('docker_has_check','=',False)]}"
+                    />
+                    <button
+                        name="action_check_docker"
+                        string="Check docker"
+                        type="object"
+                        class="btn-success"
+                        attrs="{'invisible': [('docker_has_check','=',True)]}"
+                    />
+                    <button
+                        name="action_check_docker"
+                        string="Check docker"
+                        type="object"
+                        attrs="{'invisible': [('docker_has_check','=',False)]}"
+                    />
+                    <button
+                        name="action_search_docker"
+                        string="Search Docker"
+                        type="object"
+                        attrs="{'invisible': [('docker_has_check','=',False)]}"
+                    />
                 </header>
                 <div class="oe_title">
                     <h1>
                         <field name="name" />
                     </h1>
+                </div>
+                <div name="button_box" class="oe_button_box">
+                    <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                        <field
+                            name="active"
+                            widget="boolean_button"
+                            options="{&quot;terminology&quot;: &quot;archive&quot;}"
+                        />
+                    </button>
+                    <button
+                        name="%(erplibre_devops.devops_deploy_docker_compose_deploy_docker_compose_action_window)d"
+                        type="action"
+                        class="oe_stat_button"
+                        icon="fa-tasks"
+                        context="{'search_default_system_id': active_id}"
+                        attrs="{'invisible': [('docker_compose_count', '==', 0)]}"
+                    >
+                        <field name="docker_compose_count" string="Docker Compose" widget="statinfo" />
+                    </button>
+                    <button
+                        name="%(erplibre_devops.devops_deploy_docker_volume_deploy_docker_volume_action_window)d"
+                        type="action"
+                        class="oe_stat_button"
+                        icon="fa-tasks"
+                        context="{'search_default_system_id': active_id}"
+                        attrs="{'invisible': [('docker_volume_count', '==', 0)]}"
+                    >
+                        <field name="docker_volume_count" string="Docker Volume" widget="statinfo" />
+                    </button>
+                    <button
+                        name="%(erplibre_devops.devops_deploy_docker_image_deploy_docker_image_action_window)d"
+                        type="action"
+                        class="oe_stat_button"
+                        icon="fa-tasks"
+                        context="{'search_default_system_ids': name}"
+                        attrs="{'invisible': [('docker_image_count', '==', 0)]}"
+                    >
+                        <field name="docker_image_count" string="Docker Image" widget="statinfo" />
+                    </button>
+                    <button
+                        name="%(erplibre_devops.devops_deploy_docker_network_deploy_docker_network_action_window)d"
+                        type="action"
+                        class="oe_stat_button"
+                        icon="fa-tasks"
+                        context="{'search_default_system_id': active_id}"
+                        attrs="{'invisible': [('docker_network_count', '==', 0)]}"
+                    >
+                        <field name="docker_network_count" string="Docker Network" widget="statinfo" />
+                    </button>
+                    <button
+                        name="%(erplibre_devops.devops_deploy_docker_container_deploy_docker_container_action_window)d"
+                        type="action"
+                        class="oe_stat_button"
+                        icon="fa-tasks"
+                        context="{'search_default_system_id': active_id}"
+                        attrs="{'invisible': [('docker_container_count', '==', 0)]}"
+                    >
+                        <field name="docker_container_count" string="Docker container" widget="statinfo" />
+                    </button>
                 </div>
                 <div class="bg-danger" attrs="{'invisible': [('terminal', '!=', False)]}">
                     <h3>Error:</h3>
@@ -31,45 +115,76 @@
                         <field name="use_search_cmd" />
                         <field name="debug_command" />
                     </group>
-                    <group string="Connected system">
-                        <field name="parent_system_id" />
-                        <field name="sub_system_ids" />
-                    </group>
-                    <group string="VM">
-                        <field name="devops_deploy_vm_id" />
-                    </group>
                 </group>
-                <div attrs="{'invisible': [('method', '!=', 'ssh')]}">
-                    <div class="bg-warning">
-                        <h3>Warning:</h3>
-                        Use SSH with caution!
-                        <div attrs="{'invisible': [('ssh_use_sshpass', '=', False)]}">
-                            The password can be visible into log.
+                <notebook>
+                    <page string="Information">
+                        <group>
+                            <field name="erplibre_config_path_home_ids" />
+                            <field name="devops_workspace_ids" />
+                        </group>
+                    </page>
+                    <page string="System">
+                        <group string="Connected system">
+                            <field name="parent_system_id" />
+                            <field name="sub_system_ids" />
+                        </group>
+                    </page>
+                    <page string="SSH" attrs="{'invisible': [('method', '!=', 'ssh')]}">
+                        <div class="bg-warning">
+                            <h3>Warning:</h3>
+                            Use SSH with caution!
+                            <div attrs="{'invisible': [('ssh_use_sshpass', '=', False)]}">
+                                The password can be visible into log.
+                            </div>
                         </div>
-                    </div>
-                    <group string="SSH Settings">
-                        <field name="ssh_host_name" />
-                        <field name="ssh_host" placeholder="ssh.example.com" />
-                        <field name="ssh_use_sshpass" />
-                        <field name="ssh_port" />
-                        <field name="ssh_user" placeholder="john" />
-                        <field name="ssh_password" password="True" />
-                        <field name="ssh_private_key" placeholder="/home/odoo/.ssh/id_rsa" />
-                        <field name="ssh_public_host_key" placeholder="AAAA..." />
-                        <field name="ssh_connection_status" />
-                        <button
-                            name="action_ssh_test_connection"
-                            string="Test SSH Connection"
-                            type="object"
-                            icon="fa-television"
-                        />
-                    </group>
-                </div>
-                <group string="Information">
-                    <field name="erplibre_config_path_home_ids" />
-                    <field name="devops_workspace_ids" />
-                    <!--                    <field name="devops_deploy_vm_ids" />-->
-                </group>
+                        <group string="SSH Settings">
+                            <field name="ssh_host_name" />
+                            <field name="ssh_host" placeholder="ssh.example.com" />
+                            <field name="ssh_use_sshpass" />
+                            <field name="ssh_port" />
+                            <field name="ssh_user" placeholder="john" />
+                            <field name="ssh_password" password="True" />
+                            <field name="ssh_private_key" placeholder="/home/odoo/.ssh/id_rsa" />
+                            <field name="ssh_public_host_key" placeholder="AAAA..." />
+                            <field name="ssh_connection_status" />
+                            <button
+                                name="action_ssh_test_connection"
+                                string="Test SSH Connection"
+                                type="object"
+                                icon="fa-television"
+                            />
+                        </group>
+                    </page>
+                    <page string="VM">
+                        <group>
+                            <field name="devops_deploy_vm_id" />
+                        </group>
+                    </page>
+                    <page string="Docker">
+                        <group>
+                            <group>
+                                <field name="docker_has_check" string="Has check" />
+                                <field name="docker_is_installed" string="Is installed" />
+                                <field name="docker_daemon_is_running" string="Is running" />
+                                <field name="docker_version_engine" string="Version engine" />
+                                <field name="docker_compose_version" string="Compose version" />
+                                <field name="docker_stats_total_ram_use" string="Total RAM use" />
+                            </group>
+                            <group>
+                                <field name="docker_stats" string="Stats" />
+                                <field name="docker_system_df" string="Disk space" />
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="docker_system_info" string="System info" />
+                            </group>
+                            <group>
+                                <field name="docker_version" string="Version" />
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
             </form>
         </field>
     </record>
@@ -81,12 +196,46 @@
             <search>
                 <field name="name" />
                 <field name="ssh_host" />
+                <filter
+                    name="docker_is_installed"
+                    string="Docker is installed"
+                    domain="[('docker_is_installed', '=', True)]"
+                />
+                <filter
+                    name="docker_is_not_installed"
+                    string="Docker is not installed"
+                    domain="[('docker_is_installed', '=', False)]"
+                />
+                <filter
+                    name="docker_daemon_is_running"
+                    string="Docker daemon is running"
+                    domain="[('docker_daemon_is_running', '=', True)]"
+                />
+                <filter
+                    name="docker_daemon_is_not_running"
+                    string="Docker daemon is not running"
+                    domain="[('docker_daemon_is_running', '=', False)]"
+                />
+                <filter name="is_vm" string="Is VM" domain="[('is_vm', '=', True)]" />
+                <filter name="is_not_vm" string="Is not VM" domain="[('is_vm', '=', False)]" />
+                <filter name="active" string="Active" domain="[('active','=',True)]" help="Show active" />
+                <filter name="inactive" string="Inactive" domain="[('active','=',False)]" help="Show inactive" />
                 <group string="Group By" expand="1">
                     <filter name="method" string="Method" context="{'group_by':'method'}" />
                     <filter name="parent_system_id" string="Parent system" context="{'group_by':'parent_system_id'}" />
                     <filter name="terminal" string="Terminal" context="{'group_by':'terminal'}" />
                     <filter name="use_search_cmd" string="Searching command" context="{'group_by':'use_search_cmd'}" />
                     <filter name="path_home" string="Path home" context="{'group_by':'path_home'}" />
+                    <filter
+                        name="docker_is_installed"
+                        string="Docker is installed"
+                        context="{'group_by':'docker_is_installed'}"
+                    />
+                    <filter
+                        name="docker_daemon_is_running"
+                        string="Docker daemon is running"
+                        context="{'group_by':'docker_daemon_is_running'}"
+                    />
                 </group>
             </search>
         </field>
@@ -107,6 +256,16 @@
         </field>
     </record>
 
+    <record id="devops_system_view_graph" model="ir.ui.view">
+        <field name="name">devops_system_graph</field>
+        <field name="model">devops.system</field>
+        <field name="arch" type="xml">
+            <graph string="Devops system">
+                <field name="name" type="row" />
+            </graph>
+        </field>
+    </record>
+
     <record id="devops_system_view_kanban" model="ir.ui.view">
         <field name="name">devops_system_kanban</field>
         <field name="model">devops.system</field>
@@ -114,7 +273,6 @@
             <kanban class="o_kanban_mobile">
                 <field name="name" />
                 <field name="system_status" />
-                <!--                <field name="is_vm" />-->
                 <field name="devops_deploy_vm_id" />
                 <templates>
                     <t t-name="kanban-box">
@@ -127,10 +285,10 @@
                                         </strong>
                                     </li>
                                     <li class="text-success float-right mb4" t-if="record.system_status.raw_value">
-                                        <i aria-label="Ok" class="fa fa-circle" role="img" title="Ok" />
+                                        <i class="fa fa-circle" aria-label="Ok" role="img" title="Ok" />
                                     </li>
                                     <li class="text-danger float-right mb4" t-if="!record.system_status.raw_value">
-                                        <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
+                                        <i class="fa fa-circle" aria-label="Invalid" role="img" title="Invalid" />
                                     </li>
                                 </ul>
                                 <button
@@ -175,16 +333,6 @@
             <pivot string="Devops system">
                 <field name="name" type="row" />
             </pivot>
-        </field>
-    </record>
-
-    <record id="devops_system_view_graph" model="ir.ui.view">
-        <field name="name">devops_system_graph</field>
-        <field name="model">devops.system</field>
-        <field name="arch" type="xml">
-            <graph string="Devops system">
-                <field name="name" type="row" />
-            </graph>
         </field>
     </record>
 

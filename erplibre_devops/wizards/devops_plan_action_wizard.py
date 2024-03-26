@@ -73,8 +73,6 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     working_project_name = fields.Char()
 
-    is_autopoieses = fields.Boolean()
-
     is_new_module = fields.Boolean(
         compute="_compute_is_new_module", store=True, readonly=False
     )
@@ -230,6 +228,14 @@ class DevopsPlanActionWizard(models.TransientModel):
         string="New/Existing system",
     )
 
+    working_system_can_be_power_on = fields.Boolean(
+        related="working_system_id.is_vm"
+    )
+
+    working_system_status = fields.Boolean(
+        related="working_system_id.system_status"
+    )
+
     working_cg_module_id = fields.Many2one(
         comodel_name="code.generator.module",
         string="CG code builder",
@@ -321,6 +327,14 @@ class DevopsPlanActionWizard(models.TransientModel):
             required=True,
             help="Feature for mode_view_snippet",
         )
+    )
+
+    config_uca_enable_export_data = fields.Boolean(
+        default=True,
+        help=(
+            "Will enable option nonmenclator in CG to export data associate to"
+            " models."
+        ),
     )
 
     mode_view_snippet_template_generate_website_enable_javascript = (
@@ -574,6 +588,11 @@ class DevopsPlanActionWizard(models.TransientModel):
             ("final", "Final"),
         ]
 
+    def working_system_id_power(self):
+        if self.working_system_id:
+            self.working_system_id.action_vm_power()
+        return self._reopen_self()
+
     def clear_working_system_id(self):
         self.working_system_id = False
         return self._reopen_self()
@@ -657,8 +676,8 @@ class DevopsPlanActionWizard(models.TransientModel):
         if module_name:
             self.fill_working_module_name_or_id(module_name)
             self.use_external_cg = True
+            self.config_uca_enable_export_data = False
             self.use_existing_meta_module = True
-            self.is_autopoieses = True
             self.set_mode_edit_module()
             self.action_code_module_autocomplete_module_path()
         return self.state_goto_code_module()
@@ -944,11 +963,16 @@ class DevopsPlanActionWizard(models.TransientModel):
                 run_into_workspace=True,
                 error_on_status=False,
             )
-            if exec_id.exec_status:
+            path_module = exec_id.log_all.strip()
+            if exec_id.exec_status == 2:
+                raise exceptions.Warning(
+                    f"The module '{module_name}' is duplicated :"
+                    f" \n{path_module}"
+                )
+            elif exec_id.exec_status:
                 # raise exceptions.Warning(f"Cannot find module '{module_name}'")
                 self.set_mode_new_module()
                 return self._reopen_self()
-            path_module = exec_id.log_all.strip()
             if not path_module:
                 # raise exceptions.Warning(f"Cannot find module path.")
                 self.set_mode_new_module()
@@ -1090,6 +1114,12 @@ class DevopsPlanActionWizard(models.TransientModel):
         if is_autopoiesis:
             plan_cg_value["cg_self_add_config_cg"] = True
             plan_cg_value["code_mode_context_generator"] = "autopoiesis"
+        # Support data
+        plan_cg_value[
+            "config_uca_enable_export_data"
+        ] = self.config_uca_enable_export_data
+
+        # Support snippet
         if self.mode_view_snippet and self.mode_view_snippet != "no_snippet":
             plan_cg_value["mode_view_snippet"] = self.mode_view_snippet
             plan_cg_value[
@@ -1340,14 +1370,10 @@ class DevopsPlanActionWizard(models.TransientModel):
     def action_git_commit(self):
         for rec in self:
             if rec.plan_cg_id:
-                rec.plan_cg_id.action_git_commit()
-        return self._reopen_self()
-
-    @api.multi
-    def action_git_commit_remote(self):
-        for rec in self:
-            if rec.plan_cg_id:
-                rec.plan_cg_id.action_git_commit_remote()
+                if not rec.is_remote_cg:
+                    rec.plan_cg_id.action_git_commit()
+                else:
+                    rec.plan_cg_id.action_git_commit_remote()
         return self._reopen_self()
 
     @api.multi
@@ -1380,7 +1406,6 @@ class DevopsPlanActionWizard(models.TransientModel):
                 module_path=self.working_compute_module_path,
                 module_cg_path=self.working_compute_module_cg_path,
                 module_template_path=self.working_compute_module_template_path,
-                is_autopoiesis=self.is_autopoieses,
                 is_new_module=self.is_new_module,
                 is_relative_path=True,
             )

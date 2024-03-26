@@ -63,7 +63,7 @@
                             name="action_code_module_autocomplete_module_path"
                             string="Auto-complete"
                             type="object"
-                            class="btn btn-primary"
+                            class="btn btn-success"
                         />
                     </group>
                 </group>
@@ -97,7 +97,7 @@
                             name="action_code_module_generate"
                             string="Generate"
                             type="object"
-                            class="btn btn-primary"
+                            class="btn btn-success"
                         />
                     </group>
                 </group>
@@ -139,28 +139,28 @@
                             name="action_git_commit"
                             string="Git commit"
                             type="object"
-                            class="btn btn-primary"
+                            class="btn btn-success"
                             attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', True)]}"
                         />
                         <button
                             name="action_git_commit_remote"
                             string="Git commit remote"
                             type="object"
-                            class="btn btn-primary"
+                            class="btn btn-success"
                             attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
                         />
                         <button
                             name="action_git_meld_remote"
                             string="Git meld remote"
                             type="object"
-                            class="btn btn-primary"
+                            class="btn btn-success"
                             attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
                         />
                         <button
                             name="action_git_clean_remote"
                             string="Git clean remote"
                             type="object"
-                            class="btn btn-primary"
+                            class="btn btn-success"
                             attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
                         />
                     </group>
@@ -461,54 +461,64 @@
                         />
                     </group>
                     <group string="C-Parameter" attrs="{'invisible': [('state', '!=', 'code_module')]}">
-                        <field name="use_external_cg" string="CG with metadata" />
+                        <field name="mode_view_generator" />
+                        <field name="is_remote_cg" string="Generate outside" />
+                        <field name="force_generate" />
+                    </group>
+                    <group
+                        string="C-Parameter Meta UcA &amp; UcB"
+                        attrs="{'invisible': [('state', '!=', 'code_module')]}"
+                    >
+                        <field name="use_external_cg" string="With UcA UcB" />
                         <field
                             name="use_existing_meta_module"
-                            string="Meta module"
+                            string="Select a meta"
                             attrs="{'invisible': [('use_external_cg', '==', False)]}"
                         />
                         <field
                             name="use_existing_meta_module_uca_only"
                             string="UcA only"
-                            attrs="{'invisible': ['|',('use_external_cg', '==', False),('use_existing_meta_module', '==', False)]}"
+                            attrs="{'invisible': ['|','|',('use_external_cg', '==', False),('use_existing_meta_module', '==', False),('use_existing_meta_module_ucb_only','==',True)]}"
+                        />
+                        <field
+                            name="code_generator_name"
+                            string="UcA name"
+                            attrs="{'invisible': ['|',('use_external_cg', '!=', True),('use_existing_meta_module_ucb_only','==',True)]}"
+                        />
+                        <field
+                            name="working_module_cg_path_suggestion"
+                            string="UcA suggested path"
+                            attrs="{'invisible': ['|',('use_external_cg', '!=', True),('use_existing_meta_module_ucb_only','==',True)]}"
+                        />
+                        <field
+                            name="working_module_cg_path"
+                            string="OR Manual UcA path"
+                            attrs="{'invisible': ['|','|',('working_module_cg_path_suggestion', '!=', '#'),('use_external_cg', '!=', True),('use_existing_meta_module_ucb_only','==',True)]}"
                         />
                         <field
                             name="uca_option_with_inherit"
                             string="UcA option with inherit"
-                            attrs="{'invisible': [('use_external_cg', '==', False)]}"
+                            attrs="{'invisible': ['|',('use_external_cg', '==', False),('use_existing_meta_module_ucb_only','==',True)]}"
                         />
                         <field
                             name="use_existing_meta_module_ucb_only"
                             string="UcB only"
-                            attrs="{'invisible': ['|',('use_external_cg', '==', False),('use_existing_meta_module', '==', False)]}"
-                        />
-                        <field name="is_autopoieses" />
-                        <field name="is_remote_cg" />
-                        <field name="force_generate" />
-                        <field name="mode_view_generator" />
-                    </group>
-                    <group string="C-Parameter advanced" attrs="{'invisible': [('state', '!=', 'code_module')]}">
-                        <field name="code_generator_name" />
-                        <field
-                            name="working_module_cg_path_suggestion"
-                            string="Suggested CG path"
-                            attrs="{'invisible': [('use_external_cg', '!=', True)]}"
+                            attrs="{'invisible': ['|','|',('use_external_cg', '==', False),('use_existing_meta_module', '==', False),('use_existing_meta_module_uca_only','==',True)]}"
                         />
                         <field
-                            name="working_module_cg_path"
-                            string="OR Manual CG path"
-                            attrs="{'invisible': ['|',('working_module_cg_path_suggestion', '!=', '#'),('use_external_cg', '!=', True)]}"
+                            name="template_name"
+                            string="UcB name"
+                            attrs="{'invisible': ['|',('use_external_cg', '!=', True),('use_existing_meta_module_uca_only','==',True)]}"
                         />
-                        <field name="template_name" />
                         <field
                             name="working_module_template_path_suggestion"
-                            string="Suggested Template path"
-                            attrs="{'invisible': [('use_external_cg', '!=', True)]}"
+                            string="UcB suggested path"
+                            attrs="{'invisible': ['|',('use_external_cg', '!=', True),('use_existing_meta_module_uca_only','==',True)]}"
                         />
                         <field
                             name="working_module_template_path"
-                            string="OR Manual Template path"
-                            attrs="{'invisible': ['|',('working_module_template_path_suggestion', '!=', '#'),('use_external_cg', '!=', True)]}"
+                            string="OR Manual UcB path"
+                            attrs="{'invisible': ['|','|',('working_module_template_path_suggestion', '!=', '#'),('use_external_cg', '!=', True),('use_existing_meta_module_uca_only','==',True)]}"
                         />
                     </group>
                 </group>
@@ -579,6 +589,9 @@
                             attrs="{'invisible': [('mode_view_portal', '==', 'no_portal')]}"
                             string="Support delete"
                         />
+                    </group>
+                    <group string="Data">
+                        <field name="config_uca_enable_export_data" />
                     </group>
                 </group>
                 <group
@@ -662,6 +675,14 @@
                             type="object"
                             class="btn btn-default"
                             attrs="{'invisible': [('working_system_id', '=', False)]}"
+                        />
+                        <field name="working_system_can_be_power_on" invisible="True" />
+                        <button
+                            name="working_system_id_power"
+                            string="Power the system"
+                            type="object"
+                            class="btn btn-success"
+                            attrs="{'invisible': [('working_system_can_be_power_on', '=', False)]}"
                         />
                     </group>
                 </group>
@@ -840,28 +861,21 @@
                     <field name="working_cg_writer_id" attrs="{'invisible': [('working_cg_writer_id', '=', False)]}" />
                     <button
                         name="action_git_commit"
-                        string="Git commit"
+                        string="Git commit module"
                         type="object"
                         class="oe_highlight"
-                        attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', True)]}"
+                        attrs="{'invisible': [('plan_cg_id', '=', False)]}"
                     />
                     <button
-                        name="action_git_commit_remote"
-                        string="Git commit remote"
-                        type="object"
-                        class="oe_highlight"
-                        attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
-                    />
-                    <button
-                        name="action_git_meld_remote"
-                        string="Git meld remote"
+                        name="action_git_meld"
+                        string="Git meld module"
                         type="object"
                         class="oe_highlight"
                         attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
                     />
                     <button
-                        name="action_git_clean_remote"
-                        string="Git clean remote"
+                        name="action_git_clean"
+                        string="Git clean module"
                         type="object"
                         class="oe_highlight"
                         attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"

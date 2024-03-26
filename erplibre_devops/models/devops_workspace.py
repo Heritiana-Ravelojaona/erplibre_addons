@@ -55,6 +55,18 @@ class DevopsWorkspace(models.Model):
         store=True,
     )
 
+    devops_code_todo_ids = fields.One2many(
+        comodel_name="devops.code.todo",
+        inverse_name="workspace_id",
+        string="Code TODO",
+    )
+
+    devops_code_todo_count = fields.Integer(
+        string="Test code TODO count",
+        compute="_compute_devops_code_todo_count",
+        store=True,
+    )
+
     devops_test_plan_exec_ids = fields.One2many(
         comodel_name="devops.test.plan.exec",
         inverse_name="workspace_id",
@@ -153,6 +165,11 @@ class DevopsWorkspace(models.Model):
         help="The automated robot to manage ERPLibre.",
     )
 
+    deploy_docker_compose_id = fields.Many2one(
+        comodel_name="devops.deploy.docker.compose",
+        string="Docker composite",
+    )
+
     path_code_generator_to_generate = fields.Char(
         compute="_compute_path_code_generator_to_generate",
         store=True,
@@ -162,8 +179,12 @@ class DevopsWorkspace(models.Model):
 
     is_debug_log = fields.Boolean(help="Will print cmd to debug.")
 
-    # TODO transform in in compute with devops_workspace_docker.is_running
-    is_running = fields.Boolean(readonly=True)
+    is_running = fields.Boolean(
+        compute="_compute_is_running",
+        store=True,
+    )
+
+    is_running_with_process = fields.Boolean(readonly=True)
 
     folder = fields.Char(
         required=True,
@@ -333,6 +354,33 @@ class DevopsWorkspace(models.Model):
                 rec.name += rec.folder
 
     @api.multi
+    @api.depends(
+        "workspace_docker_id",
+        "deploy_docker_compose_id",
+        "deploy_docker_compose_id.active",
+        "deploy_docker_compose_id.is_running",
+        "is_running_with_process",
+        "is_me",
+    )
+    def _compute_is_running(self):
+        for rec in self:
+            is_running = False
+            if rec.workspace_docker_id:
+                # TODO seems duplicate docker status
+                is_running = rec.workspace_docker_id.docker_is_running
+            if (
+                rec.deploy_docker_compose_id
+                and rec.deploy_docker_compose_id.active
+                and rec.deploy_docker_compose_id.is_running
+            ):
+                is_running = True
+            if rec.is_me:
+                is_running = True
+            if rec.is_running_with_process:
+                is_running = True
+            rec.is_running = is_running
+
+    @api.multi
     @api.depends("erplibre_mode.mode_source", "erplibre_mode.mode_exec")
     def _compute_is_conflict_mode_exec(self):
         for rec in self:
@@ -400,6 +448,14 @@ class DevopsWorkspace(models.Model):
         for rec in self:
             rec.devops_test_plan_exec_count = self.env[
                 "devops.test.plan.exec"
+            ].search_count([("workspace_id", "=", rec.id)])
+
+    @api.multi
+    @api.depends("devops_code_todo_ids", "devops_code_todo_ids.active")
+    def _compute_devops_code_todo_count(self):
+        for rec in self:
+            rec.devops_code_todo_count = self.env[
+                "devops.code.todo"
             ].search_count([("workspace_id", "=", rec.id)])
 
     @api.multi
@@ -577,7 +633,6 @@ class DevopsWorkspace(models.Model):
                 if rec.erplibre_mode.mode_exec in [
                     self.env.ref("erplibre_devops.erplibre_mode_exec_docker")
                 ]:
-                    rec.is_running = rec.workspace_docker_id.docker_is_running
                     rec.workspace_docker_id.action_check()
                 elif rec.erplibre_mode.mode_exec in [
                     self.env.ref("erplibre_devops.erplibre_mode_exec_terminal")
@@ -586,7 +641,7 @@ class DevopsWorkspace(models.Model):
                         f"lsof -i TCP:{rec.port_http} | grep python",
                         error_on_status=False,
                     )
-                    rec.is_running = bool(exec_id.log_all)
+                    rec.is_running_with_process = bool(exec_id.log_all)
                     rec.workspace_terminal_id.action_check()
                 else:
                     _logger.warning(
@@ -616,7 +671,6 @@ class DevopsWorkspace(models.Model):
                 rec.is_robot = True
                 rec.port_http = 8069
                 rec.port_longpolling = 8072
-                rec.is_running = True
 
     @api.multi
     def action_restore_db_image(self):
@@ -797,7 +851,7 @@ class DevopsWorkspace(models.Model):
                         force_open_terminal=True,
                     )
                     # TODO validate output if execution conflict port to remove time.sleep
-                    rec.is_running = True
+                    rec.is_running_with_process = True
                     # Time to start services, because action_check need time to detect port is open
                     time.sleep(SLEEP_KILL)
 
@@ -822,7 +876,7 @@ class DevopsWorkspace(models.Model):
                             force_exit=True,
                             error_on_status=False,
                         )
-                        rec_o.is_running = False
+                        rec_o.is_running_with_process = False
                     else:
                         rec.kill_process()
                         rec.action_check()
@@ -834,6 +888,12 @@ class DevopsWorkspace(models.Model):
                 rec.action_format_erplibre_devops()
                 rec.action_update_erplibre_devops()
                 rec.action_reboot()
+
+    @api.multi
+    def action_parse_code(self, ctx=None):
+        for rec_o in self:
+            with rec_o.devops_create_exec_bundle("Parse code") as rec:
+                self.env["devops.code.todo"].parse_workspace(rec)
 
     @api.multi
     def action_open_local_view(self, ctx=None, url_instance=None):
@@ -916,7 +976,7 @@ class DevopsWorkspace(models.Model):
                             force_exit=True,
                             error_on_status=False,
                         )
-                        rec_o.is_running = False
+                        rec_o.is_running_with_process = False
 
     @api.multi
     def action_install_workspace(self):
@@ -925,6 +985,7 @@ class DevopsWorkspace(models.Model):
                 exec_id = rec.execute(
                     cmd=f"ls {rec.folder}", error_on_status=False
                 )
+                is_detect_docker_compose = False
                 lst_file = exec_id.log_all.strip().split("\n")
                 rec.namespace = os.path.basename(rec.folder)
                 if rec.erplibre_mode.mode_source in [
@@ -935,6 +996,7 @@ class DevopsWorkspace(models.Model):
                         _logger.info(
                             "detect docker-compose.yml, please read it"
                         )
+                        is_detect_docker_compose = True
                     rec.action_pre_install_workspace()
                     rec.path_working_erplibre = "/ERPLibre"
                 elif rec.erplibre_mode.mode_source in [
@@ -1051,12 +1113,24 @@ class DevopsWorkspace(models.Model):
                     #         f"{branch_str}"
                     #     )
                     # else:
+                # TODO if docker attached, retreive port from docker-compose
                 rec.action_network_change_port_random()
                 # TODO this "works" for source git, but source docker, need to check docker inspect
                 folder_venv = os.path.join(rec.folder, ".venv")
-                rec.is_installed = rec.os_path_exists(
-                    rec.folder
-                ) and rec.os_path_exists(folder_venv)
+
+                if rec.erplibre_mode.mode_source in [
+                    self.env.ref("erplibre_devops.erplibre_mode_source_git")
+                ]:
+                    rec.is_installed = rec.os_path_exists(
+                        rec.folder
+                    ) and rec.os_path_exists(folder_venv)
+                elif rec.erplibre_mode.mode_source in [
+                    self.env.ref("erplibre_devops.erplibre_mode_source_docker")
+                ]:
+                    rec.is_installed = (
+                        rec.os_path_exists(rec.folder)
+                        and is_detect_docker_compose
+                    )
                 # TODO now, robot is this branch, but find another way to identify it
                 rec.is_robot = (
                     rec.erplibre_mode.mode_version_erplibre.id
@@ -1173,9 +1247,29 @@ class DevopsWorkspace(models.Model):
                 # index 2, keyword
                 lst_tb = [a.strip() for a in str_tb.split(",")]
                 # Remove absolute path
-                filename = lst_tb[0][6:-1][len(rec.folder) + 1 :]
+                folder_path = lst_tb[0][6:-1]
+                filename = ""
+                if folder_path.startswith(rec.folder):
+                    filename = folder_path[len(rec.folder) + 1 :]
+                else:
+                    # Maybe the workspace is ME
+                    ws_me = self.env.ref("erplibre_devops.devops_workspace_me")
+                    if folder_path.startswith(ws_me.folder):
+                        filename = folder_path[len(ws_me.folder) + 1 :]
+                    else:
+                        _logger.error(
+                            "Cannot find workspace for this folder :"
+                            f" {folder_path}"
+                        )
+
                 line_number = int(lst_tb[1][5:])
+                method_name = None
                 keyword = lst_tb[2]
+                if keyword.startswith("in "):
+                    # in MethodName, remove it for keyword
+                    lst_keyword = keyword.split("\n", 1)
+                    method_name = lst_keyword[0][3:]
+                    keyword = lst_keyword[1].strip()
                 bp_value = {
                     "name": "breakpoint_exec",
                     "description": (
@@ -1187,6 +1281,9 @@ class DevopsWorkspace(models.Model):
                     "ignore_test": True,
                     "generated_by_execution": True,
                 }
+                if method_name:
+                    bp_value["method"] = method_name
+                    devops_exec_value["exec_method"] = method_name
                 bp_id = self.env["devops.ide.breakpoint"].create(bp_value)
                 devops_exec_value["ide_breakpoint"] = bp_id.id
                 devops_exec_value["exec_filename"] = filename
@@ -1293,9 +1390,11 @@ class DevopsWorkspace(models.Model):
             "TypeError:",
             "AttributeError:",
             "ValueError:",
+            "OSError:",
             "AssertionError:",
             "SyntaxError:",
             "KeyError:",
+            "psycopg2.errors.NotNullViolation:",
             "psycopg2.errors.UndefinedTable:",
             "UnboundLocalError:",
             "FileNotFoundError:",

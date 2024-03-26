@@ -53,6 +53,11 @@ class DevopsExec(models.Model):
         help="Execution information, where it's called.",
     )
 
+    exec_method = fields.Char(
+        string="Execution method",
+        help="Execution information, where it's called.",
+    )
+
     folder = fields.Char()
 
     ide_breakpoint = fields.Many2one(

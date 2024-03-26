@@ -1311,17 +1311,35 @@ class DevopsCgNewProject(models.Model):
                             'value["enable_template_website_snippet_view"] ='
                             " False",
                             f'value["enable_template_website_snippet_view"] ='
-                            f" False\n"
-                            f"       "
-                            f' value["template_auto_export_data"]'
-                            f" = True\n"
-                            f"       "
-                            f' value["template_auto_export_data_exclude_model"]'
-                            f" = 'devops.db.image;devops.exec;devops.exec.bundle;devops.ide.pycharm;"
-                            f"devops.log.makefile.target;devops.workspace.terminal;devops.workspace;"
-                            f"devops.test.case;devops.test.plan;erplibre.mode;erplibre.mode.env;"
-                            f"erplibre.mode.exec;erplibre.mode.source;erplibre.mode.version.base;"
-                            f"erplibre.mode.version.erplibre'",
+                            f" False\n       "
+                            f' value["template_auto_export_data"] = True\n    '
+                            f'    value["template_auto_export_data_exclude_model"]'
+                            f" = 'devops.db.image; devops.exec;"
+                            f" devops.exec.bundle; devops.ide.pycharm;"
+                            f" devops.log.makefile.target;"
+                            f" devops.workspace.terminal; devops.workspace;"
+                            f" devops.test.case; devops.test.plan;"
+                            f" erplibre.mode; erplibre.mode.env;"
+                            f" erplibre.mode.exec; erplibre.mode.source;"
+                            f" erplibre.mode.version.base;"
+                            f" erplibre.mode.version.erplibre;"
+                            f" ir.actions.act_url; ir.actions.act_window;"
+                            f" ir.actions.report; ir.actions.server;"
+                            f" ir.actions.todo; ir.model; ir.model.constraint;"
+                            f" ir.model.fields; ir.model.server_constrain;"
+                            f" ir.module.module; ir.ui.menu; ir.ui.view;"
+                            f" res.groups'",
+                        )
+                    )
+                else:
+                    lst_template_hooks_py_replace.append(
+                        (
+                            'value["enable_template_website_snippet_view"] ='
+                            " False",
+                            f'value["enable_template_website_snippet_view"] ='
+                            f" False\n       "
+                            f' value["template_ignore_export_data"] ='
+                            f" True",
                         )
                     )
                 if rec.mode_view_snippet in ["enable_snippet"]:

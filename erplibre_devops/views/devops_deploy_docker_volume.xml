@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="devops_deploy_docker_volume_view_form" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_volume_form</field>
+        <field name="model">devops.deploy.docker.volume</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <div name="button_box" class="oe_button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" />
+                        </button>
+                    </div>
+                    <group>
+                        <field name="compose_id" />
+                    </group>
+                    <group>
+                        <field name="created_at_date" />
+                    </group>
+                    <group>
+                        <field name="driver" />
+                    </group>
+                    <group>
+                        <field name="mountpoint" />
+                    </group>
+                    <group>
+                        <field name="system_id" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="devops_deploy_docker_volume_view_graph" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_volume_graph</field>
+        <field name="model">devops.deploy.docker.volume</field>
+        <field name="arch" type="xml">
+            <graph string="Devops deploy docker volume">
+                <field name="name" type="row" />
+                <field name="compose_id" type="row" />
+                <field name="created_at_date" type="row" />
+                <field name="driver" type="row" />
+                <field name="mountpoint" type="row" />
+                <field name="system_id" type="row" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="devops_deploy_docker_volume_view_kanban" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_volume_kanban</field>
+        <field name="model">devops.deploy.docker.volume</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <field name="compose_id" />
+                <field name="created_at_date" />
+                <field name="driver" />
+                <field name="mountpoint" />
+                <field name="system_id" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="compose_id" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="created_at_date" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="driver" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="mountpoint" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="system_id" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="devops_deploy_docker_volume_view_pivot" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_volume_pivot</field>
+        <field name="model">devops.deploy.docker.volume</field>
+        <field name="arch" type="xml">
+            <pivot string="Devops deploy docker volume">
+                <field name="name" type="row" />
+                <field name="compose_id" type="row" />
+                <field name="created_at_date" type="row" />
+                <field name="driver" type="row" />
+                <field name="mountpoint" type="row" />
+                <field name="system_id" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="devops_deploy_docker_volume_view_search" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_volume_search</field>
+        <field name="model">devops.deploy.docker.volume</field>
+        <field name="arch" type="xml">
+            <search string="Devops deploy docker volume">
+                <field name="name" />
+                <field name="system_id" />
+                <field name="compose_id" />
+                <filter
+                    name="has_compose_id"
+                    string="Associate with a compose"
+                    domain="[('compose_id', '!=', False)]"
+                />
+                <filter name="active" string="Active" domain="[('active','=',True)]" help="Show active" />
+                <filter name="inactive" string="Inactive" domain="[('active','=',False)]" help="Show inactive" />
+                <group string="Group By" expand="1">
+                    <filter name="group_by_system_id" string="System" context="{'group_by':'system_id'}" />
+                    <filter name="group_by_compose_id" string="Composante" context="{'group_by':'compose_id'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="devops_deploy_docker_volume_view_tree" model="ir.ui.view">
+        <field name="name">devops_deploy_docker_volume_tree</field>
+        <field name="model">devops.deploy.docker.volume</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="created_at_date" />
+                <field name="mountpoint" />
+                <field name="driver" />
+                <field name="compose_id" />
+                <field name="system_id" />
+            </tree>
+        </field>
+    </record>
+
+    <act_window
+        id="devops_deploy_docker_volume_deploy_docker_volume_group_action_window"
+        name="Deploy docker volume"
+        res_model="devops.deploy.docker.volume"
+        view_mode="tree,kanban,pivot,graph,form"
+        context="{'search_default_group_by_system_id': True}"
+    />
+
+    <act_window
+        id="devops_deploy_docker_volume_deploy_docker_volume_action_window"
+        name="Deploy docker volume"
+        res_model="devops.deploy.docker.volume"
+        view_mode="tree,kanban,pivot,graph,form"
+    />
+</odoo>

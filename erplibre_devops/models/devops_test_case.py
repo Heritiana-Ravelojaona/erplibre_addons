@@ -13,6 +13,8 @@ class DevopsTestCase(models.Model):
 
     active = fields.Boolean(default=True)
 
+    is_system_test = fields.Boolean()
+
     test_plan_id = fields.Many2one(
         comodel_name="devops.test.plan",
         string="Test plan",

@@ -7,6 +7,21 @@
         <record id="devops_cg_module_code_generator_demo_theme_website" model="devops.cg.module">
             <field name="name">code_generator_demo_theme_website</field>
         </record>
+        <record id="devops_cg_module_code_generator_cron" model="devops.cg.module">
+            <field name="name">code_generator_cron</field>
+        </record>
+        <record id="devops_cg_module_code_generator_geoengine" model="devops.cg.module">
+            <field name="name">code_generator_geoengine</field>
+        </record>
+        <record id="devops_cg_module_code_generator_hook" model="devops.cg.module">
+            <field name="name">code_generator_hook</field>
+        </record>
+        <record id="devops_cg_module_code_generator_db_servers" model="devops.cg.module">
+            <field name="name">code_generator_db_servers</field>
+        </record>
+        <record id="devops_cg_module_code_generator" model="devops.cg.module">
+            <field name="name">code_generator</field>
+        </record>
         <record id="devops_cg_module_code_generator_demo_export_helpdesk" model="devops.cg.module">
             <field name="name">code_generator_demo_export_helpdesk</field>
         </record>

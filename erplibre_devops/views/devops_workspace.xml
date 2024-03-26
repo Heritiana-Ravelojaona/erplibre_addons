@@ -93,6 +93,13 @@
                         attrs="{'invisible': ['|', ('is_installed', '=', False), ('is_conflict_mode_exec', '=', True)]}"
                     />
                     <button
+                        name="action_parse_code"
+                        string="Parse code"
+                        type="object"
+                        class="oe_highlight"
+                        attrs="{'invisible': ['|', ('is_installed', '=', False), ('is_conflict_mode_exec', '=', True)]}"
+                    />
+                    <button
                         name="action_install_workspace"
                         string="Re-install"
                         type="object"
@@ -153,6 +160,16 @@
                         attrs="{'invisible': [('devops_test_plan_exec_count', '==', 0)]}"
                     >
                         <field name="devops_test_plan_exec_count" string="Test plan executions" widget="statinfo" />
+                    </button>
+                    <button
+                        name="%(erplibre_devops.devops_code_todo_code_todo_action_window)d"
+                        type="action"
+                        class="oe_stat_button"
+                        icon="fa-building-o"
+                        context="{'search_default_workspace_id': active_id}"
+                        attrs="{'invisible': [('devops_code_todo_count', '==', 0)]}"
+                    >
+                        <field name="devops_code_todo_count" string="Code TODO" widget="statinfo" />
                     </button>
                     <button
                         name="%(erplibre_devops.devops_test_result_test_result_action_window)d"
@@ -221,7 +238,6 @@
                 </div>
                 <field name="is_conflict_mode_exec" invisible="True" />
                 <field name="is_installed" invisible="True" />
-                <field name="is_running" invisible="True" />
                 <field name="is_me" invisible="True" />
                 <field name="is_robot" invisible="True" />
                 <field name="mode_exec" invisible="True" />
@@ -230,6 +246,7 @@
                         <field name="system_id" />
                         <field name="folder" />
                         <field name="erplibre_mode" />
+                        <field name="is_running" />
                     </group>
                     <group string="Execution">
                         <field name="is_debug_log" />
@@ -272,6 +289,7 @@
                     </group>
                     <group string="Docker" attrs="{'invisible': [('is_installed', '=', False)]}">
                         <field name="workspace_docker_id" />
+                        <field name="deploy_docker_compose_id" />
                     </group>
                     <group string="Action">
                         <button name="action_open_terminal" string="Terminal" type="object" class="oe_highlight" />
@@ -344,8 +362,13 @@
             <search>
                 <field name="name" />
                 <field name="folder" />
-                <filter string="Is me" name="is_me" domain="[('is_me','=',True)]" />
-                <filter string="Is robot" name="is_robot" domain="[('is_robot','=',True)]" />
+                <filter name="is_me" string="Is me" domain="[('is_me','=',True)]" />
+                <filter name="is_robot" string="Is robot" domain="[('is_robot','=',True)]" />
+                <filter
+                    name="has_deploy_docker_compose"
+                    string="Has deploy docker compose"
+                    domain="[('deploy_docker_compose_id','!=',False)]"
+                />
                 <group string="Group By" expand="1">
                     <filter name="system_id" string="System" context="{'group_by':'system_id'}" />
                     <filter name="folder" string="Folder" context="{'group_by':'folder'}" />
@@ -402,7 +425,7 @@
                     icon="fa-code"
                     attrs="{'invisible': [('system_method', '!=', 'local')]}"
                 />
-                <button name="action_open_terminal" type="object" class="oe_stat_button" icon="fa-terminal" help="" />
+                <button name="action_open_terminal" type="object" class="oe_stat_button" icon="fa-terminal" />
                 <button name="action_open_directory" type="object" class="oe_stat_button" icon="fa-folder" />
                 <button name="action_open_local_view" type="object" class="oe_stat_button" icon="fa-desktop" />
                 <button
@@ -447,28 +470,28 @@
                                         </strong>
                                     </li>
                                     <li class="text-success float-right mb4" t-if="record.is_installed.raw_value">
-                                        <i aria-label="Ok" class="fa fa-circle" role="img" title="Ok" />
+                                        <i class="fa fa-circle" aria-label="Ok" role="img" title="Ok" />
                                     </li>
                                     <li class="text-danger float-right mb4" t-if="!record.is_installed.raw_value">
-                                        <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
+                                        <i class="fa fa-circle" aria-label="Invalid" role="img" title="Invalid" />
                                     </li>
                                     <li class="text-success float-right mb4" t-if="record.is_me.raw_value">
-                                        <i aria-label="Ok" class="fa fa-circle" role="img" title="Ok" />
+                                        <i class="fa fa-circle" aria-label="Ok" role="img" title="Ok" />
                                     </li>
                                     <li class="text-danger float-right mb4" t-if="!record.is_me.raw_value">
-                                        <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
+                                        <i class="fa fa-circle" aria-label="Invalid" role="img" title="Invalid" />
                                     </li>
                                     <li class="text-success float-right mb4" t-if="record.is_robot.raw_value">
-                                        <i aria-label="Ok" class="fa fa-circle" role="img" title="Ok" />
+                                        <i class="fa fa-circle" aria-label="Ok" role="img" title="Ok" />
                                     </li>
                                     <li class="text-danger float-right mb4" t-if="!record.is_robot.raw_value">
-                                        <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
+                                        <i class="fa fa-circle" aria-label="Invalid" role="img" title="Invalid" />
                                     </li>
                                     <li class="text-success float-right mb4" t-if="record.is_running.raw_value">
-                                        <i aria-label="Ok" class="fa fa-circle" role="img" title="Ok" />
+                                        <i class="fa fa-circle" aria-label="Ok" role="img" title="Ok" />
                                     </li>
                                     <li class="text-danger float-right mb4" t-if="!record.is_running.raw_value">
-                                        <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
+                                        <i class="fa fa-circle" aria-label="Invalid" role="img" title="Invalid" />
                                     </li>
                                 </ul>
                             </div>
