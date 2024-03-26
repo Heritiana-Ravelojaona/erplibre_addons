@@ -183,7 +183,7 @@ volumes:
             if "db_host" not in result:
                 # TODO remove this information from executable of docker
                 result += (
-                    "db_host = db\ndb_port = 5432\ndb_user ="
+                    "\ndb_host = db\ndb_port = 5432\ndb_user ="
                     " odoo\ndb_password = mysecretpassword\n"
                 )
             if "admin_passwd" not in result:
