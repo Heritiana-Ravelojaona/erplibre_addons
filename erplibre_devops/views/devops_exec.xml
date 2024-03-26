@@ -58,6 +58,7 @@
                         <field name="ide_breakpoint" />
                         <field name="exec_filename" />
                         <field name="exec_keyword" />
+                        <field name="exec_method" />
                         <field name="exec_line_number" />
                     </group>
                 </group>

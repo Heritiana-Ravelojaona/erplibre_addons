@@ -1199,9 +1199,29 @@ class DevopsWorkspace(models.Model):
                 # index 2, keyword
                 lst_tb = [a.strip() for a in str_tb.split(",")]
                 # Remove absolute path
-                filename = lst_tb[0][6:-1][len(rec.folder) + 1 :]
+                folder_path = lst_tb[0][6:-1]
+                filename = ""
+                if folder_path.startswith(rec.folder):
+                    filename = folder_path[len(rec.folder) + 1 :]
+                else:
+                    # Maybe the workspace is ME
+                    ws_me = self.env.ref("erplibre_devops.devops_workspace_me")
+                    if folder_path.startswith(ws_me.folder):
+                        filename = folder_path[len(ws_me.folder) + 1 :]
+                    else:
+                        _logger.error(
+                            "Cannot find workspace for this folder :"
+                            f" {folder_path}"
+                        )
+
                 line_number = int(lst_tb[1][5:])
+                method_name = None
                 keyword = lst_tb[2]
+                if keyword.startswith("in "):
+                    # in MethodName, remove it for keyword
+                    lst_keyword = keyword.split("\n", 1)
+                    method_name = lst_keyword[0][3:]
+                    keyword = lst_keyword[1].strip()
                 bp_value = {
                     "name": "breakpoint_exec",
                     "description": (
@@ -1213,6 +1233,9 @@ class DevopsWorkspace(models.Model):
                     "ignore_test": True,
                     "generated_by_execution": True,
                 }
+                if method_name:
+                    bp_value["method"] = method_name
+                    devops_exec_value["exec_method"] = method_name
                 bp_id = self.env["devops.ide.breakpoint"].create(bp_value)
                 devops_exec_value["ide_breakpoint"] = bp_id.id
                 devops_exec_value["exec_filename"] = filename

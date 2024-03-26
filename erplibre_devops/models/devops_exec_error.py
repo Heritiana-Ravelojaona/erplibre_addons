@@ -45,6 +45,11 @@ class DevopsExecError(models.Model):
         help="Execution information, where it's called.",
     )
 
+    exec_method = fields.Char(
+        string="Execution method",
+        help="Execution information, where it's called.",
+    )
+
     exec_line_number = fields.Integer(
         string="Execution line number",
         help="Execution information, where it's called.",
