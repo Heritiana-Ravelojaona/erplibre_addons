@@ -5,7 +5,10 @@ class DevopsDeployDockerImage(models.Model):
     _name = "devops.deploy.docker.image"
     _description = "devops_deploy_docker_image"
 
-    name = fields.Char(store=True, compute="_compute_name")
+    name = fields.Char(
+        compute="_compute_name",
+        store=True,
+    )
 
     system_ids = fields.Many2many(
         comodel_name="devops.system",

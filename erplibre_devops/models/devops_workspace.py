@@ -179,7 +179,10 @@ class DevopsWorkspace(models.Model):
 
     is_debug_log = fields.Boolean(help="Will print cmd to debug.")
 
-    is_running = fields.Boolean(store=True, compute="_compute_is_running")
+    is_running = fields.Boolean(
+        compute="_compute_is_running",
+        store=True,
+    )
 
     is_running_with_process = fields.Boolean(readonly=True)
 

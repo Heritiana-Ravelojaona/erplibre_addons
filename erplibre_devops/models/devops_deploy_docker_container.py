@@ -8,7 +8,9 @@ class DevopsDeployDockerContainer(models.Model):
     name = fields.Char(readonly=True)
 
     system_id = fields.Many2one(
-        comodel_name="devops.system", string="System", readonly=True
+        comodel_name="devops.system",
+        string="System",
+        readonly=True,
     )
 
     active = fields.Boolean(default=True)

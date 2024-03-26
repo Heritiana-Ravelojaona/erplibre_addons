@@ -362,11 +362,11 @@
             <search>
                 <field name="name" />
                 <field name="folder" />
-                <filter string="Is me" name="is_me" domain="[('is_me','=',True)]" />
-                <filter string="Is robot" name="is_robot" domain="[('is_robot','=',True)]" />
+                <filter name="is_me" string="Is me" domain="[('is_me','=',True)]" />
+                <filter name="is_robot" string="Is robot" domain="[('is_robot','=',True)]" />
                 <filter
-                    string="Has deploy docker compose"
                     name="has_deploy_docker_compose"
+                    string="Has deploy docker compose"
                     domain="[('deploy_docker_compose_id','!=',False)]"
                 />
                 <group string="Group By" expand="1">
@@ -425,7 +425,7 @@
                     icon="fa-code"
                     attrs="{'invisible': [('system_method', '!=', 'local')]}"
                 />
-                <button name="action_open_terminal" type="object" class="oe_stat_button" icon="fa-terminal" help="" />
+                <button name="action_open_terminal" type="object" class="oe_stat_button" icon="fa-terminal" />
                 <button name="action_open_directory" type="object" class="oe_stat_button" icon="fa-folder" />
                 <button name="action_open_local_view" type="object" class="oe_stat_button" icon="fa-desktop" />
                 <button
@@ -470,28 +470,28 @@
                                         </strong>
                                     </li>
                                     <li class="text-success float-right mb4" t-if="record.is_installed.raw_value">
-                                        <i aria-label="Ok" class="fa fa-circle" role="img" title="Ok" />
+                                        <i class="fa fa-circle" aria-label="Ok" role="img" title="Ok" />
                                     </li>
                                     <li class="text-danger float-right mb4" t-if="!record.is_installed.raw_value">
-                                        <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
+                                        <i class="fa fa-circle" aria-label="Invalid" role="img" title="Invalid" />
                                     </li>
                                     <li class="text-success float-right mb4" t-if="record.is_me.raw_value">
-                                        <i aria-label="Ok" class="fa fa-circle" role="img" title="Ok" />
+                                        <i class="fa fa-circle" aria-label="Ok" role="img" title="Ok" />
                                     </li>
                                     <li class="text-danger float-right mb4" t-if="!record.is_me.raw_value">
-                                        <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
+                                        <i class="fa fa-circle" aria-label="Invalid" role="img" title="Invalid" />
                                     </li>
                                     <li class="text-success float-right mb4" t-if="record.is_robot.raw_value">
-                                        <i aria-label="Ok" class="fa fa-circle" role="img" title="Ok" />
+                                        <i class="fa fa-circle" aria-label="Ok" role="img" title="Ok" />
                                     </li>
                                     <li class="text-danger float-right mb4" t-if="!record.is_robot.raw_value">
-                                        <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
+                                        <i class="fa fa-circle" aria-label="Invalid" role="img" title="Invalid" />
                                     </li>
                                     <li class="text-success float-right mb4" t-if="record.is_running.raw_value">
-                                        <i aria-label="Ok" class="fa fa-circle" role="img" title="Ok" />
+                                        <i class="fa fa-circle" aria-label="Ok" role="img" title="Ok" />
                                     </li>
                                     <li class="text-danger float-right mb4" t-if="!record.is_running.raw_value">
-                                        <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
+                                        <i class="fa fa-circle" aria-label="Invalid" role="img" title="Invalid" />
                                     </li>
                                 </ul>
                             </div>

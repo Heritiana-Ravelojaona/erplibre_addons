@@ -6,33 +6,31 @@
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button class="oe_stat_button" icon="fa-archive" name="toggle_active" type="object">
-                            <field name="active" widget="boolean_button" />
-                        </button>
-                        <button
-                            name="%(erplibre_devops.devops_deploy_docker_container_deploy_docker_container_action_window)d"
-                            type="action"
-                            class="oe_stat_button"
-                            icon="fa-tasks"
-                            context="{'search_default_compose_id': [active_id]}"
-                            help="Open associate docker container"
-                            string="Docker container"
-                        />
-                        <button
-                            name="%(erplibre_devops.devops_deploy_docker_volume_deploy_docker_volume_action_window)d"
-                            type="action"
-                            class="oe_stat_button"
-                            icon="fa-tasks"
-                            context="{'search_default_compose_id': [active_id]}"
-                            help="Open associate docker volume"
-                            string="Docker volume"
-                        />
-                    </div>
                     <div class="oe_title">
                         <h1>
                             <field name="name" />
                         </h1>
+                    </div>
+                    <div name="button_box" class="oe_button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" />
+                        </button>
+                        <button
+                            name="%(erplibre_devops.devops_deploy_docker_container_deploy_docker_container_action_window)d"
+                            string="Docker container"
+                            type="action"
+                            class="oe_stat_button"
+                            icon="fa-tasks"
+                            context="{'search_default_compose_id': [active_id]}"
+                        />
+                        <button
+                            name="%(erplibre_devops.devops_deploy_docker_volume_deploy_docker_volume_action_window)d"
+                            string="Docker volume"
+                            type="action"
+                            class="oe_stat_button"
+                            icon="fa-tasks"
+                            context="{'search_default_compose_id': [active_id]}"
+                        />
                     </div>
                     <group>
                         <field name="config_file_path" />
@@ -41,6 +39,11 @@
                         <field name="system_id" />
                     </group>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" options="{'post_refresh': 'recipients'}" widget="mail_thread" />
+                </div>
             </form>
         </field>
     </record>
@@ -83,10 +86,10 @@
                                         </strong>
                                     </li>
                                     <li class="text-success float-right mb4" t-if="record.is_running.raw_value">
-                                        <i aria-label="Ok" class="fa fa-circle" role="img" title="Ok" />
+                                        <i class="fa fa-circle" aria-label="Ok" role="img" title="Ok" />
                                     </li>
                                     <li class="text-danger float-right mb4" t-if="!record.is_running.raw_value">
-                                        <i aria-label="Invalid" class="fa fa-circle" role="img" title="Invalid" />
+                                        <i class="fa fa-circle" aria-label="Invalid" role="img" title="Invalid" />
                                     </li>
                                     <li class="mb4">
                                         <strong>

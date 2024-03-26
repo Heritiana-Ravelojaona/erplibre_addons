@@ -6,15 +6,15 @@
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button class="oe_stat_button" icon="fa-archive" name="toggle_active" type="object">
-                            <field name="active" widget="boolean_button" />
-                        </button>
-                    </div>
                     <div class="oe_title">
                         <h1>
                             <field name="name" />
                         </h1>
+                    </div>
+                    <div name="button_box" class="oe_button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" />
+                        </button>
                     </div>
                     <group>
                         <group>
@@ -158,7 +158,7 @@
             <search string="Devops deploy docker image">
                 <field name="name" />
                 <field name="id_image" />
-                <field name="system_ids" filter_domain="[('system_ids.name', '=', self)]" string="Systems" />
+                <field name="system_ids" string="Systems" filter_domain="[('system_ids.name', '=', self)]" />
                 <group string="Group By" expand="1">
                     <filter name="group_by_repository" string="Repository" context="{'group_by':'repository'}" />
                 </group>

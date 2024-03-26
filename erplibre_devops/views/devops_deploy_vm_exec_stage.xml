@@ -64,7 +64,7 @@
         <field name="model">devops.deploy.vm.exec.stage</field>
         <field name="arch" type="xml">
             <search string="Devops deploy vm exec stage">
-                <filter domain="[('name','!=',False)]" name="name" string="Name" />
+                <filter name="name" string="Name" domain="[('name','!=',False)]" />
             </search>
         </field>
     </record>

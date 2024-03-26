@@ -5,6 +5,7 @@ from odoo import _, api, fields, models
 
 class DevopsDeployDockerCompose(models.Model):
     _name = "devops.deploy.docker.compose"
+    _inherit = ["mail.activity.mixin", "mail.thread"]
     _description = "devops_deploy_docker_compose"
 
     name = fields.Char(readonly=True)
@@ -19,9 +20,15 @@ class DevopsDeployDockerCompose(models.Model):
 
     config_file_path = fields.Char(readonly=True)
 
-    folder_root = fields.Char(store=True, compute="_compute_folder_root")
+    folder_root = fields.Char(
+        compute="_compute_folder_root",
+        store=True,
+    )
 
-    is_running = fields.Boolean(readonly=True, track_visibility="onchange")
+    is_running = fields.Boolean(
+        readonly=True,
+        track_visibility="onchange",
+    )
 
     @api.depends("config_file_path")
     def _compute_folder_root(self):
