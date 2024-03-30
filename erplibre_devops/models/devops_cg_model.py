@@ -5,7 +5,7 @@ class DevopsCgModel(models.Model):
     _name = "devops.cg.model"
     _description = "devops_cg_model"
 
-    name = fields.Char()
+    name = fields.Char(required=True)
 
     description = fields.Char()
 
