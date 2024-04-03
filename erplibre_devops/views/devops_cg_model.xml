@@ -6,21 +6,40 @@
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
-                    <group>
-                        <field name="name" />
-                    </group>
+                    <div name="button_box" class="oe_button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" />
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
                     <group>
                         <field name="description" />
-                    </group>
-                    <group>
                         <field name="module_id" />
                     </group>
-                    <group>
-                        <field name="field_ids" />
-                    </group>
-                    <group>
-                        <field name="devops_workspace_ids" />
-                    </group>
+                    <notebook>
+                        <page string="Field">
+                            <group>
+                                <field name="field_ids" />
+                            </group>
+                        </page>
+                        <page string="Workspace">
+                            <group>
+                                <field name="devops_workspace_ids" />
+                            </group>
+                        </page>
+                        <page string="Information">
+                            <group>
+                                <group>
+                                    <field name="sequence" />
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
@@ -111,6 +130,7 @@
         <field name="model">devops.cg.model</field>
         <field name="arch" type="xml">
             <tree>
+                <field name="sequence" widget="handle" />
                 <field name="name" />
                 <field name="module_id" />
                 <field name="description" />

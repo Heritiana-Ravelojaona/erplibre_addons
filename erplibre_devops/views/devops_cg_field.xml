@@ -6,9 +6,14 @@
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
                     <group>
                         <group>
-                            <field name="name" />
                             <field name="type" />
                             <field
                                 name="relation"
@@ -28,8 +33,14 @@
                     </group>
                     <group>
                         <field name="model_id" />
-                        <field name="devops_workspace_ids" />
                     </group>
+                    <notebook>
+                        <page string="Workspace">
+                            <group>
+                                <field name="devops_workspace_ids" />
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>

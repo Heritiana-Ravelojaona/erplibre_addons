@@ -4,8 +4,13 @@ from odoo import _, api, fields, models
 class DevopsCgModel(models.Model):
     _name = "devops.cg.model"
     _description = "devops_cg_model"
+    _order = "sequence, id"
 
     name = fields.Char(required=True)
+
+    active = fields.Boolean(default=True)
+
+    sequence = fields.Integer(default=10)
 
     description = fields.Char()
 
