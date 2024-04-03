@@ -1006,10 +1006,12 @@ class DevopsPlanActionWizard(models.TransientModel):
     def set_mode_new_module(self):
         self.is_new_module = True
         self.mode_view_generator = "new_view"
+        self.config_uca_enable_export_data = False
 
     def set_mode_edit_module(self):
         self.is_new_module = False
         self.mode_view_generator = "same_view"
+        self.config_uca_enable_export_data = True
 
     def generate_new_model(
         self,
