@@ -19,6 +19,13 @@
             <xpath expr="//footer" position="inside">
                 <!--                <header>-->
                 <button
+                    name="action_code_module_generate"
+                    string="Generate"
+                    type="object"
+                    class="btn btn-success"
+                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False),('force_show_final', '==', False)]}"
+                />
+                <button
                     name="action_git_commit"
                     string="Git commit module"
                     type="object"
@@ -173,7 +180,7 @@
                             name="action_code_module_generate"
                             string="Generate"
                             type="object"
-                            class="btn btn-default"
+                            class="btn btn-success"
                         />
                     </group>
                 </group>
@@ -620,17 +627,6 @@
                         />
                     </group>
                 </group>
-                <group
-                    string="G-Generate"
-                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
-                >
-                    <button
-                        name="action_code_module_generate"
-                        string="Generate"
-                        type="object"
-                        class="btn btn-success"
-                    />
-                </group>
                 <group name="group_g_a_local" attrs="{'invisible': [('state', '!=', 'g_a_local')]}">
                     <group string="DB">
                         <field name="image_db_selection" />
@@ -868,6 +864,7 @@
                 <group name="not_supported" attrs="{'invisible': [('state', '!=', 'not_supported')]}">
                     <p>This state is not supported, please go back.</p>
                 </group>
+                <hr attrs="{'invisible': [('state', '!=', 'final'), ('force_show_final', '!=', True)]}" />
                 <group
                     string="Result"
                     name="final"
