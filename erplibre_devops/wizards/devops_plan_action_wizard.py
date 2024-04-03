@@ -1169,6 +1169,12 @@ class DevopsPlanActionWizard(models.TransientModel):
             plan_cg_value["code_generator_name"] = self.code_generator_name
         if self.template_name:
             plan_cg_value["template_name"] = self.template_name
+        # Before generate, clean if necessary
+        cg_module_id = self.env["code.generator.module"].search(
+            [("name", "=", module_name)]
+        )
+        if cg_module_id:
+            cg_module_id.unlink()
         # Generate
         plan_cg_id = self.env["devops.plan.cg"].create(plan_cg_value)
         plan_cg_id.action_code_generator_generate_all()
