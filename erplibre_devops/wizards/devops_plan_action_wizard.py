@@ -104,7 +104,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             ("addons/ERPLibre_erplibre_addons", "ERPLibre addons"),
             ("addons/TechnoLibre_odoo-code-generator", "Code generator"),
         ],
-        default="#",
+        default="addons/addons",
         required=True,
         help="Suggestion relative path",
     )
