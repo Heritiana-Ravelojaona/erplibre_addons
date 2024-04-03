@@ -1106,9 +1106,6 @@ class DevopsPlanActionWizard(models.TransientModel):
             "devops_cg_ids": [(6, 0, cg_id.ids)],
             "devops_cg_module_ids": [(6, 0, cg_module_id.ids)],
             "devops_cg_model_ids": [(6, 0, self.model_ids.ids)],
-            "devops_cg_model_to_remove_ids": [
-                (6, 0, self.model_to_remove_ids.ids)
-            ],
             "devops_cg_field_ids": [(6, 0, lst_field_id)],
             "stop_execution_if_env_not_clean": not self.force_generate,
             "use_external_cg": self.use_external_cg,
@@ -1203,9 +1200,10 @@ class DevopsPlanActionWizard(models.TransientModel):
                 f"{module_name}/security/ir.model.access.csv",
                 f"{module_name}/views/menu.xml",
             ]
-            if self.model_ids:
+            model_ids = self.model_ids.filtered(lambda r: not r.is_to_remove)
+            if model_ids:
                 lst_default_file.append(f"{module_name}/models/__init__.py")
-                for cg_model_id in self.model_ids:
+                for cg_model_id in model_ids:
                     model_file_name = cg_model_id.name.replace(".", "_")
                     lst_default_file.append(
                         f"{module_name}/models/{model_file_name}.py"
@@ -1216,8 +1214,9 @@ class DevopsPlanActionWizard(models.TransientModel):
         cmd_git_add = ";".join([f"git add '{a}'" for a in lst_default_file])
         # Git remove
         lst_default_file_rm = []
-        if self.model_to_remove_ids:
-            for cg_model_id in self.model_to_remove_ids:
+        model_to_remove_ids = self.model_ids.filtered(lambda r: r.is_to_remove)
+        if model_to_remove_ids:
+            for cg_model_id in model_to_remove_ids:
                 model_file_name = cg_model_id.name.replace(".", "_")
                 lst_default_file_rm.append(
                     f"{module_name}/models/{model_file_name}.py"

@@ -14,6 +14,13 @@ class DevopsCgModel(models.Model):
 
     description = fields.Char()
 
+    is_to_remove = fields.Boolean(
+        help=(
+            "Active to tell the code generator to remove by refactoring this"
+            " model."
+        )
+    )
+
     field_ids = fields.One2many(
         comodel_name="devops.cg.field",
         inverse_name="model_id",

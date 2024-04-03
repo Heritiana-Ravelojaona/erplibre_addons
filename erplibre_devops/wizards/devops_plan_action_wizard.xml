@@ -438,7 +438,6 @@
                     attrs="{'invisible': [('state', '!=', 'a_a_model'),('state', '!=', 'c_a_model')]}"
                 >
                     <field name="model_ids" />
-                    <field name="model_to_remove_ids" />
                 </group>
                 <!--                <group name="group_a_f_devops_regen" attrs="{'invisible': [('state', '!=', 'a_f_devops_regen')]}">-->
                 <!--                    -->
@@ -540,7 +539,6 @@
                     attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
                 >
                     <field name="model_ids" />
-                    <field name="model_to_remove_ids" />
                 </group>
                 <group
                     name="group_code_module_2"

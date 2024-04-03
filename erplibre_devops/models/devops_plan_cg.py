@@ -495,12 +495,12 @@ class DevopsPlanCg(models.Model):
                         if model_conf:
                             dct_new_project["config"] = model_conf
                             # extra_arg = f" --config '{model_conf}'"
-                        if rec.devops_cg_model_to_remove_ids:
+                        model_to_remove_ids = rec.devops_cg_model_ids.filtered(
+                            lambda r: r.is_to_remove
+                        )
+                        if model_to_remove_ids:
                             dct_new_project["model_to_remove"] = ";".join(
-                                [
-                                    a.name
-                                    for a in rec.devops_cg_model_to_remove_ids
-                                ]
+                                [a.name for a in model_to_remove_ids]
                             )
                         if rec.use_external_cg:
                             new_project_id = self.env[
@@ -596,7 +596,10 @@ class DevopsPlanCg(models.Model):
             else:
                 lst_portal_model = []
             # TODO reorder the model from dependency inter model, ignore one2many
-            for model_model_id in rec.devops_cg_model_ids:
+            model_ids = rec.devops_cg_model_ids.filtered(
+                lambda r: not r.is_to_remove
+            )
+            for model_model_id in model_ids:
                 lst_depend_model = None
                 if (
                     lst_portal_model

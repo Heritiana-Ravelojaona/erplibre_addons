@@ -12,7 +12,7 @@
                         </button>
                     </div>
                     <div class="oe_title">
-                        <label for="name" class="oe_edit_only"/>
+                        <label for="name" class="oe_edit_only" />
                         <h1>
                             <field name="name" />
                         </h1>
@@ -20,6 +20,7 @@
                     <group>
                         <field name="description" />
                         <field name="module_id" />
+                        <field name="is_to_remove" />
                     </group>
                     <notebook>
                         <page string="Field">
@@ -135,7 +136,7 @@
                 <field name="module_id" />
                 <field name="description" />
                 <field name="field_ids" widget="many2many_tags" />
-                <field name="devops_workspace_ids" widget="many2many_tags" />
+                <field name="is_to_remove" />
             </tree>
         </field>
     </record>

@@ -7,7 +7,7 @@
             <form string="Titre">
                 <sheet>
                     <div class="oe_title">
-                        <label for="name" class="oe_edit_only"/>
+                        <label for="name" class="oe_edit_only" />
                         <h1>
                             <field name="name" />
                         </h1>
@@ -142,7 +142,6 @@
                 <field name="field_relation" />
                 <field name="field_relation_manual" />
                 <field name="help" />
-                <field name="devops_workspace_ids" widget="many2many_tags" />
             </tree>
         </field>
     </record>
