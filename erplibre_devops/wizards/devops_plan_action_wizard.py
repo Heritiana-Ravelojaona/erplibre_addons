@@ -1224,14 +1224,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                     f"{module_name}/views/{model_file_name}.xml"
                 )
         cmd_git_rm = ";".join([f"git rm '{a}'" for a in lst_default_file_rm])
-        if cmd_git_add and cmd_git_rm:
-            cmd_git = f"{cmd_git_add};{cmd_git_rm}"
-        elif cmd_git_add:
-            cmd_git = cmd_git_add
-        elif cmd_git_rm:
-            cmd_git = cmd_git_rm
-        else:
-            cmd_git = ""
+        cmd_git = ";".join([cmd_git_add, cmd_git_rm])
         if cmd_git:
             wp_id.execute(
                 cmd=cmd_git,
