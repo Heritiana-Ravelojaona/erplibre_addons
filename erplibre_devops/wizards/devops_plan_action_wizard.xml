@@ -122,7 +122,7 @@
                                 <br />
                                 3. Adjust B to change path, with C for parameters.
                             </p>
-                            <p>4. Create models and options.</p>
+                            <p>4. Create models, views and controllers.</p>
                         </div>
                     </group>
                     <group>
@@ -156,7 +156,7 @@
                                 <br />
                                 3. Adjust B to change path, with C for parameters.
                                 <br />
-                                4. Create models and options.
+                                4. Create models, views and controllers.
                             </p>
                             <p>5. Result</p>
                         </div>
@@ -471,16 +471,19 @@
                             attrs="{'invisible': [('working_module_path_suggestion', '!=', '#')]}"
                         />
                     </group>
-                    <group string="C-Parameter" attrs="{'invisible': [('state', '!=', 'code_module')]}">
+                </group>
+                <group
+                    string="C-Parameter"
+                    name="group_code_module_part_2"
+                    attrs="{'invisible': [('state', '!=', 'code_module')]}"
+                >
+                    <group string="Code generator" attrs="{'invisible': [('state', '!=', 'code_module')]}">
                         <field name="mode_view_generator" />
                         <field name="force_generate" />
                         <field name="is_remote_cg" string="Generate outside ME" />
                         <!--                        <field name="is_cg_temporary" string="Generate temporary" />-->
                     </group>
-                    <group
-                        string="C-Parameter Meta UcA &amp; UcB"
-                        attrs="{'invisible': [('state', '!=', 'code_module')]}"
-                    >
+                    <group string="Meta UcA &amp; UcB" attrs="{'invisible': [('state', '!=', 'code_module')]}">
                         <field name="use_external_cg" string="With UcA UcB" />
                         <field
                             name="use_existing_meta_module"
@@ -542,10 +545,13 @@
                 </group>
                 <group
                     name="group_code_module_2"
-                    string="E-Options"
+                    string="E-View"
                     attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
                 >
-                    <group string="Snippet">
+                    <group string="Web / admin space">
+                        <div>Activate by default.</div>
+                    </group>
+                    <group string="Website Snippet">
                         <field name="mode_view_snippet" string="Mode" />
                         <field
                             name="mode_view_snippet_template_generate_website_snippet_generic_mdl"
@@ -601,7 +607,13 @@
                             string="Support delete"
                         />
                     </group>
-                    <group string="Data">
+                </group>
+                <group
+                    name="group_code_module_3"
+                    string="F-Data"
+                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
+                >
+                    <group string="Export from ME">
                         <field
                             name="config_uca_enable_export_data"
                             attrs="{'invisible': [('use_external_cg', '==', True)]}"
@@ -609,7 +621,7 @@
                     </group>
                 </group>
                 <group
-                    string="F-Generate"
+                    string="G-Generate"
                     attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
                 >
                     <button
