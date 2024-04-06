@@ -38,12 +38,27 @@ class DevopsCgField(models.Model):
         default="char",
     )
 
+    related_manual = fields.Char(
+        comodel_name="devops.cg.model",
+        string="Related manual",
+        help="Related field WIP",
+    )
+
+    # TODO rename relation to comodel_id
+    # related_field_id = fields.Many2one(
+    #     comodel_name="devops.cg.field",
+    #     string="Related",
+    #     help="Related field WIP",
+    # )
+
+    # TODO rename relation to comodel_id
     relation = fields.Many2one(
         comodel_name="devops.cg.model",
         string="Comodel",
         help="comodel - Create relation for many2one, many2many, one2many",
     )
 
+    # TODO rename relation to comodel_name
     relation_manual = fields.Char(
         string="Comodel manual",
         help=(
@@ -52,6 +67,7 @@ class DevopsCgField(models.Model):
         ),
     )
 
+    # TODO rename to inverse_field_id
     field_relation = fields.Many2one(
         comodel_name="devops.cg.field",
         domain="[('model_id', '=', relation)]",
@@ -59,6 +75,7 @@ class DevopsCgField(models.Model):
         help="inverse_name - Need for one2many to associate with many2one.",
     )
 
+    # TODO rename inverse_field_name
     field_relation_manual = fields.Char(
         string="Inverse field manual",
         help=(
@@ -66,6 +83,14 @@ class DevopsCgField(models.Model):
             " manual entry."
         ),
     )
+
+    # TODO rename to relation
+    relation_ref = fields.Char(
+        string="Relation ref",
+        help="The relation name for many2many",
+    )
+
+    string = fields.Char(help="Label of the field")
 
     widget = fields.Selection(
         selection=[
@@ -117,4 +142,6 @@ class DevopsCgField(models.Model):
             # TODO support many2many with different relation
         if self.help:
             dct_field["help"] = self.help
+        if self.string:
+            dct_field["field_description"] = self.string
         return dct_field

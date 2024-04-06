@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import time
@@ -945,6 +946,15 @@ class DevopsPlanActionWizard(models.TransientModel):
             # # finally
             # self.state = "final"
 
+    def action_purge_metadata(self):
+        with self.root_workspace_id.devops_create_exec_bundle(
+            "Code Module - purge metadata"
+        ) as wp_id:
+            self.env["devops.cg.module"].search([]).unlink()
+            self.env["devops.cg.model"].search([]).unlink()
+            self.env["devops.cg.field"].search([]).unlink()
+        return self._reopen_self()
+
     def action_code_module_autocomplete_module_path(self):
         with self.root_workspace_id.devops_create_exec_bundle(
             "Code Module - auto-complete module path"
@@ -1001,6 +1011,156 @@ class DevopsPlanActionWizard(models.TransientModel):
             else:
                 self.working_module_path = relative_path_module
             self.set_mode_edit_module()
+            exec_id = wp_id.execute(
+                cmd=(
+                    "./script/code_generator/search_class_model.py -d"
+                    f" {relative_path_module}/{module_name} --json"
+                    " --with_inherit"
+                ),
+                run_into_workspace=True,
+                error_on_status=False,
+            )
+            str_dct_model = exec_id.log_all.strip()
+            if exec_id.exec_status != 0:
+                _logger.error("TODO i crash and forgot to raise an error!")
+            else:
+                # Create cg.model
+                dct_model = json.loads(str_dct_model)
+                dct_model_cg = {}
+                dct_model_cg_depend = {}
+                lst_model_to_add = []
+                lst_model_field = []
+                for model_name, v in dct_model.items():
+                    model_id = self.env["devops.cg.model"].search(
+                        [("name", "=", model_name)]
+                    )
+                    if not model_id:
+                        model_value = {
+                            "name": model_name,
+                            "is_inherit": v.get("is_inherit", False),
+                        }
+                        model_id = self.env["devops.cg.model"].create(
+                            model_value
+                        )
+                    lst_model_to_add.append(model_id.id)
+                    lst_model_field.append((model_id, v))
+                    dct_model_cg[model_name] = model_id
+                    dct_model_cg_depend[model_name] = []
+                # Create cg.field
+                for model_id, v in lst_model_field:
+                    if "fields" in v.keys():
+                        # This algorithm only works when the module is working and formatted
+                        for dct_field in v.get("fields").values():
+                            ttype = dct_field.get("type").lower()
+                            field_name = dct_field.get("name")
+                            value_value = {
+                                "name": field_name,
+                                "type": ttype,
+                                "model_id": model_id.id,
+                            }
+                            model_name = model_id.name
+                            # Check if exist
+                            field_id = self.env["devops.cg.field"].search(
+                                [
+                                    ("name", "=", field_name),
+                                    ("model_id", "=", model_id.id),
+                                ]
+                            )
+                            if field_id:
+                                continue
+                            if "comodel_name" in dct_field.keys():
+                                comodel_name = dct_field.get("comodel_name")
+                                model_id_searched = dct_model_cg.get(
+                                    comodel_name
+                                )
+                                if model_id_searched:
+                                    value_value[
+                                        "relation"
+                                    ] = model_id_searched.id
+                                    if (
+                                        model_id_searched.id
+                                        not in dct_model_cg_depend[model_name]
+                                        and ttype not in ["one2many"]
+                                        and model_id_searched.id != model_id.id
+                                    ):
+                                        # Ignore one2many and depend on itself
+                                        # Keep cache on depend model
+                                        dct_model_cg_depend[model_name].append(
+                                            model_id_searched.id
+                                        )
+                                else:
+                                    value_value[
+                                        "relation_manual"
+                                    ] = comodel_name
+                                if "inverse_name" in dct_field.keys():
+                                    inverse_name = dct_field.get(
+                                        "inverse_name"
+                                    )
+                                    # TODO detect field_relation, need to reorder the field model
+                                    value_value[
+                                        "field_relation_manual"
+                                    ] = inverse_name
+                                if "relation" in dct_field.keys():
+                                    relation_ref = dct_field.get("relation")
+                                    value_value["relation_ref"] = relation_ref
+                            if "help" in dct_field.keys():
+                                value_value["help"] = dct_field.get("help")
+                            if "string" in dct_field.keys():
+                                value_value["string"] = dct_field.get("string")
+                            if "related" in dct_field.keys():
+                                value_value["related_manual"] = dct_field.get(
+                                    "related"
+                                )
+
+                            field_id = self.env["devops.cg.field"].create(
+                                value_value
+                            )
+
+                self.model_ids = [(6, 0, lst_model_to_add)]
+                # reorder from dependency
+                # TODO reorder from dependency list, change sequence
+                lst_model_delete = []
+                sequence_no = 10
+                max_loop = 1000
+                i = 0
+                lst_id_model_order = []
+                has_change = True
+                while i < max_loop and dct_model_cg_depend and has_change:
+                    i += 1
+                    has_change = False
+                    for model_name, lst_depend in dct_model_cg_depend.items():
+                        model_id = dct_model_cg.get(model_name)
+                        if not lst_depend:
+                            model_id.sequence = sequence_no
+                            sequence_no += 1
+                            lst_model_delete.append(model_name)
+                            lst_id_model_order.append(model_id.id)
+                            has_change = True
+                        else:
+                            # delete dependency from lst_model_order
+                            lst_diff = list(
+                                set(lst_id_model_order).intersection(
+                                    set(lst_depend)
+                                )
+                            )
+                            if lst_diff:
+                                for i_diff in lst_diff:
+                                    lst_depend.remove(i_diff)
+                                    has_change = True
+
+                    for model_to_delete in lst_model_delete:
+                        del dct_model_cg_depend[model_to_delete]
+                    lst_model_delete = []
+                if dct_model_cg_depend:
+                    _logger.error(
+                        "Cannot reorder dependency of models, debug:"
+                        f" {dct_model_cg_depend}"
+                    )
+                    for model_name, lst_depend in dct_model_cg_depend.items():
+                        model_id = dct_model_cg.get(model_name)
+                        model_id.sequence = sequence_no
+                        sequence_no += 1
+
         return self._reopen_self()
 
     def set_mode_new_module(self):

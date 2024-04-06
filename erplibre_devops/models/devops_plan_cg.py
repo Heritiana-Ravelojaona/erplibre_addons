@@ -1249,7 +1249,15 @@ class DevopsPlanCg(models.Model):
                     "help": field_id.help,
                     "type": field_id.type,
                 }
-                if field_id.type in [
+                # ignore_field_relation = bool(field_id.related_manual or field_id.related_field_id)
+                ignore_field_relation = bool(field_id.related_manual)
+                if ignore_field_relation:
+                    if field_id.related_manual:
+                        dct_value_field["related"] = field_id.related_manual
+                    # else:
+                    #     # TODO support related field id
+                    #     dct_value_field["related"] = field_id.related_manual
+                if not ignore_field_relation and field_id.type in [
                     "many2one",
                     "many2many",
                     "one2many",
@@ -1267,7 +1275,7 @@ class DevopsPlanCg(models.Model):
                             f" '{field_id.type}'"
                         )
                         raise exceptions.Warning(msg_err)
-                if field_id.type in [
+                if not ignore_field_relation and field_id.type in [
                     "one2many",
                 ]:
                     dct_value_field["relation_field"] = (

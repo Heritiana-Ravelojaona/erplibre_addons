@@ -19,6 +19,20 @@
             <xpath expr="//div[@name='states_buttons']" position="inside">
                 <!--                <header>-->
                 <button
+                    name="action_code_module_autocomplete_module_path"
+                    string="Auto-complete"
+                    type="object"
+                    class="btn btn-success"
+                    attrs="{'invisible': [('state', '!=', 'code_module')]}"
+                />
+                <button
+                    name="action_purge_metadata"
+                    string="Clear cache"
+                    type="object"
+                    class="btn btn-warning"
+                    attrs="{'invisible': [('state', '!=', 'code_module')]}"
+                />
+                <button
                     name="action_code_module_generate"
                     string="Generate"
                     type="object"
@@ -112,6 +126,12 @@
                             type="object"
                             class="btn btn-success"
                         />
+                        <button
+                            name="action_purge_metadata"
+                            string="Clear cache"
+                            type="object"
+                            class="btn btn-warning"
+                        />
                     </group>
                 </group>
                 <group
@@ -139,6 +159,12 @@
                             string="Auto-complete"
                             type="object"
                             class="btn btn-default"
+                        />
+                        <button
+                            name="action_purge_metadata"
+                            string="Clear cache"
+                            type="object"
+                            class="btn btn-warning"
                         />
                         <button
                             name="action_code_module_generate"
@@ -175,6 +201,12 @@
                             string="Auto-complete"
                             type="object"
                             class="btn btn-default"
+                        />
+                        <button
+                            name="action_purge_metadata"
+                            string="Clear cache"
+                            type="object"
+                            class="btn btn-warning"
                         />
                         <button
                             name="action_code_module_generate"

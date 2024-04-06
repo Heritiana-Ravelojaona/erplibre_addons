@@ -15,6 +15,7 @@
                     <group>
                         <group>
                             <field name="type" />
+                            <field name="string" />
                             <field
                                 name="relation"
                                 attrs="{'invisible': [('type', 'not in', ['many2one', 'many2many', 'one2many'])]}"
@@ -28,6 +29,9 @@
                                 name="field_relation_manual"
                                 attrs="{'invisible': ['|', ('type', 'not in', ['one2many']), ('field_relation', '!=', False)]}"
                             />
+                            <field name="relation_ref" attrs="{'invisible': [('type', 'not in', ['many2many'])]}" />
+                            <field name="related_manual" />
+                            <!--                            <field name="related_field_id" />-->
                             <field name="help" />
                         </group>
                     </group>

@@ -21,6 +21,8 @@ class DevopsCgModel(models.Model):
         )
     )
 
+    is_inherit = fields.Boolean(help="If the model inherit another model.")
+
     field_ids = fields.One2many(
         comodel_name="devops.cg.field",
         inverse_name="model_id",
