@@ -265,3 +265,28 @@ class DevopsExec(models.Model):
                 rec_ws.with_context(
                     breakpoint_id=o_rec.ide_breakpoint.id
                 ).ide_pycharm.action_start_pycharm()
+
+    @api.multi
+    def open_cmd_into_ide(self):
+        ws_id = self.env["devops.workspace"].search(
+            [("is_me", "=", True)], limit=1
+        )
+        if not ws_id:
+            return
+        for o_rec in self:
+            with ws_id.devops_create_exec_bundle(
+                "Open cmd into IDE"
+            ) as rec_ws:
+                split_cmd = self.cmd.split(" ", 1)
+                cmd = split_cmd[0]
+                if not cmd.endswith(".py"):
+                    raise exceptions.Warning(
+                        _("CMD need to be a python file.")
+                    )
+                if len(split_cmd) > 1:
+                    args = split_cmd[1]
+                else:
+                    args = ""
+                rec_ws.with_context(
+                    breakpoint_id=o_rec.ide_breakpoint.id
+                ).ide_pycharm.add_script_python_configuration(cmd, args=args)
