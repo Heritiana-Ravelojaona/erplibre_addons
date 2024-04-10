@@ -1024,8 +1024,24 @@ class DevopsPlanActionWizard(models.TransientModel):
             if exec_id.exec_status != 0:
                 _logger.error("TODO i crash and forgot to raise an error!")
             else:
+                # The file need to finish by }, or cut it and remove output execution
+                last_pos_char = str_dct_model.rfind("}")
+                if last_pos_char == -1:
+                    _logger.error(
+                        "Cannot detect JSON dict when searching class model."
+                    )
+                    # TODO You can stop execution here, but let crash later
+                    str_dct_model_complete = str_dct_model
+                    lst_logs_model = []
+                else:
+                    str_dct_model_complete = str_dct_model[: last_pos_char + 1]
+                    lst_logs_model = (
+                        str_dct_model[last_pos_char + 1 :].strip().split("\n")
+                    )
+                    # TODO show this log to action view
+                    _logger.warning("\n".join(lst_logs_model))
                 # Create cg.model
-                dct_model = json.loads(str_dct_model)
+                dct_model = json.loads(str_dct_model_complete)
                 dct_model_cg = {}
                 dct_model_cg_depend = {}
                 lst_model_to_add = []
