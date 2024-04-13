@@ -400,11 +400,7 @@ class DevopsIdePycharm(models.Model):
                         f"Unknown add_configuration mode {conf_add_mode}"
                     )
 
-    def add_script_python_configuration(
-        self,
-        cmd,
-        args="",
-    ):
+    def add_script_python_configuration(self, cmd, args=""):
         for rec in self:
             with self.devops_workspace.devops_create_exec_bundle(
                 "PyCharm add script python configuration"

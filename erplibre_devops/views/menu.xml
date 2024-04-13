@@ -152,46 +152,6 @@
     />
 
     <menuitem
-        id="menu_docker_compose"
-        name="Compose"
-        action="devops_docker_compose_docker_compose_group_action_window"
-        sequence="1"
-        parent="menu_deploy_docker_group"
-    />
-
-    <menuitem
-        id="menu_docker_container"
-        name="Container"
-        action="devops_docker_container_docker_container_group_action_window"
-        sequence="2"
-        parent="menu_deploy_docker_group"
-    />
-
-    <menuitem
-        id="menu_docker_image"
-        name="Image"
-        action="devops_docker_image_docker_image_group_action_window"
-        sequence="3"
-        parent="menu_deploy_docker_group"
-    />
-
-    <menuitem
-        id="menu_docker_network"
-        name="Network"
-        action="devops_docker_network_docker_network_group_action_window"
-        sequence="4"
-        parent="menu_deploy_docker_group"
-    />
-
-    <menuitem
-        id="menu_docker_volume"
-        name="Volume"
-        action="devops_docker_volume_docker_volume_group_action_window"
-        sequence="5"
-        parent="menu_deploy_docker_group"
-    />
-
-    <menuitem
         id="menu_deploy_vm"
         name="VM"
         action="devops_deploy_vm_deploy_vm_action_window"
@@ -237,6 +197,46 @@
         action="devops_exec_error_action_window"
         sequence="7"
         parent="menu_process"
+    />
+
+    <menuitem
+        id="menu_docker_compose"
+        name="Compose"
+        action="devops_docker_compose_docker_compose_group_action_window"
+        sequence="1"
+        parent="menu_deploy_docker_group"
+    />
+
+    <menuitem
+        id="menu_docker_container"
+        name="Container"
+        action="devops_docker_container_docker_container_group_action_window"
+        sequence="2"
+        parent="menu_deploy_docker_group"
+    />
+
+    <menuitem
+        id="menu_docker_image"
+        name="Image"
+        action="devops_docker_image_docker_image_group_action_window"
+        sequence="3"
+        parent="menu_deploy_docker_group"
+    />
+
+    <menuitem
+        id="menu_docker_network"
+        name="Network"
+        action="devops_docker_network_docker_network_group_action_window"
+        sequence="4"
+        parent="menu_deploy_docker_group"
+    />
+
+    <menuitem
+        id="menu_docker_volume"
+        name="Volume"
+        action="devops_docker_volume_docker_volume_group_action_window"
+        sequence="5"
+        parent="menu_deploy_docker_group"
     />
 
     <menuitem

@@ -1039,7 +1039,8 @@ class DevopsPlanActionWizard(models.TransientModel):
                         str_dct_model[last_pos_char + 1 :].strip().split("\n")
                     )
                     # TODO show this log to action view
-                    _logger.warning("\n".join(lst_logs_model))
+                    if lst_logs_model:
+                        _logger.warning("\n".join(lst_logs_model))
                 # Create cg.model
                 dct_model = json.loads(str_dct_model_complete)
                 dct_model_cg = {}
