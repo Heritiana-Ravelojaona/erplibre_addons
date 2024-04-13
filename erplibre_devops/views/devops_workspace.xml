@@ -289,7 +289,7 @@
                     </group>
                     <group string="Docker" attrs="{'invisible': [('is_installed', '=', False)]}">
                         <field name="workspace_docker_id" />
-                        <field name="deploy_docker_compose_id" />
+                        <field name="docker_compose_id" />
                     </group>
                     <group string="Action">
                         <button name="action_open_terminal" string="Terminal" type="object" class="oe_highlight" />
@@ -365,9 +365,9 @@
                 <filter name="is_me" string="Is me" domain="[('is_me','=',True)]" />
                 <filter name="is_robot" string="Is robot" domain="[('is_robot','=',True)]" />
                 <filter
-                    name="has_deploy_docker_compose"
-                    string="Has deploy docker compose"
-                    domain="[('deploy_docker_compose_id','!=',False)]"
+                    name="has_docker_compose"
+                    string="Has docker compose"
+                    domain="[('docker_compose_id','!=',False)]"
                 />
                 <group string="Group By" expand="1">
                     <filter name="system_id" string="System" context="{'group_by':'system_id'}" />

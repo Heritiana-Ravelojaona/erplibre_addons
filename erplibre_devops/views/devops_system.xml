@@ -53,7 +53,7 @@
                         />
                     </button>
                     <button
-                        name="%(erplibre_devops.devops_deploy_docker_compose_deploy_docker_compose_action_window)d"
+                        name="%(erplibre_devops.devops_docker_compose_docker_compose_action_window)d"
                         type="action"
                         class="oe_stat_button"
                         icon="fa-tasks"
@@ -63,7 +63,7 @@
                         <field name="docker_compose_count" string="Docker Compose" widget="statinfo" />
                     </button>
                     <button
-                        name="%(erplibre_devops.devops_deploy_docker_volume_deploy_docker_volume_action_window)d"
+                        name="%(erplibre_devops.devops_docker_volume_docker_volume_action_window)d"
                         type="action"
                         class="oe_stat_button"
                         icon="fa-tasks"
@@ -73,7 +73,7 @@
                         <field name="docker_volume_count" string="Docker Volume" widget="statinfo" />
                     </button>
                     <button
-                        name="%(erplibre_devops.devops_deploy_docker_image_deploy_docker_image_action_window)d"
+                        name="%(erplibre_devops.devops_docker_image_docker_image_action_window)d"
                         type="action"
                         class="oe_stat_button"
                         icon="fa-tasks"
@@ -83,7 +83,7 @@
                         <field name="docker_image_count" string="Docker Image" widget="statinfo" />
                     </button>
                     <button
-                        name="%(erplibre_devops.devops_deploy_docker_network_deploy_docker_network_action_window)d"
+                        name="%(erplibre_devops.devops_docker_network_docker_network_action_window)d"
                         type="action"
                         class="oe_stat_button"
                         icon="fa-tasks"
@@ -93,7 +93,7 @@
                         <field name="docker_network_count" string="Docker Network" widget="statinfo" />
                     </button>
                     <button
-                        name="%(erplibre_devops.devops_deploy_docker_container_deploy_docker_container_action_window)d"
+                        name="%(erplibre_devops.devops_docker_container_docker_container_action_window)d"
                         type="action"
                         class="oe_stat_button"
                         icon="fa-tasks"

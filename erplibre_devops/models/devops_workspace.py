@@ -165,8 +165,8 @@ class DevopsWorkspace(models.Model):
         help="The automated robot to manage ERPLibre.",
     )
 
-    deploy_docker_compose_id = fields.Many2one(
-        comodel_name="devops.deploy.docker.compose",
+    docker_compose_id = fields.Many2one(
+        comodel_name="devops.docker.compose",
         string="Docker composite",
     )
 
@@ -356,9 +356,9 @@ class DevopsWorkspace(models.Model):
     @api.multi
     @api.depends(
         "workspace_docker_id",
-        "deploy_docker_compose_id",
-        "deploy_docker_compose_id.active",
-        "deploy_docker_compose_id.is_running",
+        "docker_compose_id",
+        "docker_compose_id.active",
+        "docker_compose_id.is_running",
         "is_running_with_process",
         "is_me",
     )
@@ -369,9 +369,9 @@ class DevopsWorkspace(models.Model):
                 # TODO seems duplicate docker status
                 is_running = rec.workspace_docker_id.docker_is_running
             if (
-                rec.deploy_docker_compose_id
-                and rec.deploy_docker_compose_id.active
-                and rec.deploy_docker_compose_id.is_running
+                rec.docker_compose_id
+                and rec.docker_compose_id.active
+                and rec.docker_compose_id.is_running
             ):
                 is_running = True
             if rec.is_me:

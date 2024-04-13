@@ -1,9 +1,9 @@
 from odoo import _, api, fields, models
 
 
-class DevopsDeployDockerImage(models.Model):
-    _name = "devops.deploy.docker.image"
-    _description = "devops_deploy_docker_image"
+class DevopsDockerImage(models.Model):
+    _name = "devops.docker.image"
+    _description = "devops_docker_image"
 
     name = fields.Char(
         compute="_compute_name",
@@ -12,7 +12,7 @@ class DevopsDeployDockerImage(models.Model):
 
     system_ids = fields.Many2many(
         comodel_name="devops.system",
-        relation="deploy_docker_image_system_ids_rel",
+        relation="docker_image_system_ids_rel",
         string="Systems",
         readonly=True,
     )

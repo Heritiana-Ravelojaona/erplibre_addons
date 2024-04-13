@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record id="devops_deploy_docker_container_view_form" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_container_form</field>
-        <field name="model">devops.deploy.docker.container</field>
+    <record id="devops_docker_container_view_form" model="ir.ui.view">
+        <field name="name">devops_docker_container_form</field>
+        <field name="model">devops.docker.container</field>
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
@@ -48,11 +48,11 @@
         </field>
     </record>
 
-    <record id="devops_deploy_docker_container_view_graph" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_container_graph</field>
-        <field name="model">devops.deploy.docker.container</field>
+    <record id="devops_docker_container_view_graph" model="ir.ui.view">
+        <field name="name">devops_docker_container_graph</field>
+        <field name="model">devops.docker.container</field>
         <field name="arch" type="xml">
-            <graph string="Devops deploy docker container">
+            <graph string="Devops docker container">
                 <field name="name" type="row" />
                 <field name="command" type="row" />
                 <field name="create_at" type="row" />
@@ -70,9 +70,9 @@
         </field>
     </record>
 
-    <record id="devops_deploy_docker_container_view_kanban" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_container_kanban</field>
-        <field name="model">devops.deploy.docker.container</field>
+    <record id="devops_docker_container_view_kanban" model="ir.ui.view">
+        <field name="name">devops_docker_container_kanban</field>
+        <field name="model">devops.docker.container</field>
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <field name="name" />
@@ -163,11 +163,11 @@
         </field>
     </record>
 
-    <record id="devops_deploy_docker_container_view_pivot" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_container_pivot</field>
-        <field name="model">devops.deploy.docker.container</field>
+    <record id="devops_docker_container_view_pivot" model="ir.ui.view">
+        <field name="name">devops_docker_container_pivot</field>
+        <field name="model">devops.docker.container</field>
         <field name="arch" type="xml">
-            <pivot string="Devops deploy docker container">
+            <pivot string="Devops docker container">
                 <field name="name" type="row" />
                 <field name="command" type="row" />
                 <field name="create_at" type="row" />
@@ -185,11 +185,11 @@
         </field>
     </record>
 
-    <record id="devops_deploy_docker_container_view_search" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_container_search</field>
-        <field name="model">devops.deploy.docker.container</field>
+    <record id="devops_docker_container_view_search" model="ir.ui.view">
+        <field name="name">devops_docker_container_search</field>
+        <field name="model">devops.docker.container</field>
         <field name="arch" type="xml">
-            <search string="Devops deploy docker container">
+            <search string="Devops docker container">
                 <field name="name" />
                 <field name="system_id" />
                 <field name="compose_id" />
@@ -203,9 +203,9 @@
         </field>
     </record>
 
-    <record id="devops_deploy_docker_container_view_tree" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_container_tree</field>
-        <field name="model">devops.deploy.docker.container</field>
+    <record id="devops_docker_container_view_tree" model="ir.ui.view">
+        <field name="name">devops_docker_container_tree</field>
+        <field name="model">devops.docker.container</field>
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
@@ -229,17 +229,17 @@
     </record>
 
     <act_window
-        id="devops_deploy_docker_container_deploy_docker_container_group_action_window"
-        name="Deploy docker group container"
-        res_model="devops.deploy.docker.container"
+        id="devops_docker_container_docker_container_group_action_window"
+        name="Docker group container"
+        res_model="devops.docker.container"
         view_mode="tree,kanban,pivot,graph,form"
         context="{'search_default_group_by_system_id': True}"
     />
 
     <act_window
-        id="devops_deploy_docker_container_deploy_docker_container_action_window"
-        name="Deploy docker container"
-        res_model="devops.deploy.docker.container"
+        id="devops_docker_container_docker_container_action_window"
+        name="Docker container"
+        res_model="devops.docker.container"
         view_mode="tree,kanban,pivot,graph,form"
     />
 </odoo>

@@ -161,7 +161,7 @@ class DevopsSystem(models.Model):
     )
 
     docker_compose_ids = fields.One2many(
-        comodel_name="devops.deploy.docker.compose",
+        comodel_name="devops.docker.compose",
         inverse_name="system_id",
         string="Docker compose",
     )
@@ -173,7 +173,7 @@ class DevopsSystem(models.Model):
     )
 
     docker_volume_ids = fields.One2many(
-        comodel_name="devops.deploy.docker.volume",
+        comodel_name="devops.docker.volume",
         inverse_name="system_id",
         string="Docker volume",
     )
@@ -185,8 +185,8 @@ class DevopsSystem(models.Model):
     )
 
     docker_image_ids = fields.Many2many(
-        comodel_name="devops.deploy.docker.image",
-        relation="deploy_docker_image_system_ids_rel",
+        comodel_name="devops.docker.image",
+        relation="docker_image_system_ids_rel",
         string="Docker image",
     )
 
@@ -197,7 +197,7 @@ class DevopsSystem(models.Model):
     )
 
     docker_network_ids = fields.One2many(
-        comodel_name="devops.deploy.docker.network",
+        comodel_name="devops.docker.network",
         inverse_name="system_id",
         string="Docker network",
     )
@@ -209,7 +209,7 @@ class DevopsSystem(models.Model):
     )
 
     docker_container_ids = fields.One2many(
-        comodel_name="devops.deploy.docker.container",
+        comodel_name="devops.docker.container",
         inverse_name="system_id",
         string="Docker container",
     )
@@ -359,7 +359,7 @@ class DevopsSystem(models.Model):
     def _compute_docker_compose_count(self):
         for rec in self:
             rec.docker_compose_count = self.env[
-                "devops.deploy.docker.compose"
+                "devops.docker.compose"
             ].search_count([("system_id", "=", rec.id)])
 
     @api.multi
@@ -367,7 +367,7 @@ class DevopsSystem(models.Model):
     def _compute_docker_volume_count(self):
         for rec in self:
             rec.docker_volume_count = self.env[
-                "devops.deploy.docker.volume"
+                "devops.docker.volume"
             ].search_count([("system_id", "=", rec.id)])
 
     @api.multi
@@ -375,7 +375,7 @@ class DevopsSystem(models.Model):
     def _compute_docker_image_count(self):
         for rec in self:
             rec.docker_image_count = self.env[
-                "devops.deploy.docker.image"
+                "devops.docker.image"
             ].search_count([("system_ids", "in", [rec.id])])
 
     @api.multi
@@ -383,7 +383,7 @@ class DevopsSystem(models.Model):
     def _compute_docker_network_count(self):
         for rec in self:
             rec.docker_network_count = self.env[
-                "devops.deploy.docker.network"
+                "devops.docker.network"
             ].search_count([("system_id", "=", rec.id)])
 
     @api.multi
@@ -391,7 +391,7 @@ class DevopsSystem(models.Model):
     def _compute_docker_container_count(self):
         for rec in self:
             rec.docker_container_count = self.env[
-                "devops.deploy.docker.container"
+                "devops.docker.container"
             ].search_count([("system_id", "=", rec.id)])
 
     def get_ssh_address(self):
@@ -860,31 +860,31 @@ class DevopsSystem(models.Model):
             # Debug, force clean all before
             debug = True
             if debug:
-                self.env["devops.deploy.docker.compose"].search(
+                self.env["devops.docker.compose"].search(
                     [
                         ("system_id", "=", rec.id),
                     ],
                     limit=1,
                 ).write({"active": False})
-                self.env["devops.deploy.docker.volume"].search(
+                self.env["devops.docker.volume"].search(
                     [
                         ("system_id", "=", rec.id),
                     ],
                     limit=1,
                 ).write({"active": False})
-                self.env["devops.deploy.docker.image"].search(
+                self.env["devops.docker.image"].search(
                     [
                         ("system_ids", "in", rec.ids),
                     ],
                     limit=1,
                 ).write({"active": False})
-                self.env["devops.deploy.docker.network"].search(
+                self.env["devops.docker.network"].search(
                     [
                         ("system_id", "=", rec.id),
                     ],
                     limit=1,
                 ).write({"active": False})
-                self.env["devops.deploy.docker.container"].search(
+                self.env["devops.docker.container"].search(
                     [
                         ("system_id", "=", rec.id),
                     ],
@@ -906,16 +906,14 @@ class DevopsSystem(models.Model):
             lst_compose = json.loads(out)
             for dct_compose in lst_compose:
                 compose_name = dct_compose.get("Name")
-                deploy_docker_compose_id = self.env[
-                    "devops.deploy.docker.compose"
-                ].search(
+                docker_compose_id = self.env["devops.docker.compose"].search(
                     [
                         ("name", "=", compose_name),
                         ("system_id", "=", rec.id),
                     ],
                     limit=1,
                 )
-                if not deploy_docker_compose_id:
+                if not docker_compose_id:
                     is_running = dct_compose.get("Status") == "running(2)"
                     compose_value = {
                         "name": compose_name,
@@ -930,10 +928,10 @@ class DevopsSystem(models.Model):
                     # )
                     # if status == 0:
                     #     deploy_image_value["history_full"] = out
-                    deploy_docker_compose_id = self.env[
-                        "devops.deploy.docker.compose"
+                    docker_compose_id = self.env[
+                        "devops.docker.compose"
                     ].create(compose_value)
-                dct_compose_name_id[compose_name] = deploy_docker_compose_id
+                dct_compose_name_id[compose_name] = docker_compose_id
 
             # 2. Volume
             cmd = "docker volume ls -q"
@@ -953,8 +951,8 @@ class DevopsSystem(models.Model):
                     lst_volume_inspect = json.loads(out)
                     for volume_inspect in lst_volume_inspect:
                         volume_name = volume_inspect.get("Name")
-                        deploy_docker_volume_id = self.env[
-                            "devops.deploy.docker.volume"
+                        docker_volume_id = self.env[
+                            "devops.docker.volume"
                         ].search(
                             [
                                 ("name", "=", volume_name),
@@ -962,7 +960,7 @@ class DevopsSystem(models.Model):
                             ],
                             limit=1,
                         )
-                        if not deploy_docker_volume_id:
+                        if not docker_volume_id:
                             deploy_volume_value = {
                                 "name": volume_name,
                                 "system_id": rec.id,
@@ -989,12 +987,10 @@ class DevopsSystem(models.Model):
                                     deploy_volume_value[
                                         "compose_id"
                                     ] = compose_id.id
-                            deploy_docker_volume_id = self.env[
-                                "devops.deploy.docker.volume"
+                            docker_volume_id = self.env[
+                                "devops.docker.volume"
                             ].create(deploy_volume_value)
-                        dct_volume_name_id[
-                            volume_name
-                        ] = deploy_docker_volume_id
+                        dct_volume_name_id[volume_name] = docker_volume_id
             # 3. Image
             # cmd = "docker container ls --no-trunc -a --format json"
             cmd = "docker image ls -a --no-trunc --format json"
@@ -1018,15 +1014,13 @@ class DevopsSystem(models.Model):
                     if id_image.startswith(str_ignore_id_image)
                     else id_image[:12]
                 )
-                deploy_docker_image_id = self.env[
-                    "devops.deploy.docker.image"
-                ].search(
+                docker_image_id = self.env["devops.docker.image"].search(
                     [
                         ("id_image", "=", id_image),
                     ],
                     limit=1,
                 )
-                if not deploy_docker_image_id:
+                if not docker_image_id:
                     deploy_image_value = {
                         "system_ids": [(6, 0, rec.ids)],
                         "id_image": id_image,
@@ -1050,18 +1044,16 @@ class DevopsSystem(models.Model):
                     )
                     if status == 0:
                         deploy_image_value["inspect_full"] = out
-                    deploy_docker_image_id = self.env[
-                        "devops.deploy.docker.image"
-                    ].create(deploy_image_value)
+                    docker_image_id = self.env["devops.docker.image"].create(
+                        deploy_image_value
+                    )
                 elif (
-                    not deploy_docker_image_id.system_ids
-                    or rec.id not in deploy_docker_image_id.system_ids.ids
+                    not docker_image_id.system_ids
+                    or rec.id not in docker_image_id.system_ids.ids
                 ):
                     # Update image associate to this system
-                    deploy_docker_image_id.system_ids = [(4, rec.id)]
-                dct_image_name_id[
-                    deploy_docker_image_id.name
-                ] = deploy_docker_image_id
+                    docker_image_id.system_ids = [(4, rec.id)]
+                dct_image_name_id[docker_image_id.name] = docker_image_id
             # 4. Network
             cmd = "docker network ls --no-trunc --format json"
             out, status = rec.execute_with_result(
@@ -1074,16 +1066,14 @@ class DevopsSystem(models.Model):
                 dct_network = json.loads(json_network)
                 id_network = dct_network.get("ID")
                 id_short_network = id_network[:12]
-                deploy_docker_network_id = self.env[
-                    "devops.deploy.docker.network"
-                ].search(
+                docker_network_id = self.env["devops.docker.network"].search(
                     [
                         ("id_network", "=", id_network),
                         ("system_id", "=", rec.id),
                     ],
                     limit=1,
                 )
-                if not deploy_docker_network_id:
+                if not docker_network_id:
                     network_value = {
                         "name": dct_network.get("Name"),
                         "system_id": rec.id,
@@ -1102,12 +1092,12 @@ class DevopsSystem(models.Model):
                     )
                     if status == 0:
                         network_value["inspect_full"] = out
-                    deploy_docker_network_id = self.env[
-                        "devops.deploy.docker.network"
+                    docker_network_id = self.env[
+                        "devops.docker.network"
                     ].create(network_value)
                     dct_network_name_id[
-                        deploy_docker_network_id.name
-                    ] = deploy_docker_network_id
+                        docker_network_id.name
+                    ] = docker_network_id
             # 5. Container
             cmd = "docker container ls --no-trunc -a --format json"
             out, status = rec.execute_with_result(
@@ -1119,15 +1109,15 @@ class DevopsSystem(models.Model):
             for json_container in lst_json_container:
                 dct_container = json.loads(json_container)
                 id_container = dct_container.get("ID")
-                deploy_docker_container_id = self.env[
-                    "devops.deploy.docker.container"
+                docker_container_id = self.env[
+                    "devops.docker.container"
                 ].search(
                     [
                         ("id_container", "=", id_container),
                     ],
                     limit=1,
                 )
-                if not deploy_docker_container_id:
+                if not docker_container_id:
                     container_value = {
                         "name": dct_container.get("Names"),
                         "system_id": rec.id,
@@ -1197,13 +1187,11 @@ class DevopsSystem(models.Model):
                     # if compose_id:
                     #     container_value["compose_id"] = compose_id.id
 
-                    deploy_docker_container_id = self.env[
-                        "devops.deploy.docker.container"
+                    docker_container_id = self.env[
+                        "devops.docker.container"
                     ].create(container_value)
 
-                dct_container_name_id[
-                    id_container
-                ] = deploy_docker_container_id
+                dct_container_name_id[id_container] = docker_container_id
             for compose_id in dct_compose_name_id.values():
                 workspace_ids = rec.devops_workspace_ids.filtered(
                     lambda r: r.folder == compose_id.folder_root
@@ -1215,11 +1203,11 @@ class DevopsSystem(models.Model):
                         "erplibre_devops.erplibre_mode_source_docker"
                     )
                     if (
-                        ws_id.deploy_docker_compose_id
+                        ws_id.docker_compose_id
                         and ws_id.erplibre_mode.mode_source != mode_docker_id
                     ):
                         continue
-                    ws_id.deploy_docker_compose_id = compose_id.id
+                    ws_id.docker_compose_id = compose_id.id
                     if not ws_id.is_installed:
                         # Can install it!
                         ws_id.action_install_workspace()

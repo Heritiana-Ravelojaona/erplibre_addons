@@ -1,9 +1,9 @@
 from odoo import _, api, fields, models
 
 
-class DevopsDeployDockerNetwork(models.Model):
-    _name = "devops.deploy.docker.network"
-    _description = "devops_deploy_docker_network"
+class DevopsDockerNetwork(models.Model):
+    _name = "devops.docker.network"
+    _description = "devops_docker_network"
 
     name = fields.Char(readonly=True)
 

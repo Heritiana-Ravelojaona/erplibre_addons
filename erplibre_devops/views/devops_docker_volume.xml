@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record id="devops_deploy_docker_volume_view_form" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_volume_form</field>
-        <field name="model">devops.deploy.docker.volume</field>
+    <record id="devops_docker_volume_view_form" model="ir.ui.view">
+        <field name="name">devops_docker_volume_form</field>
+        <field name="model">devops.docker.volume</field>
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
@@ -36,11 +36,11 @@
         </field>
     </record>
 
-    <record id="devops_deploy_docker_volume_view_graph" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_volume_graph</field>
-        <field name="model">devops.deploy.docker.volume</field>
+    <record id="devops_docker_volume_view_graph" model="ir.ui.view">
+        <field name="name">devops_docker_volume_graph</field>
+        <field name="model">devops.docker.volume</field>
         <field name="arch" type="xml">
-            <graph string="Devops deploy docker volume">
+            <graph string="Devops docker volume">
                 <field name="name" type="row" />
                 <field name="compose_id" type="row" />
                 <field name="created_at_date" type="row" />
@@ -51,9 +51,9 @@
         </field>
     </record>
 
-    <record id="devops_deploy_docker_volume_view_kanban" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_volume_kanban</field>
-        <field name="model">devops.deploy.docker.volume</field>
+    <record id="devops_docker_volume_view_kanban" model="ir.ui.view">
+        <field name="name">devops_docker_volume_kanban</field>
+        <field name="model">devops.docker.volume</field>
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <field name="name" />
@@ -106,11 +106,11 @@
         </field>
     </record>
 
-    <record id="devops_deploy_docker_volume_view_pivot" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_volume_pivot</field>
-        <field name="model">devops.deploy.docker.volume</field>
+    <record id="devops_docker_volume_view_pivot" model="ir.ui.view">
+        <field name="name">devops_docker_volume_pivot</field>
+        <field name="model">devops.docker.volume</field>
         <field name="arch" type="xml">
-            <pivot string="Devops deploy docker volume">
+            <pivot string="Devops docker volume">
                 <field name="name" type="row" />
                 <field name="compose_id" type="row" />
                 <field name="created_at_date" type="row" />
@@ -121,11 +121,11 @@
         </field>
     </record>
 
-    <record id="devops_deploy_docker_volume_view_search" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_volume_search</field>
-        <field name="model">devops.deploy.docker.volume</field>
+    <record id="devops_docker_volume_view_search" model="ir.ui.view">
+        <field name="name">devops_docker_volume_search</field>
+        <field name="model">devops.docker.volume</field>
         <field name="arch" type="xml">
-            <search string="Devops deploy docker volume">
+            <search string="Devops docker volume">
                 <field name="name" />
                 <field name="system_id" />
                 <field name="compose_id" />
@@ -144,9 +144,9 @@
         </field>
     </record>
 
-    <record id="devops_deploy_docker_volume_view_tree" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_volume_tree</field>
-        <field name="model">devops.deploy.docker.volume</field>
+    <record id="devops_docker_volume_view_tree" model="ir.ui.view">
+        <field name="name">devops_docker_volume_tree</field>
+        <field name="model">devops.docker.volume</field>
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
@@ -160,17 +160,17 @@
     </record>
 
     <act_window
-        id="devops_deploy_docker_volume_deploy_docker_volume_group_action_window"
-        name="Deploy docker volume"
-        res_model="devops.deploy.docker.volume"
+        id="devops_docker_volume_docker_volume_group_action_window"
+        name="Docker volume"
+        res_model="devops.docker.volume"
         view_mode="tree,kanban,pivot,graph,form"
         context="{'search_default_group_by_system_id': True}"
     />
 
     <act_window
-        id="devops_deploy_docker_volume_deploy_docker_volume_action_window"
-        name="Deploy docker volume"
-        res_model="devops.deploy.docker.volume"
+        id="devops_docker_volume_docker_volume_action_window"
+        name="Docker volume"
+        res_model="devops.docker.volume"
         view_mode="tree,kanban,pivot,graph,form"
     />
 </odoo>

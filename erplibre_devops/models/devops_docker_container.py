@@ -1,9 +1,9 @@
 from odoo import _, api, fields, models
 
 
-class DevopsDeployDockerContainer(models.Model):
-    _name = "devops.deploy.docker.container"
-    _description = "devops_deploy_docker_container"
+class DevopsDockerContainer(models.Model):
+    _name = "devops.docker.container"
+    _description = "devops_docker_container"
 
     name = fields.Char(readonly=True)
 
@@ -28,25 +28,25 @@ class DevopsDeployDockerContainer(models.Model):
     mounts_full = fields.Text(readonly=True)
 
     image_id = fields.Many2one(
-        comodel_name="devops.deploy.docker.image",
+        comodel_name="devops.docker.image",
         string="Image",
         readonly=True,
     )
 
     network_id = fields.Many2one(
-        comodel_name="devops.deploy.docker.network",
+        comodel_name="devops.docker.network",
         string="Network",
         readonly=True,
     )
 
     compose_id = fields.Many2one(
-        comodel_name="devops.deploy.docker.compose",
+        comodel_name="devops.docker.compose",
         string="Compose",
         readonly=True,
     )
 
     volume_ids = fields.Many2many(
-        comodel_name="devops.deploy.docker.volume",
+        comodel_name="devops.docker.volume",
         string="Volumes",
         readonly=True,
     )
