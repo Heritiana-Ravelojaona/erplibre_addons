@@ -335,7 +335,7 @@ class DevopsPlanActionWizard(models.TransientModel):
     )
 
     config_uca_enable_export_data = fields.Boolean(
-        default=True,
+        default=False,
         help=(
             "Will enable option nonmenclator in CG to export data associate to"
             " models."
@@ -681,11 +681,11 @@ class DevopsPlanActionWizard(models.TransientModel):
         if module_name:
             self.fill_working_module_name_or_id(module_name)
             self.use_external_cg = True
-            self.config_uca_enable_export_data = False
             self.use_existing_meta_module = True
             self.is_cg_temporary = True
-            self.set_mode_edit_module()
+            # self.set_mode_edit_module()
             self.action_code_module_autocomplete_module_path()
+            self.config_uca_enable_export_data = False
         return self.state_goto_code_module()
 
     def state_goto_code_shortcut(self):

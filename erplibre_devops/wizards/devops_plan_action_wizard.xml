@@ -659,7 +659,7 @@
                     <group string="Export from ME">
                         <field
                             name="config_uca_enable_export_data"
-                            attrs="{'invisible': [('use_external_cg', '==', True)]}"
+                            attrs="{'invisible': [('use_external_cg', '==', False)]}"
                         />
                     </group>
                 </group>
