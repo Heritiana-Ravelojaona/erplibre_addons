@@ -357,12 +357,16 @@ class DevopsPlanActionWizard(models.TransientModel):
     )
 
     instance_gpu_mode = fields.Selection(
-        related="instance_list_to_deploy.gpu_mode", readonly=False
+        related="instance_list_to_deploy.gpu_mode",
+        readonly=False,
+        required=True,
     )
 
     instance_is_support_gpu = fields.Boolean(
         related="instance_list_to_deploy.is_support_gpu"
     )
+
+    instance_yaml = fields.Text(compute="_compute_instance_yaml", store=True)
 
     instance_port_1 = fields.Integer(related="instance_list_to_deploy.port_1")
 
@@ -464,6 +468,17 @@ class DevopsPlanActionWizard(models.TransientModel):
                 rec.ssh_host = rec.working_system_id.ssh_host
                 rec.ssh_user = rec.working_system_id.ssh_user
                 rec.ssh_password = rec.working_system_id.ssh_password
+
+    @api.multi
+    @api.depends(
+        "instance_gpu_mode", "instance_port_1", "instance_list_to_deploy"
+    )
+    def _compute_instance_yaml(self):
+        for rec in self:
+            rec.instance_yaml = ""
+            if rec.instance_list_to_deploy:
+                rec.instance_list_to_deploy.gpu_mode = rec.instance_gpu_mode
+                rec.instance_yaml = rec.instance_list_to_deploy.yaml
 
     @api.multi
     @api.depends(
@@ -1242,6 +1257,24 @@ class DevopsPlanActionWizard(models.TransientModel):
                 cmd=f"docker compose up",
             )
         return self._reopen_self()
+
+    def instance_create_operate_localai(self):
+        ctx = {
+            "default_system_id": self.working_system_id.id,
+            "default_request_url": f"http://localhost:{self.instance_port_1}",
+        }
+        return {
+            "name": _("Create operation LocalAI."),
+            "type": "ir.actions.act_window",
+            "view_type": "form",
+            "view_mode": "form",
+            "res_model": "devops.operate.localai",
+            "view_id": self.env.ref(
+                "erplibre_devops.devops_operate_localai_view_form"
+            ).id,
+            "target": "_blank",
+            "context": ctx,
+        }
 
     def set_mode_new_module(self):
         self.is_new_module = True

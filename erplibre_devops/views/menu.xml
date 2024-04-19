@@ -308,6 +308,14 @@
     <menuitem id="menu_operate" name="Operate" sequence="9" parent="menu_erplibre_devops" />
 
     <menuitem
+        id="menu_operate_localai"
+        name="LocalAI"
+        sequence="3"
+        action="devops_operate_localai_operate_localai_action_window"
+        parent="menu_operate"
+    />
+
+    <menuitem
         id="menu_plan_cg"
         name="Code generator"
         action="devops_plan_cg_plan_cg_action_window"

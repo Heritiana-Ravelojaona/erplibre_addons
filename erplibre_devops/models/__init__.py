@@ -29,6 +29,7 @@ from . import (
     devops_log_error,
     devops_log_makefile_target,
     devops_log_warning,
+    devops_operate_localai,
     devops_plan_cg,
     devops_system,
     devops_test_case,

@@ -748,6 +748,16 @@
                         class="btn btn-success"
                         attrs="{'invisible': ['|',('instance_list_to_deploy', '=', False),('instance_name', '=', False)]}"
                     />
+                    <button
+                        name="instance_create_operate_localai"
+                        string="Create operation"
+                        type="object"
+                        class="btn btn-success"
+                        attrs="{'invisible': ['|',('instance_list_to_deploy', '=', False),('instance_name', '=', False)]}"
+                    />
+                </group>
+                <group attrs="{'invisible': ['|',('state', '!=', 'i_new_instance'),('working_system_id', '=', False)]}">
+                    <field name="instance_yaml" />
                 </group>
                 <group
                     string="Introduction"

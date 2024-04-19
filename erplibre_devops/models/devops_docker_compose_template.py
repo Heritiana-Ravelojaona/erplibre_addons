@@ -44,9 +44,9 @@ class DevopsDockerComposeTemplate(models.Model):
 
     is_generic_template = fields.Boolean()
 
-    yaml = fields.Text(compute="_compute_yaml")
+    yaml = fields.Text(compute="_compute_yaml", store=True)
 
-    @api.depends("docker_compose_model", "gpu_mode")
+    @api.depends("docker_compose_model", "gpu_mode", "port_1")
     @api.multi
     def _compute_yaml(self):
         for rec in self:
@@ -57,12 +57,16 @@ class DevopsDockerComposeTemplate(models.Model):
             elif rec.docker_compose_model == "nextcloud":
                 rec.yaml = "fds"
             elif rec.docker_compose_model == "localai":
+                with_mistra_openorca = True
                 if rec.gpu_mode == "gpu_cuda_11":
                     image = "localai/localai:latest-aio-gpu-nvidia-cuda-11"
                 elif rec.gpu_mode == "gpu_cuda_12":
                     image = "localai/localai:latest-aio-gpu-nvidia-cuda-12"
                 else:
-                    image = "localai/localai:latest-aio-cpu"
+                    if with_mistra_openorca:
+                        image = "localai/localai:v2.12.4-ffmpeg-core"
+                    else:
+                        image = "localai/localai:latest-aio-cpu"
 
                 deploy = ""
                 if rec.gpu_mode in ["gpu_cuda_11", "gpu_cuda_12"]:
@@ -74,6 +78,10 @@ class DevopsDockerComposeTemplate(models.Model):
            - driver: nvidia
              count: 1
              capabilities: [gpu]""".strip()
+
+                command = ""
+                if rec.gpu_mode in ["no_gpu"] and with_mistra_openorca:
+                    command = f"command: mistral-openorca"
 
                 rec.yaml = f"""
 version: "3.9"
@@ -89,6 +97,7 @@ services:
       - {rec.port_1}:8080
     environment:
       - DEBUG=true
+    {command}
     volumes:
       - ./models:/build/models:cached
     {deploy}

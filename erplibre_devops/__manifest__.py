@@ -69,6 +69,7 @@
         "views/devops_ide_breakpoint.xml",
         "views/devops_ide_pycharm.xml",
         "views/devops_log_makefile_target.xml",
+        "views/devops_operate_localai.xml",
         "views/devops_plan_cg.xml",
         "views/devops_system.xml",
         "views/res_config_settings.xml",
