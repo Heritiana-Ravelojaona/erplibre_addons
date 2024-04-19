@@ -371,6 +371,12 @@
                             type="object"
                             class="btn btn-default"
                         />
+                        <button
+                            name="state_goto_i_new_instance"
+                            string="Instance"
+                            type="object"
+                            class="btn btn-default"
+                        />
                         <div>Migration</div>
                         <div>Backup/Restoration</div>
                         <div>Install/Update/Remove</div>
@@ -692,6 +698,57 @@
                 <!--                        <button name="state_goto_c_a_model" string="Add model" type="object" class="btn btn-default" />-->
                 <!--                    </group>-->
                 <!--                </group>-->
+                <group
+                    string="Introduction"
+                    name="group_i_new_instance"
+                    attrs="{'invisible': [('state', '!=', 'i_new_instance')]}"
+                >
+                    <div>
+                        Choose existing system.
+                        <br />
+                        <button
+                            name="search_subsystem_workspace"
+                            string="Update sub-system to find remote system"
+                            type="object"
+                            class="btn btn-default"
+                        />
+                    </div>
+                </group>
+                <group string="Choose a system" attrs="{'invisible': [('state', '!=', 'i_new_instance')]}">
+                    <field name="working_system_id" string="Existing system" options="{'no_create': True}" />
+                    <group>
+                        <!--                        <button-->
+                        <!--                            name="clear_working_system_id"-->
+                        <!--                            string="A new system please"-->
+                        <!--                            type="object"-->
+                        <!--                            class="btn btn-default"-->
+                        <!--                            attrs="{'invisible': [('working_system_id', '=', False)]}"-->
+                        <!--                        />-->
+                        <field name="working_system_can_be_power_on" invisible="True" />
+                        <button
+                            name="working_system_id_power"
+                            string="Power the system"
+                            type="object"
+                            class="btn btn-success"
+                            attrs="{'invisible': [('working_system_can_be_power_on', '=', False)]}"
+                        />
+                    </group>
+                </group>
+                <group attrs="{'invisible': ['|',('state', '!=', 'i_new_instance'),('working_system_id', '=', False)]}">
+                    <field name="instance_list_to_deploy" />
+                    <field name="instance_name" />
+                    <field name="instance_path" />
+                    <field name="instance_is_support_gpu" invisible="True" />
+                    <field name="instance_port_1" />
+                    <field name="instance_gpu_mode" attrs="{'invisible': [('instance_is_support_gpu','=',False)]}" />
+                    <button
+                        name="instance_deploy"
+                        string="Deploy"
+                        type="object"
+                        class="btn btn-success"
+                        attrs="{'invisible': ['|',('instance_list_to_deploy', '=', False),('instance_name', '=', False)]}"
+                    />
+                </group>
                 <group
                     string="Introduction"
                     name="group_i_new_remote_system"

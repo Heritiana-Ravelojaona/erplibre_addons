@@ -349,6 +349,27 @@ class DevopsPlanActionWizard(models.TransientModel):
         )
     )
 
+    instance_list_to_deploy = fields.Many2one(
+        comodel_name="devops.docker.compose.template",
+        default=lambda s: s.default_devops_docker_compose_template(),
+        domain="[('is_generic_template', '=', True)]",
+        help="Instance list, from project list.",
+    )
+
+    instance_gpu_mode = fields.Selection(
+        related="instance_list_to_deploy.gpu_mode", readonly=False
+    )
+
+    instance_is_support_gpu = fields.Boolean(
+        related="instance_list_to_deploy.is_support_gpu"
+    )
+
+    instance_port_1 = fields.Integer(related="instance_list_to_deploy.port_1")
+
+    instance_name = fields.Char()
+
+    instance_path = fields.Char()
+
     mode_view_snippet_template_generate_website_snippet_type = (
         fields.Selection(
             selection=[
@@ -517,6 +538,12 @@ class DevopsPlanActionWizard(models.TransientModel):
             if rec.working_module_id:
                 rec.set_mode_edit_module()
 
+    @api.model
+    def default_devops_docker_compose_template(self):
+        return self.env.ref(
+            "erplibre_devops.devops_docker_compose_template_default_erplibre"
+        )
+
     @api.multi
     @api.depends(
         "working_erplibre_config_path_home_id",
@@ -589,6 +616,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             ("h_a_test_plan_exec", "Run test plan execution"),
             ("h_b_cg", "Run test code generator"),
             ("i_new_remote_system", "New remote system"),
+            ("i_new_instance", "New instance"),
             ("not_supported", "Not supported"),
             ("final", "Final"),
         ]
@@ -731,6 +759,13 @@ class DevopsPlanActionWizard(models.TransientModel):
     #     self.state = "c_existing_module"
     #     return self._reopen_self()
 
+    def state_goto_i_new_instance(self):
+        self.state = "i_new_instance"
+        self.working_system_id = self.env.ref(
+            "erplibre_devops.devops_system_local"
+        ).id
+        return self._reopen_self()
+
     def state_goto_i_new_remote_system(self):
         self.state = "i_new_remote_system"
         self.working_system_id = False
@@ -766,6 +801,9 @@ class DevopsPlanActionWizard(models.TransientModel):
         self.state = "a_autopoiesis_devops"
 
     def state_previous_i_new_remote_system(self):
+        self.state = "init"
+
+    def state_previous_i_new_instance(self):
         self.state = "init"
 
     def state_previous_a_c_action(self):
@@ -1178,6 +1216,31 @@ class DevopsPlanActionWizard(models.TransientModel):
                         model_id.sequence = sequence_no
                         sequence_no += 1
 
+        return self._reopen_self()
+
+    def instance_deploy(self):
+        if self.instance_list_to_deploy and self.instance_list_to_deploy.yaml:
+            yaml = self.instance_list_to_deploy.yaml
+            working_dir_path = os.path.join(
+                self.instance_path, self.instance_name
+            )
+            file_docker_compose = os.path.join(
+                working_dir_path, "docker-compose.yml"
+            )
+            self.working_system_id.execute_with_result(
+                f"mkdir '{working_dir_path}'",
+                None,
+                engine="sh",
+            )
+            self.working_system_id.execute_with_result(
+                f"echo '{yaml}' > '{file_docker_compose}'",
+                None,
+                engine="sh",
+            )
+            self.working_system_id.execute_terminal_gui(
+                folder=working_dir_path,
+                cmd=f"docker compose up",
+            )
         return self._reopen_self()
 
     def set_mode_new_module(self):

@@ -240,6 +240,14 @@
     />
 
     <menuitem
+        id="menu_docker_compose_template"
+        name="Compose template"
+        action="devops_docker_compose_template_docker_compose_template_action_window"
+        sequence="6"
+        parent="menu_deploy_docker_group"
+    />
+
+    <menuitem
         id="menu_erplibre_config_path_home"
         name="Path home"
         action="erplibre_config_path_home_config_path_home_action_window"

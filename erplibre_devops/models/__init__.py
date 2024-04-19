@@ -15,6 +15,7 @@ from . import (
     devops_deploy_vm_exec_stage,
     devops_deploy_vm_snapshot,
     devops_docker_compose,
+    devops_docker_compose_template,
     devops_docker_container,
     devops_docker_image,
     devops_docker_network,
