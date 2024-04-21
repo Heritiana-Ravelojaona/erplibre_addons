@@ -9,6 +9,8 @@ class DevopsPlanProject(models.Model):
 
     temperature = fields.Float(default=0.1)
 
+    step = fields.Integer(default=20)
+
     type_context = fields.Char(help="Will generate about this type context")
 
     website_max_number_one_pager = fields.Integer(default=10)
@@ -39,8 +41,10 @@ class DevopsPlanProject(models.Model):
         required=True,
     )
 
-    question_one_pager_introduction = fields.Text(
-        compute="_compute_question_one_pager_introduction"
+    question_one_pager_introduction = fields.Text(compute="_compute_question")
+
+    question_one_pager_background_introduction = fields.Text(
+        compute="_compute_question"
     )
 
     @api.depends(
@@ -49,14 +53,18 @@ class DevopsPlanProject(models.Model):
         "website_max_number_one_pager",
         "type_context",
     )
-    def _compute_question_one_pager_introduction(self):
+    def _compute_question(self):
         for rec in self:
             message = ""
+            message_background = ""
             if rec.project_type == "website_one_pager_alimentation":
                 message = (
                     f"Décrit moi en {rec.website_max_number_one_pager} mots,"
                     f" un {rec.society_type} nommé {rec.name} sur le sujet"
                     f" d'une introduction fabrique des {rec.type_context}"
+                )
+                message_background = (
+                    f"{rec.type_context} background with table"
                 )
             elif rec.project_type == "website_one_pager_sante":
                 message = (
@@ -64,6 +72,9 @@ class DevopsPlanProject(models.Model):
                     f" un {rec.society_type} nommé {rec.name} sur le sujet"
                     f" d'une introduction sur la {rec.type_context} dans le"
                     " contexte du domaine de la santé."
+                )
+                message_background = (
+                    f"{rec.type_context} background with medication health"
                 )
             elif rec.project_type == "website_one_pager_magasin":
                 message = (
@@ -73,7 +84,11 @@ class DevopsPlanProject(models.Model):
                     " venir acheter des produits dans un magasin de"
                     f" {rec.type_context}"
                 )
+                message_background = (
+                    f"{rec.type_context} background on table shop"
+                )
             rec.question_one_pager_introduction = message
+            rec.question_one_pager_background_introduction = message_background
 
     @api.multi
     def execute(self):
@@ -87,17 +102,31 @@ class DevopsPlanProject(models.Model):
             # TODO installer website,website_snippet_all
             # TODO générer du texte
             # TODO créer du contenu sur le site web
+            # TODO request_url auto_fill search existing localAI
             op_value = {
                 "prompt": rec.question_one_pager_introduction,
                 "feature": "generate_text",
                 "system_id": self.env.ref(
                     "erplibre_devops.devops_system_local"
                 ).id,
-                "request_url": f"http://localhost:8080",
+                "request_url": f"http://localhost:8081",
                 "temperature": rec.temperature,
             }
             op_id = self.env["devops.operate.localai"].create(op_value)
             op_id.execute_ia()
+
+            op_value = {
+                "prompt": rec.question_one_pager_background_introduction,
+                "feature": "generate_image",
+                "system_id": self.env.ref(
+                    "erplibre_devops.devops_system_local"
+                ).id,
+                "request_url": f"http://localhost:8080",
+                "step": rec.step,
+            }
+            op_img_id = self.env["devops.operate.localai"].create(op_value)
+            op_img_id.execute_ia()
+
             home_page_id = self.env["ir.ui.view"].search(
                 [
                     ("key", "=", "website.homepage"),
@@ -112,7 +141,7 @@ class DevopsPlanProject(models.Model):
     <t t-set="pageName" t-value="'homepage'"/>
     <div id="wrap" class="oe_structure oe_empty">
       <section class="s_cover parallax s_parallax_is_fixed bg-black-50 pt96 pb96 s_parallax_no_overflow_hidden" data-scroll-background-ratio="1" style="background-image: none; --darkreader-inline-bgimage: none;" data-darkreader-inline-bgimage="">
-        <span class="s_parallax_bg oe_img_bg oe_custom_bg" style="background-image: url('/web/image/website.s_cover_default_image'); background-position: 50% 0;"/>
+        <span class="s_parallax_bg oe_img_bg oe_custom_bg" style="background-image: url('{op_img_id.last_result_url}'); background-position: 50% 0;"/>
         <div class="container">
           <div class="row s_nb_column_fixed">
             <div class="col-lg-12 s_title" data-name="Title">

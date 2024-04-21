@@ -22,6 +22,7 @@
                         </group>
                         <group string="Configuration">
                             <field name="temperature" />
+                            <field name="step" />
                             <field name="website_max_number_one_pager" string="Mots maximum" />
                         </group>
                     </group>
@@ -29,6 +30,7 @@
                         <page string="Question">
                             <group>
                                 <field name="question_one_pager_introduction" />
+                                <field name="question_one_pager_background_introduction" />
                             </group>
                         </page>
                     </notebook>

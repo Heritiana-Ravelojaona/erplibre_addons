@@ -35,7 +35,10 @@ class DevopsDockerComposeTemplate(models.Model):
     )
 
     port_1 = fields.Integer(
-        string="Port 1", help="Principal port", default=8080
+        string="Port 1",
+        help="Principal port",
+        default=8080,
+        readonly=False,
     )
 
     port_2 = fields.Integer(string="Port 2", help="Second port")
