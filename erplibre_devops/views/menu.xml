@@ -21,7 +21,7 @@
 
     <menuitem id="menu_devops" name="DevOps" sequence="1" parent="menu_erplibre_devops" />
 
-    <menuitem id="menu_erplibre" name="ERPLibre" sequence="2" parent="menu_erplibre_devops" />
+    <menuitem id="menu_erplibre" name="ERPLibre" sequence="4" parent="menu_config" />
 
     <menuitem id="menu_plan" name="Plan" sequence="3" parent="menu_erplibre_devops" />
 
