@@ -15,17 +15,23 @@
                         </h1>
                     </div>
                     <group>
-                        <field name="project_type" />
-                        <field
-                            name="type_produit_magasin"
-                            attrs="{'invisible': [('project_type','=','website_one_pager_restaurant')]}"
-                        />
-                        <field
-                            name="type_repas_restaurant"
-                            attrs="{'invisible': [('project_type','=','website_one_pager_magasin')]}"
-                        />
-                        <field name="website_max_number_one_pager" />
+                        <group string="Information">
+                            <field name="project_type" />
+                            <field name="society_type" />
+                            <field name="type_context" />
+                        </group>
+                        <group string="Configuration">
+                            <field name="temperature" />
+                            <field name="website_max_number_one_pager" string="Mots maximum" />
+                        </group>
                     </group>
+                    <notebook>
+                        <page string="Question">
+                            <group>
+                                <field name="question_one_pager_introduction" />
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
@@ -38,8 +44,7 @@
             <graph string="Devops plan project">
                 <field name="name" type="row" />
                 <field name="project_type" type="row" />
-                <field name="type_produit_magasin" type="row" />
-                <field name="type_repas_restaurant" type="row" />
+                <field name="type_context" type="row" />
                 <field name="website_max_number_one_pager" type="measure" />
             </graph>
         </field>
@@ -52,8 +57,7 @@
             <kanban class="o_kanban_mobile">
                 <field name="name" />
                 <field name="project_type" />
-                <field name="type_produit_magasin" />
-                <field name="type_repas_restaurant" />
+                <field name="type_context" />
                 <field name="website_max_number_one_pager" />
                 <templates>
                     <t t-name="kanban-box">
@@ -72,12 +76,7 @@
                                     </li>
                                     <li class="mb4">
                                         <strong>
-                                            <field name="type_produit_magasin" />
-                                        </strong>
-                                    </li>
-                                    <li class="mb4">
-                                        <strong>
-                                            <field name="type_repas_restaurant" />
+                                            <field name="type_context" />
                                         </strong>
                                     </li>
                                     <li class="mb4">
@@ -101,8 +100,7 @@
             <pivot string="Devops plan project">
                 <field name="name" type="row" />
                 <field name="project_type" type="row" />
-                <field name="type_produit_magasin" type="row" />
-                <field name="type_repas_restaurant" type="row" />
+                <field name="type_context" type="row" />
                 <field name="website_max_number_one_pager" type="measure" />
             </pivot>
         </field>
@@ -115,16 +113,7 @@
             <search string="Devops plan project">
                 <filter domain="[('name','!=',False)]" name="name" string="Name" />
                 <filter domain="[('project_type','!=',False)]" name="project_type" string="Project Type" />
-                <filter
-                    domain="[('type_produit_magasin','!=',False)]"
-                    name="type_produit_magasin"
-                    string="Type Produit Magasin"
-                />
-                <filter
-                    domain="[('type_repas_restaurant','!=',False)]"
-                    name="type_repas_restaurant"
-                    string="Type Repas Restaurant"
-                />
+                <filter domain="[('type_context','!=',False)]" name="type_context" string="Type Repas Restaurant" />
                 <filter
                     domain="[('website_max_number_one_pager','!=',False)]"
                     name="website_max_number_one_pager"
@@ -140,8 +129,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="project_type" />
-                <field name="type_produit_magasin" />
-                <field name="type_repas_restaurant" />
+                <field name="type_context" />
                 <field name="website_max_number_one_pager" />
                 <field name="name" />
             </tree>
