@@ -31,6 +31,7 @@ from . import (
     devops_log_warning,
     devops_operate_localai,
     devops_plan_cg,
+    devops_plan_project,
     devops_system,
     devops_test_case,
     devops_test_case_exec,

@@ -71,6 +71,7 @@
         "views/devops_log_makefile_target.xml",
         "views/devops_operate_localai.xml",
         "views/devops_plan_cg.xml",
+        "views/devops_plan_project.xml",
         "views/devops_system.xml",
         "views/res_config_settings.xml",
         "views/devops_test_case.xml",

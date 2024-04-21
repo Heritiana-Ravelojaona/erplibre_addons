@@ -323,6 +323,14 @@
         parent="menu_plan"
     />
 
+    <menuitem
+        id="menu_plan_project"
+        name="Projet"
+        action="devops_plan_project_plan_project_action_window"
+        sequence="2"
+        parent="menu_plan"
+    />
+
     <menuitem id="menu_release" name="Release" sequence="7" parent="menu_erplibre_devops" />
 
     <menuitem
