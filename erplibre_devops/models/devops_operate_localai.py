@@ -12,15 +12,17 @@ class DevopsOperateLocalai(models.Model):
 
     name = fields.Char()
 
-    last_result = fields.Text()
+    last_result = fields.Text(readonly=True)
 
-    last_result_message = fields.Text()
+    last_result_message = fields.Text(readonly=True)
 
-    last_result_url = fields.Char()
+    last_result_url = fields.Char(readonly=True)
 
     request_url = fields.Char(required=True)
 
-    prompt = fields.Char()
+    prompt = fields.Text()
+
+    prompt_compute = fields.Text(compute="_compute_prompt_compute", store=True)
 
     feature = fields.Selection(
         selection=[
@@ -46,6 +48,41 @@ class DevopsOperateLocalai(models.Model):
     system_id = fields.Many2one(
         comodel_name="devops.system",
         string="System",
+        required=True,
+    )
+
+    gen_img_detail_level_id = fields.Many2one(
+        comodel_name="devops.gen.img.detail",
+        string="Detail level",
+    )
+
+    gen_img_light_ids = fields.Many2many(
+        comodel_name="devops.gen.img.light",
+        string="Light",
+    )
+
+    gen_img_style_artist_ids = fields.Many2many(
+        comodel_name="devops.gen.img.style_artist",
+        string="Style artist",
+    )
+
+    gen_img_style_type_ids = fields.Many2many(
+        comodel_name="devops.gen.img.style_type",
+        string="Style type",
+    )
+
+    gen_img_texture_ids = fields.Many2many(
+        comodel_name="devops.gen.img.texture",
+        string="Texture",
+    )
+
+    gen_img_size = fields.Selection(
+        selection=[
+            # ("256x256", "256x256"),
+            ("512x512", "512x512"),
+            # ("1024x1024", "1024x1024"),
+        ],
+        default="512x512",
         required=True,
     )
 
@@ -82,19 +119,57 @@ class DevopsOperateLocalai(models.Model):
 
     @api.multi
     @api.depends(
+        "gen_img_detail_level_id",
+        "gen_img_light_ids",
+        "gen_img_style_artist_ids",
+        "gen_img_style_type_ids",
+        "gen_img_texture_ids",
+        "prompt",
+    )
+    def _compute_prompt_compute(self):
+        for rec in self:
+            prompt = rec.prompt
+            if rec.gen_img_detail_level_id:
+                str_detail_level = rec.gen_img_detail_level_id.name
+                prompt += f" – image {str_detail_level}"
+            if rec.gen_img_light_ids:
+                str_light = " et ".join(
+                    [a.name for a in rec.gen_img_light_ids]
+                )
+                prompt += f" – lumière {str_light}"
+            if rec.gen_img_style_artist_ids:
+                str_style_artist = " et de ".join(
+                    [a.name for a in rec.gen_img_style_artist_ids]
+                )
+                prompt += f" – style de {str_style_artist}"
+            if rec.gen_img_style_type_ids:
+                str_style_type = " et ".join(
+                    [a.name for a in rec.gen_img_style_type_ids]
+                )
+                prompt += f" – style {str_style_type}"
+            if rec.gen_img_texture_ids:
+                str_texture = " et ".join(
+                    [a.name for a in rec.gen_img_texture_ids]
+                )
+                prompt += f" – texture {str_texture}"
+            rec.prompt_compute = prompt
+
+    @api.multi
+    @api.depends(
         "request_url",
         "feature",
         "step",
         "temperature",
         "model_name_llm",
-        "prompt",
+        "gen_img_size",
+        "prompt_compute",
     )
     def _compute_cmd(self):
         for rec in self:
             # TODO The char ' causes a bug into the prompt
             # /bin/sh: 1: Syntax error: Unterminated quoted string
-            if rec.prompt:
-                prompt = rec.prompt.replace("'", "")
+            if rec.prompt_compute:
+                prompt = rec.prompt_compute.replace("'", "")
             else:
                 prompt = ""
             if rec.feature == "generate_image":
@@ -102,7 +177,8 @@ class DevopsOperateLocalai(models.Model):
                 rec.cmd += ' -H "Content-Type:application/json"'
                 rec.cmd += (
                     ' -d "{ \\"prompt\\": \\"%s\\", \\"step\\": %s,'
-                    ' \\"size\\": \\"256x256\\" }"' % (prompt, rec.step)
+                    ' \\"size\\": \\"%s\\" }"'
+                    % (prompt, rec.step, rec.gen_img_size)
                 )
             elif rec.feature == "generate_text":
                 rec.cmd = f"curl {rec.request_url}/v1/chat/completions"

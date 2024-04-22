@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="devops_gen_img_detail_01" model="devops.gen.img.detail">
+            <field name="name">fortement détaillée</field>
+        </record>
+        <record id="devops_gen_img_detail_02" model="devops.gen.img.detail">
+            <field name="name">détaillée à l'extrême</field>
+        </record>
+        <record id="devops_gen_img_detail_03" model="devops.gen.img.detail">
+            <field name="name">très haute résolution</field>
+        </record>
+    </data>
+</odoo>

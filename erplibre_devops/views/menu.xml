@@ -23,6 +23,8 @@
 
     <menuitem id="menu_erplibre" name="ERPLibre" sequence="4" parent="menu_config" />
 
+    <menuitem id="menu_gen_image_config" name="Image generator" sequence="5" parent="menu_config" />
+
     <menuitem id="menu_plan" name="Plan" sequence="3" parent="menu_erplibre_devops" />
 
     <menuitem id="menu_test" name="Test" sequence="6" parent="menu_erplibre_devops" />
@@ -245,6 +247,46 @@
         action="devops_docker_compose_template_docker_compose_template_action_window"
         sequence="6"
         parent="menu_deploy_docker_group"
+    />
+
+    <menuitem
+        id="menu_gen_img_detail"
+        name="Level detail"
+        action="devops_gen_img_detail_gen_img_detail_action_window"
+        sequence="1"
+        parent="menu_gen_image_config"
+    />
+
+    <menuitem
+        id="menu_gen_img_light"
+        name="Light style"
+        action="devops_gen_img_light_gen_img_light_action_window"
+        sequence="2"
+        parent="menu_gen_image_config"
+    />
+
+    <menuitem
+        id="menu_gen_img_style_artist"
+        name="Artist style"
+        action="devops_gen_img_style_artist_gen_img_style_artist_action_window"
+        sequence="3"
+        parent="menu_gen_image_config"
+    />
+
+    <menuitem
+        id="menu_gen_img_style_type"
+        name="Style type"
+        action="devops_gen_img_style_type_gen_img_style_type_action_window"
+        sequence="4"
+        parent="menu_gen_image_config"
+    />
+
+    <menuitem
+        id="menu_gen_img_texture"
+        name="Texture"
+        action="devops_gen_img_texture_gen_img_texture_action_window"
+        sequence="5"
+        parent="menu_gen_image_config"
     />
 
     <menuitem

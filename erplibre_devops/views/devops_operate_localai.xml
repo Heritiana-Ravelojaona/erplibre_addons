@@ -20,24 +20,35 @@
                             <field name="name" />
                         </h1>
                     </div>
-                    <group>
-                        <group string="Input">
-                            <field name="request_url" />
-                            <field name="prompt" />
-                            <field name="feature" />
-                            <field name="step" />
-                            <field name="cmd" />
-                            <field name="model_name_llm" />
+                    <group string="Info">
+                        <field name="system_id" />
+                        <field name="request_url" />
+                        <field name="model_name_llm" />
+                        <field name="feature" />
+                    </group>
+                    <group string="Input">
+                        <field name="prompt" />
+                        <field name="prompt_compute" />
+                        <field name="cmd" />
+                    </group>
+                    <group string="Configuration">
+                        <group string="Text">
                             <field name="temperature" />
                         </group>
-                        <group string="Result">
-                            <field name="last_result" />
-                            <field name="last_result_message" />
-                            <field name="last_result_url" widget="url" />
+                        <group string="Image">
+                            <field name="step" />
+                            <field name="gen_img_size" />
+                            <field name="gen_img_detail_level_id" />
+                            <field name="gen_img_light_ids" widget="many2many_tags" />
+                            <field name="gen_img_style_artist_ids" widget="many2many_tags" />
+                            <field name="gen_img_style_type_ids" widget="many2many_tags" />
+                            <field name="gen_img_texture_ids" widget="many2many_tags" />
                         </group>
-                        <group string="Info">
-                            <field name="system_id" />
-                        </group>
+                    </group>
+                    <group string="Result">
+                        <field name="last_result_message" />
+                        <field name="last_result_url" widget="url" />
+                        <field name="last_result" />
                     </group>
                 </sheet>
             </form>
