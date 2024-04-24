@@ -7,6 +7,8 @@ class DevopsDockerComposeTemplate(models.Model):
 
     name = fields.Char()
 
+    active = fields.Boolean(default=True)
+
     docker_compose_model = fields.Selection(
         selection=[
             ("erplibre", "ERPLibre"),
@@ -44,6 +46,11 @@ class DevopsDockerComposeTemplate(models.Model):
     port_2 = fields.Integer(string="Port 2", help="Second port")
 
     port_3 = fields.Integer(string="Port 3", help="Third port")
+
+    type_ids = fields.Many2many(
+        comodel_name="devops.instance.type",
+        string="Types",
+    )
 
     is_generic_template = fields.Boolean()
 

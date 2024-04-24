@@ -47,6 +47,14 @@ class DevopsPlanProject(models.Model):
         compute="_compute_question"
     )
 
+    instance_exec_text_id = fields.Many2one(
+        comodel_name="devops.instance.exec"
+    )
+
+    instance_exec_image_id = fields.Many2one(
+        comodel_name="devops.instance.exec"
+    )
+
     @api.depends(
         "name",
         "project_type",
@@ -103,29 +111,35 @@ class DevopsPlanProject(models.Model):
             # TODO générer du texte
             # TODO créer du contenu sur le site web
             # TODO request_url auto_fill search existing localAI
+            if not rec.instance_exec_text_id:
+                message = _("Need to fill variable instance_exec_text_id")
+                raise exceptions.Warning(message)
             op_value = {
                 "prompt": rec.question_one_pager_introduction,
                 "feature": "generate_text",
                 "system_id": self.env.ref(
                     "erplibre_devops.devops_system_local"
                 ).id,
-                "request_url": f"http://localhost:8081",
+                "request_url": rec.instance_exec_text_id.url,
                 "temperature": rec.temperature,
             }
             op_id = self.env["devops.operate.localai"].create(op_value)
             op_id.execute_ia()
 
-            op_value = {
-                "prompt": rec.question_one_pager_background_introduction,
-                "feature": "generate_image",
-                "system_id": self.env.ref(
-                    "erplibre_devops.devops_system_local"
-                ).id,
-                "request_url": f"http://localhost:8080",
-                "step": rec.step,
-            }
-            op_img_id = self.env["devops.operate.localai"].create(op_value)
-            op_img_id.execute_ia()
+            op_image_url = "#"
+            if rec.instance_exec_image_id:
+                op_value = {
+                    "prompt": rec.question_one_pager_background_introduction,
+                    "feature": "generate_image",
+                    "system_id": self.env.ref(
+                        "erplibre_devops.devops_system_local"
+                    ).id,
+                    "request_url": rec.instance_exec_image_id.url,
+                    "step": rec.step,
+                }
+                op_img_id = self.env["devops.operate.localai"].create(op_value)
+                op_img_id.execute_ia()
+                op_image_url = op_img_id.last_result_url
 
             home_page_id = self.env["ir.ui.view"].search(
                 [
@@ -141,7 +155,7 @@ class DevopsPlanProject(models.Model):
     <t t-set="pageName" t-value="'homepage'"/>
     <div id="wrap" class="oe_structure oe_empty">
       <section class="s_cover parallax s_parallax_is_fixed bg-black-50 pt96 pb96 s_parallax_no_overflow_hidden" data-scroll-background-ratio="1" style="background-image: none; --darkreader-inline-bgimage: none;" data-darkreader-inline-bgimage="">
-        <span class="s_parallax_bg oe_img_bg oe_custom_bg" style="background-image: url('{op_img_id.last_result_url}'); background-position: 50% 0;"/>
+        <span class="s_parallax_bg oe_img_bg oe_custom_bg" style="background-image: url('{op_image_url}'); background-position: 50% 0;"/>
         <div class="container">
           <div class="row s_nb_column_fixed">
             <div class="col-lg-12 s_title" data-name="Title">

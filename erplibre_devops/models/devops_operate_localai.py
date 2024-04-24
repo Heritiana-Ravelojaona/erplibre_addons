@@ -18,6 +18,8 @@ class DevopsOperateLocalai(models.Model):
 
     last_result_url = fields.Char(readonly=True)
 
+    instance_exec_id = fields.Many2one(comodel_name="devops.instance.exec")
+
     request_url = fields.Char(required=True)
 
     prompt = fields.Text()
@@ -136,7 +138,7 @@ class DevopsOperateLocalai(models.Model):
                 str_light = " et ".join(
                     [a.name for a in rec.gen_img_light_ids]
                 )
-                prompt += f" – lumière {str_light}"
+                prompt += f" – style d'éclairage de type {str_light}"
             if rec.gen_img_style_artist_ids:
                 str_style_artist = " et de ".join(
                     [a.name for a in rec.gen_img_style_artist_ids]
@@ -169,7 +171,8 @@ class DevopsOperateLocalai(models.Model):
             # TODO The char ' causes a bug into the prompt
             # /bin/sh: 1: Syntax error: Unterminated quoted string
             if rec.prompt_compute:
-                prompt = rec.prompt_compute.replace("'", "")
+                # prompt = rec.prompt_compute.replace("'", "").replace("{", "\\{").replace("}", "\\}").replace("\n", "")
+                prompt = rec.prompt_compute.replace("'", "").replace("\n", "")
             else:
                 prompt = ""
             if rec.feature == "generate_image":

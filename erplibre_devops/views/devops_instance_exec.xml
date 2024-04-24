@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="devops_instance_exec_view_form" model="ir.ui.view">
+        <field name="name">devops_instance_exec_form</field>
+        <field name="model">devops.instance.exec</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                    </group>
+                    <group>
+                        <field name="docker_container_ids" widget="many2many_tags" />
+                        <field name="docker_image_ids" widget="many2many_tags" />
+                        <field name="docker_network_ids" widget="many2many_tags" />
+                        <field name="docker_volume_ids" widget="many2many_tags" />
+                        <field name="port" />
+                        <field name="system_id" />
+                        <field name="type_ids" widget="many2many_tags" />
+                        <field name="url" />
+                        <field name="workspace_id" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="devops_instance_exec_view_graph" model="ir.ui.view">
+        <field name="name">devops_instance_exec_graph</field>
+        <field name="model">devops.instance.exec</field>
+        <field name="arch" type="xml">
+            <graph string="Devops instance exec">
+                <field name="name" type="row" />
+                <field name="port" type="measure" />
+                <field name="system_id" type="row" />
+                <field name="url" type="row" />
+                <field name="workspace_id" type="row" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="devops_instance_exec_view_kanban" model="ir.ui.view">
+        <field name="name">devops_instance_exec_kanban</field>
+        <field name="model">devops.instance.exec</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <field name="docker_container_ids" />
+                <field name="docker_image_ids" />
+                <field name="docker_network_ids" />
+                <field name="docker_volume_ids" />
+                <field name="port" />
+                <field name="system_id" />
+                <field name="type_ids" />
+                <field name="url" />
+                <field name="workspace_id" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="docker_container_ids" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="docker_image_ids" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="docker_network_ids" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="docker_volume_ids" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="port" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="system_id" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="type_ids" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="url" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="workspace_id" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="devops_instance_exec_view_pivot" model="ir.ui.view">
+        <field name="name">devops_instance_exec_pivot</field>
+        <field name="model">devops.instance.exec</field>
+        <field name="arch" type="xml">
+            <pivot string="Devops instance exec">
+                <field name="name" type="row" />
+                <field name="port" type="measure" />
+                <field name="system_id" type="row" />
+                <field name="url" type="row" />
+                <field name="workspace_id" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="devops_instance_exec_view_search" model="ir.ui.view">
+        <field name="name">devops_instance_exec_search</field>
+        <field name="model">devops.instance.exec</field>
+        <field name="arch" type="xml">
+            <search string="Devops instance exec">
+                <filter domain="[('name','!=',False)]" name="name" string="Name" />
+                <filter
+                    domain="[('docker_container_ids','!=',False)]"
+                    name="docker_container_ids"
+                    string="Docker Container"
+                />
+                <filter domain="[('docker_image_ids','!=',False)]" name="docker_image_ids" string="Docker Image" />
+                <filter
+                    domain="[('docker_network_ids','!=',False)]"
+                    name="docker_network_ids"
+                    string="Docker Network"
+                />
+                <filter domain="[('docker_volume_ids','!=',False)]" name="docker_volume_ids" string="Docker Volume" />
+                <filter domain="[('port','!=',False)]" name="port" string="Port" />
+                <filter domain="[('system_id','!=',False)]" name="system_id" string="System" />
+                <filter domain="[('type_ids','!=',False)]" name="type_ids" string="Type" />
+                <filter domain="[('url','!=',False)]" name="url" string="Url" />
+                <filter domain="[('workspace_id','!=',False)]" name="workspace_id" string="Workspace" />
+            </search>
+        </field>
+    </record>
+
+    <record id="devops_instance_exec_view_tree" model="ir.ui.view">
+        <field name="name">devops_instance_exec_tree</field>
+        <field name="model">devops.instance.exec</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="docker_container_ids" widget="many2many_tags" />
+                <field name="docker_image_ids" widget="many2many_tags" />
+                <field name="docker_network_ids" widget="many2many_tags" />
+                <field name="docker_volume_ids" widget="many2many_tags" />
+                <field name="type_ids" widget="many2many_tags" />
+                <field name="port" />
+                <field name="system_id" />
+                <field name="url" />
+                <field name="workspace_id" />
+            </tree>
+        </field>
+    </record>
+
+    <act_window
+        id="devops_instance_exec_instance_exec_action_window"
+        name="Instance exec"
+        res_model="devops.instance.exec"
+        view_mode="tree,kanban,pivot,graph,form"
+    />
+</odoo>

@@ -5,6 +5,7 @@
             <field name="name">ERPLibre</field>
             <field name="docker_compose_model">erplibre</field>
             <field name="is_generic_template" eval="True" />
+            <field name="type_ids" eval="[(4, ref('erplibre_devops.devops_instance_type_erp'))]" />
         </record>
         <record model="devops.docker.compose.template" id="devops_docker_compose_template_default_rocketchat">
             <field name="name">RocketChat</field>
@@ -21,6 +22,7 @@
             <field name="docker_compose_model">localai</field>
             <field name="is_generic_template" eval="True" />
             <field name="is_support_gpu" eval="True" />
+            <field name="type_ids" eval="[(4, ref('erplibre_devops.devops_instance_type_gen_text')),(4, ref('erplibre_devops.devops_instance_type_gen_image'))]" />
         </record>
     </data>
 </odoo>

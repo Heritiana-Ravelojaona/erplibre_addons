@@ -738,6 +738,7 @@
                     <field name="instance_list_to_deploy" />
                     <field name="instance_name" />
                     <field name="instance_path" />
+                    <field name="instance_type_ids" widget="many2many_tags" />
                     <field name="instance_is_support_gpu" invisible="True" />
                     <field name="instance_port_1" />
                     <field name="instance_gpu_mode" attrs="{'invisible': [('instance_is_support_gpu','=',False)]}" />

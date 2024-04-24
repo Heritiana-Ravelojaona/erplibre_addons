@@ -19,6 +19,10 @@ class DevopsPlanActionWizard(models.TransientModel):
             [("name", "like", "erplibre_base")], limit=1
         )
 
+    def _default_instance_path(self):
+        workspace_id = self.env.ref("erplibre_devops.devops_workspace_me")
+        return os.path.join(workspace_id.folder, ".venv", "project")
+
     name = fields.Char()
 
     root_workspace_id = fields.Many2one(
@@ -357,22 +361,41 @@ class DevopsPlanActionWizard(models.TransientModel):
     )
 
     instance_gpu_mode = fields.Selection(
-        related="instance_list_to_deploy.gpu_mode",
-        readonly=False,
+        selection=[
+            ("no_gpu", "No GPU"),
+            ("gpu_cuda_11", "GPU Cuda 11"),
+            ("gpu_cuda_12", "GPU Cuda 12"),
+        ],
+        default="no_gpu",
         required=True,
+        help="Choose a GPU mode.",
     )
 
     instance_is_support_gpu = fields.Boolean(
         related="instance_list_to_deploy.is_support_gpu"
     )
 
-    instance_yaml = fields.Text(compute="_compute_instance_yaml", store=True)
+    instance_yaml = fields.Text(compute="_compute_instance_yaml")
 
-    instance_port_1 = fields.Integer(related="instance_list_to_deploy.port_1")
+    instance_port_1 = fields.Integer(
+        string="Port 1",
+        help="Principal port",
+        default=8080,
+        readonly=False,
+    )
 
     instance_name = fields.Char()
 
-    instance_path = fields.Char()
+    instance_path = fields.Char(default=_default_instance_path)
+
+    instance_last_exec_id = fields.Many2one(
+        comodel_name="devops.instance.exec"
+    )
+
+    instance_type_ids = fields.Many2many(
+        comodel_name="devops.instance.type",
+        string="Types",
+    )
 
     mode_view_snippet_template_generate_website_snippet_type = (
         fields.Selection(
@@ -477,8 +500,15 @@ class DevopsPlanActionWizard(models.TransientModel):
         for rec in self:
             rec.instance_yaml = ""
             if rec.instance_list_to_deploy:
-                rec.instance_list_to_deploy.gpu_mode = rec.instance_gpu_mode
-                rec.instance_yaml = rec.instance_list_to_deploy.yaml
+                # TODO maybe don't need to store the value?
+                copy_instance_template = rec.instance_list_to_deploy.copy(
+                    default={
+                        "gpu_mode": rec.instance_gpu_mode,
+                        "port_1": rec.instance_port_1,
+                        "active": False,
+                    }
+                )
+                rec.instance_yaml = copy_instance_template.yaml
 
     @api.multi
     @api.depends(
@@ -1234,8 +1264,9 @@ class DevopsPlanActionWizard(models.TransientModel):
         return self._reopen_self()
 
     def instance_deploy(self):
-        if self.instance_list_to_deploy and self.instance_list_to_deploy.yaml:
-            yaml = self.instance_list_to_deploy.yaml
+        if self.instance_list_to_deploy and self.instance_yaml:
+            yaml = self.instance_yaml
+
             working_dir_path = os.path.join(
                 self.instance_path, self.instance_name
             )
@@ -1256,12 +1287,24 @@ class DevopsPlanActionWizard(models.TransientModel):
                 folder=working_dir_path,
                 cmd=f"docker compose up",
             )
+            # TODO ne pas copier toute la liste de type_ids, sélectionner ce qui est nécessaire
+            # Le copier dans la liste par défaut à la copie, l'utilisateur pour l'enlever.
+            inst_exec_value = {
+                "port": self.instance_port_1,
+                "url": f"http://localhost:{self.instance_port_1}",
+                "type_ids": [(6, 0, self.instance_type_ids.ids)],
+                "system_id": self.working_system_id.id,
+            }
+            self.instance_last_exec_id = self.env[
+                "devops.instance.exec"
+            ].create(inst_exec_value)
         return self._reopen_self()
 
     def instance_create_operate_localai(self):
         ctx = {
             "default_system_id": self.working_system_id.id,
-            "default_request_url": f"http://localhost:{self.instance_port_1}",
+            "default_instance_exec_id": self.instance_last_exec_id.id,
+            "default_request_url": self.instance_last_exec_id.url,
         }
         return {
             "name": _("Create operation LocalAI."),

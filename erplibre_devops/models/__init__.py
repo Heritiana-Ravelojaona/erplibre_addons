@@ -31,6 +31,8 @@ from . import (
     devops_ide_breakpoint,
     devops_ide_pycharm,
     devops_ide_pycharm_configuration,
+    devops_instance_exec,
+    devops_instance_type,
     devops_log_error,
     devops_log_makefile_target,
     devops_log_warning,

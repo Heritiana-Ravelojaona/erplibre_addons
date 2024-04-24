@@ -25,6 +25,10 @@
                             <field name="step" />
                             <field name="website_max_number_one_pager" string="Mots maximum" />
                         </group>
+                        <group string="Instance">
+                            <field name="instance_exec_text_id" />
+                            <field name="instance_exec_image_id" />
+                        </group>
                     </group>
                     <notebook>
                         <page string="Question">

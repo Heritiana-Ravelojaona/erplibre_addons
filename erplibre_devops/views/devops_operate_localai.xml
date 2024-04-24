@@ -25,6 +25,7 @@
                         <field name="request_url" />
                         <field name="model_name_llm" />
                         <field name="feature" />
+                        <field name="instance_exec_id" />
                     </group>
                     <group string="Input">
                         <field name="prompt" />
