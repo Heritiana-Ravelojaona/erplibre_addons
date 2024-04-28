@@ -98,6 +98,14 @@ class DevopsPlanActionWizard(models.TransientModel):
         store=True, compute="_compute_has_configured_path"
     )
 
+    instance_exec_from_workspace_id = fields.Many2one(
+        comodel_name="devops.instance.exec",
+        help=(
+            "Help to create a new instance_exec_id from this one, will be a"
+            " copy to deploy."
+        ),
+    )
+
     instance_exec_text_id = fields.Many2one(
         comodel_name="devops.instance.exec"
     )
@@ -1290,9 +1298,15 @@ class DevopsPlanActionWizard(models.TransientModel):
         if self.instance_list_to_deploy and self.instance_yaml:
             yaml = self.instance_yaml
 
-            working_dir_path = os.path.join(
-                self.instance_path, self.instance_name
-            )
+            if self.instance_exec_from_workspace_id:
+                working_dir_path = os.path.join(
+                    self.instance_path,
+                    self.instance_exec_from_workspace_id.instance_name,
+                )
+            else:
+                working_dir_path = os.path.join(
+                    self.instance_path, self.instance_name
+                )
             file_docker_compose = os.path.join(
                 working_dir_path, "docker-compose.yml"
             )

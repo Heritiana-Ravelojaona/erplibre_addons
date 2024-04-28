@@ -61,6 +61,11 @@ class DevopsWorkspace(models.Model):
         string="Code TODO",
     )
 
+    instance_exec_external_project_ids = fields.One2many(
+        comodel_name="devops.instance.exec",
+        inverse_name="workspace_id",
+    )
+
     devops_code_todo_count = fields.Integer(
         string="Test code TODO count",
         compute="_compute_devops_code_todo_count",
@@ -648,6 +653,19 @@ class DevopsWorkspace(models.Model):
                         "Support other mode_exec to detect is_running"
                         f" '{rec.mode_exec}'"
                     )
+                # Show external project associate to this workspace
+                exec_id = rec.execute(
+                    cmd=f"ls {rec.folder}/.venv/project", error_on_status=False
+                )
+                if exec_id.exec_status == 0:
+                    lst_dir = exec_id.log_all.split()
+                    for dir_name in lst_dir:
+                        # TODO fill more information, detect what is inside
+                        value = {
+                            "instance_name": dir_name,
+                            "workspace_id": rec.id,
+                        }
+                        self.env["devops.instance.exec"].create(value)
 
     @api.multi
     def action_install_me_workspace(self):
@@ -662,6 +680,7 @@ class DevopsWorkspace(models.Model):
                     cmd=f"ls {rec.folder}/.git", error_on_status=False
                 )
                 status_ls = exec_id.log_all
+                # TODO check status instead of no such file, french broke this
                 if "No such file or directory" not in status_ls:
                     rec.erplibre_mode = self.env.ref(
                         "erplibre_devops.erplibre_mode_git_robot_libre"

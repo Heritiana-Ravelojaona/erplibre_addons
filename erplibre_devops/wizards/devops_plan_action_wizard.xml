@@ -770,6 +770,7 @@
                 >
                     <field name="instance_list_to_deploy" />
                     <field name="instance_name" />
+                    <field name="instance_exec_from_workspace_id" string="OR duplicate instance" />
                     <field name="instance_path" />
                     <field name="instance_type_ids" widget="many2many_tags" />
                     <field name="instance_is_support_gpu" invisible="True" />
@@ -780,14 +781,14 @@
                         string="Deploy"
                         type="object"
                         class="btn btn-success"
-                        attrs="{'invisible': ['|',('instance_list_to_deploy', '=', False),('instance_name', '=', False)]}"
+                        attrs="{'invisible': ['|',('instance_list_to_deploy', '=', False),('instance_name', '=', False),('instance_exec_from_workspace_id', '=', False)]}"
                     />
                     <button
                         name="instance_create_operate_localai"
                         string="Create operation"
                         type="object"
                         class="btn btn-success"
-                        attrs="{'invisible': ['|',('instance_list_to_deploy', '=', False),('instance_name', '=', False)]}"
+                        attrs="{'invisible': ['|',('instance_list_to_deploy', '=', False),('instance_name', '=', False),('instance_exec_from_workspace_id', '=', False)]}"
                     />
                 </group>
                 <group

@@ -303,6 +303,9 @@
                     <group string="IDE">
                         <field name="ide_pycharm" />
                     </group>
+                    <group string="External project">
+                        <field name="instance_exec_external_project_ids" />
+                    </group>
                 </group>
                 <notebook attrs="{'invisible': [('is_installed', '=', False)]}">
                     <page name="status" string="Status">

@@ -7,6 +7,8 @@ class DevopsInstanceExec(models.Model):
 
     name = fields.Char(compute="_compute_name", store=True)
 
+    instance_name = fields.Char(help="Optional")
+
     docker_container_ids = fields.Many2many(
         comodel_name="devops.docker.container",
         string="Docker Container",
@@ -46,8 +48,8 @@ class DevopsInstanceExec(models.Model):
         string="Workspace",
     )
 
-    @api.depends("url", "type_ids")
+    @api.depends("url", "type_ids", "instance_name")
     def _compute_name(self):
         for rec in self:
             str_type = "|".join([a.name for a in rec.type_ids])
-            rec.name = f"{str_type} {rec.url}"
+            rec.name = f"{rec.instance_name} {str_type} {rec.url}".strip()
