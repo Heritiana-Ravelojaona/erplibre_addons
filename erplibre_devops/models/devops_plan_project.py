@@ -3,17 +3,25 @@ from odoo import _, api, exceptions, fields, models
 
 class DevopsPlanProject(models.Model):
     _name = "devops.plan.project"
+    _inherit = ["mail.activity.mixin", "mail.thread"]
     _description = "devops_plan_project"
 
-    name = fields.Char(help="Project name", required=True)
+    name = fields.Char(
+        help="Project name", required=True, track_visibility="onchange"
+    )
 
-    temperature = fields.Float(default=0.1)
+    temperature = fields.Float(default=0.1, track_visibility="onchange")
 
-    step = fields.Integer(default=20)
+    step = fields.Integer(default=20, track_visibility="onchange")
 
-    type_context = fields.Char(help="Will generate about this type context")
+    type_context = fields.Char(
+        help="Will generate about this type context",
+        track_visibility="onchange",
+    )
 
-    website_max_number_one_pager = fields.Integer(default=10)
+    website_max_number_one_pager = fields.Integer(
+        default=10, track_visibility="onchange"
+    )
 
     project_type = fields.Selection(
         selection=[
@@ -27,6 +35,7 @@ class DevopsPlanProject(models.Model):
         default="website_one_pager_alimentation",
         required=True,
         help="Will use DevOps tools to create this project type.",
+        track_visibility="onchange",
     )
 
     society_type = fields.Selection(
@@ -42,24 +51,29 @@ class DevopsPlanProject(models.Model):
         ],
         default="projet",
         required=True,
+        track_visibility="onchange",
     )
 
-    question_one_pager_introduction = fields.Text(compute="_compute_question")
+    question_one_pager_introduction = fields.Text(
+        compute="_compute_question", track_visibility="onchange"
+    )
 
-    result_one_pager_introduction = fields.Text()
+    result_one_pager_introduction = fields.Text(track_visibility="onchange")
 
     question_one_pager_background_introduction = fields.Text(
-        compute="_compute_question"
+        compute="_compute_question", track_visibility="onchange"
     )
 
-    result_one_pager_background_introduction = fields.Char()
+    result_one_pager_background_introduction = fields.Char(
+        track_visibility="onchange"
+    )
 
     instance_exec_text_id = fields.Many2one(
-        comodel_name="devops.instance.exec"
+        comodel_name="devops.instance.exec", track_visibility="onchange"
     )
 
     instance_exec_image_id = fields.Many2one(
-        comodel_name="devops.instance.exec"
+        comodel_name="devops.instance.exec", track_visibility="onchange"
     )
 
     @api.depends(
@@ -80,8 +94,8 @@ class DevopsPlanProject(models.Model):
                     f" introduction fabrique des {rec.type_context}"
                 )
                 message_background = (
-                    f"Présentation des aliments «{rec.type_context}» sur une"
-                    " table de restaurant bien décoré."
+                    f"Aliments «{rec.type_context}» d'une beauté extreme sur"
+                    " une table de restaurant bien décoré."
                 )
             elif rec.project_type == "website_one_pager_sante":
                 message = (
@@ -197,7 +211,7 @@ class DevopsPlanProject(models.Model):
                 extra_arch_db = """
       <section class="s_full_menu">
         <div class="container-fluid">
-          <h2 class="o_default_snippet_text">Menu A'la carte</h2>
+          <h2 class="o_default_snippet_text">Menu à la carte</h2>
           <div class="row menu-container">
             <div class="col-lg-2 text-center">
               <h4 class="o_default_snippet_text">Hamburgers</h4>

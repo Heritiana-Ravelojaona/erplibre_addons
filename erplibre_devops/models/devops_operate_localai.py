@@ -8,23 +8,32 @@ _logger = logging.getLogger(__name__)
 
 class DevopsOperateLocalai(models.Model):
     _name = "devops.operate.localai"
+    _inherit = ["mail.activity.mixin", "mail.thread"]
     _description = "devops_operate_localai"
 
-    name = fields.Char()
+    name = fields.Char(track_visibility="onchange")
 
-    last_result = fields.Text(readonly=True)
+    last_result = fields.Text(readonly=True, track_visibility="onchange")
 
-    last_result_message = fields.Text(readonly=True)
+    last_result_message = fields.Text(
+        readonly=True, track_visibility="onchange"
+    )
 
-    last_result_url = fields.Char(readonly=True)
+    last_result_url = fields.Char(readonly=True, track_visibility="onchange")
 
-    instance_exec_id = fields.Many2one(comodel_name="devops.instance.exec")
+    instance_exec_id = fields.Many2one(
+        comodel_name="devops.instance.exec", track_visibility="onchange"
+    )
 
-    request_url = fields.Char(required=True)
+    request_url = fields.Char(required=True, track_visibility="onchange")
 
-    prompt = fields.Text()
+    prompt = fields.Text(track_visibility="onchange")
 
-    prompt_compute = fields.Text(compute="_compute_prompt_compute", store=True)
+    prompt_compute = fields.Text(
+        compute="_compute_prompt_compute",
+        store=True,
+        track_visibility="onchange",
+    )
 
     feature = fields.Selection(
         selection=[
@@ -33,6 +42,7 @@ class DevopsOperateLocalai(models.Model):
         ],
         default="generate_text",
         required=True,
+        track_visibility="onchange",
     )
 
     model_name_llm = fields.Selection(
@@ -41,41 +51,48 @@ class DevopsOperateLocalai(models.Model):
         ],
         default="mistral-openorca",
         required=True,
+        track_visibility="onchange",
     )
 
-    step = fields.Integer(default=10)
+    step = fields.Integer(default=10, track_visibility="onchange")
 
-    temperature = fields.Float(default=0.1)
+    temperature = fields.Float(default=0.1, track_visibility="onchange")
 
     system_id = fields.Many2one(
         comodel_name="devops.system",
         string="System",
         required=True,
+        track_visibility="onchange",
     )
 
     gen_img_detail_level_id = fields.Many2one(
         comodel_name="devops.gen.img.detail",
         string="Detail level",
+        track_visibility="onchange",
     )
 
     gen_img_light_ids = fields.Many2many(
         comodel_name="devops.gen.img.light",
         string="Light",
+        track_visibility="onchange",
     )
 
     gen_img_style_artist_ids = fields.Many2many(
         comodel_name="devops.gen.img.style_artist",
         string="Style artist",
+        track_visibility="onchange",
     )
 
     gen_img_style_type_ids = fields.Many2many(
         comodel_name="devops.gen.img.style_type",
         string="Style type",
+        track_visibility="onchange",
     )
 
     gen_img_texture_ids = fields.Many2many(
         comodel_name="devops.gen.img.texture",
         string="Texture",
+        track_visibility="onchange",
     )
 
     gen_img_size = fields.Selection(
@@ -86,9 +103,12 @@ class DevopsOperateLocalai(models.Model):
         ],
         default="512x512",
         required=True,
+        track_visibility="onchange",
     )
 
-    cmd = fields.Char(compute="_compute_cmd", store=True)
+    cmd = fields.Char(
+        compute="_compute_cmd", store=True, track_visibility="onchange"
+    )
 
     @api.multi
     def execute_ia(self):
@@ -112,7 +132,7 @@ class DevopsOperateLocalai(models.Model):
                     rec.last_result_url = False
                     rec.last_result_message = (
                         data.get("choices")[0].get("message").get("content")
-                    )
+                    ).strip()
                     rec.last_result = json_out
                 else:
                     _logger.error(f"Feature not supported '{rec.feature}'")

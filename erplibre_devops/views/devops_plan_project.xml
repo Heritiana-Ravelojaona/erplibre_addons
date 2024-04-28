@@ -27,8 +27,8 @@
                             <field name="website_max_number_one_pager" string="Mots maximum" />
                         </group>
                         <group string="Instance">
-                            <field name="instance_exec_text_id" />
-                            <field name="instance_exec_image_id" />
+                            <field name="instance_exec_text_id" string="Text generator" />
+                            <field name="instance_exec_image_id" string="Image generator" />
                         </group>
                     </group>
                     <notebook>
@@ -49,6 +49,11 @@
                         </page>
                     </notebook>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" options="{'post_refresh': 'recipients'}" widget="mail_thread" />
+                </div>
             </form>
         </field>
     </record>
