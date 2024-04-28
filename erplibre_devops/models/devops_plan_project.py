@@ -57,6 +57,17 @@ class DevopsPlanProject(models.Model):
         compute="_compute_has_aliment", store=True, track_visibility="onchange"
     )
 
+    result_list_aliment_count = fields.Integer(
+        compute="_compute_result_list_aliment_count",
+        help="Will count the aliment from question question_list_aliment",
+        store=True,
+        track_visibility="onchange",
+    )
+
+    result_list_aliment_image = fields.Text(
+        help="A URL link to an image per line", track_visibility="onchange"
+    )
+
     society_type = fields.Selection(
         selection=[
             ("projet", "Projet"),
@@ -197,6 +208,16 @@ class DevopsPlanProject(models.Model):
             rec.result_list_aliment = ""
 
     @api.multi
+    @api.depends("has_aliment", "result_list_aliment")
+    def _compute_result_list_aliment_count(self):
+        for rec in self:
+            lst_aliment = []
+            if rec.has_aliment and rec.result_list_aliment:
+                dct_aliment_items = json.loads(rec.result_list_aliment)
+                lst_aliment = dct_aliment_items.get("aliment")
+            rec.result_list_aliment_count = len(lst_aliment)
+
+    @api.multi
     def install_requirement(self):
         set_module_need = {"website"}
         module_ids = self.env["ir.module.module"].search(
@@ -309,6 +330,59 @@ class DevopsPlanProject(models.Model):
                         op_img_id.last_result_url
                     )
 
+            if (
+                rec.has_aliment
+                and not rec.result_list_aliment_image
+                and rec.result_list_aliment
+                and rec.result_list_aliment_count
+            ):
+                try:
+                    dct_aliment_items = json.loads(rec.result_list_aliment)
+                    lst_aliment = dct_aliment_items.get("aliment")
+                    lst_image_url = []
+                    for dct_aliment in lst_aliment:
+                        aliment_name = dct_aliment.get("name")
+                        aliment_description = dct_aliment.get("description")
+                        op_value = {
+                            "prompt": (
+                                "Démonstration d'un magnifique plat en gros"
+                                f" plan de «{aliment_name}» d'une beauté"
+                                " extreme décrit comme"
+                                f" «{aliment_description}»"
+                            ),
+                            "feature": "generate_image",
+                            "system_id": self.env.ref(
+                                "erplibre_devops.devops_system_local"
+                            ).id,
+                            "request_url": rec.instance_exec_image_id.url,
+                            "step": rec.step,
+                            "gen_img_detail_level_id": self.env.ref(
+                                "erplibre_devops.devops_gen_img_detail_02"
+                            ).id,
+                            "gen_img_light_ids": [
+                                (
+                                    6,
+                                    0,
+                                    self.env.ref(
+                                        "erplibre_devops.devops_gen_img_light_04"
+                                    ).ids,
+                                )
+                            ],
+                        }
+                        op_img_id = self.env["devops.operate.localai"].create(
+                            op_value
+                        )
+                        op_img_id.execute_ia()
+                        lst_image_url.append(op_img_id.last_result_url)
+
+                    rec.result_list_aliment_image = "\n".join(lst_image_url)
+                except Exception as e:
+                    # TODO create an execution error
+                    _logger.error(
+                        "Cannot parse json from variable result_list_aliment,"
+                        " ignore and continue"
+                    )
+
             if rec.result_one_pager_background_introduction:
                 span_introduction_image = f"""<span class="s_parallax_bg oe_img_bg oe_custom_bg" style="background-image: url('{rec.result_one_pager_background_introduction}'); background-position: 50.00% 100.00%;"/>"""
             else:
@@ -327,15 +401,17 @@ class DevopsPlanProject(models.Model):
                 try:
                     dct_aliment_items = json.loads(rec.result_list_aliment)
                     lst_aliment = dct_aliment_items.get("aliment")
+                    lst_url_aliment = rec.result_list_aliment_image.split("\n")
                     html_aliment = ""
-                    for dct_aliment in lst_aliment:
+                    for i, dct_aliment in enumerate(lst_aliment):
                         aliment_name = dct_aliment.get("name")
                         aliment_description = dct_aliment.get("description")
+                        aliment_url = lst_url_aliment[i]
                         price = random.randint(1, 30)
                         html_aliment += f"""
   <div class="row">
     <div class="col-lg-4 text-center">
-      <img src="/web/image/website_snippet_all.image_content_13" alt="#" class="img img-fluid d-block mx-auto"/>
+      <img src="{aliment_url}" alt="#" class="img img-fluid d-block mx-auto"/>
     </div>
     <div class="col-lg-8 s_full_menu_content_description">
       <h4 class="o_default_snippet_text">{aliment_name}<span class="slash o_default_snippet_text"><span class="price o_default_snippet_text"> | </span> {price}.00$</span></h4>

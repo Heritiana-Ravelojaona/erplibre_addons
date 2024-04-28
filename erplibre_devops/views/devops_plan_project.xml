@@ -66,6 +66,16 @@
                                     string="R. Liste aliment"
                                     attrs="{'invisible': [('has_aliment', '=', False)]}"
                                 />
+                                <field
+                                    name="result_list_aliment_count"
+                                    string="C. Aliment count"
+                                    attrs="{'invisible': [('has_aliment', '=', False)]}"
+                                />
+                                <field
+                                    name="result_list_aliment_image"
+                                    string="R. Aliment image"
+                                    attrs="{'invisible': [('has_aliment', '=', False)]}"
+                                />
                             </group>
                         </page>
                     </notebook>
