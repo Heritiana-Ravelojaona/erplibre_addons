@@ -1,4 +1,10 @@
+import json
+import logging
+import random
+
 from odoo import _, api, exceptions, fields, models
+
+_logger = logging.getLogger(__name__)
 
 
 class DevopsPlanProject(models.Model):
@@ -18,6 +24,10 @@ class DevopsPlanProject(models.Model):
     temperature = fields.Float(default=0.1, track_visibility="onchange")
 
     step = fields.Integer(default=20, track_visibility="onchange")
+
+    has_requirement_to_install = fields.Boolean()
+
+    gen_nb_aliment = fields.Integer(default=5, track_visibility="onchange")
 
     type_context = fields.Char(
         help="Will generate about this type context",
@@ -43,6 +53,10 @@ class DevopsPlanProject(models.Model):
         track_visibility="onchange",
     )
 
+    has_aliment = fields.Boolean(
+        compute="_compute_has_aliment", store=True, track_visibility="onchange"
+    )
+
     society_type = fields.Selection(
         selection=[
             ("projet", "Projet"),
@@ -61,6 +75,18 @@ class DevopsPlanProject(models.Model):
 
     question_one_pager_introduction = fields.Text(
         compute="_compute_question", track_visibility="onchange"
+    )
+
+    question_list_aliment = fields.Text(
+        compute="_compute_question", track_visibility="onchange"
+    )
+
+    result_list_aliment = fields.Text(
+        help=(
+            "List of aliment, by csv, separate by ;. Use header : name,"
+            " description"
+        ),
+        track_visibility="onchange",
     )
 
     result_one_pager_introduction = fields.Text(track_visibility="onchange")
@@ -92,8 +118,17 @@ class DevopsPlanProject(models.Model):
                 f" context {rec.type_context}"
             )
 
+    @api.multi
+    @api.depends("project_type", "society_type")
+    def _compute_has_aliment(self):
+        for rec in self:
+            rec.has_aliment = (
+                rec.project_type == "website_one_pager_alimentation"
+                or rec.society_type == "restaurant"
+            )
+
     @api.depends(
-        "name",
+        "society_name",
         "project_type",
         "website_max_number_one_pager",
         "type_context",
@@ -102,6 +137,7 @@ class DevopsPlanProject(models.Model):
         for rec in self:
             message = ""
             message_background = ""
+            rec.question_list_aliment = ""
             if rec.project_type == "website_one_pager_alimentation":
                 message = (
                     "Génère moi un texte de"
@@ -113,6 +149,17 @@ class DevopsPlanProject(models.Model):
                 message_background = (
                     f"Aliments «{rec.type_context}» d'une beauté extreme sur"
                     " une table de restaurant bien décoré."
+                )
+                rec.question_list_aliment = (
+                    f"Génère moi {rec.gen_nb_aliment} nom d'aliment de"
+                    f" «{rec.type_context}» avec une description. Ta réponse"
+                    " doit etre sous le format json, tel que le gabarit"
+                    " suivant : {'aliment':[{'name':'Aliment"
+                    " 1','description':'Description Aliment"
+                    " 1'},{'name':'Aliment 2','description':'Description"
+                    " Aliment 2'}]}, En remplaçant Aliment 1 par un produit"
+                    f" alimentaire similaire à «{rec.type_context}», ainsi que"
+                    " Aliment 2."
                 )
             elif rec.project_type == "website_one_pager_sante":
                 message = (
@@ -147,6 +194,25 @@ class DevopsPlanProject(models.Model):
         for rec in self:
             rec.result_one_pager_introduction = ""
             rec.result_one_pager_background_introduction = ""
+            rec.result_list_aliment = ""
+
+    @api.multi
+    def install_requirement(self):
+        set_module_need = {"website"}
+        module_ids = self.env["ir.module.module"].search(
+            [
+                ("name", "in", list(set_module_need)),
+                ("state", "!=", "installed"),
+            ]
+        )
+        if module_ids:
+            for module_id in module_ids:
+                module_id.button_immediate_install()
+                self.has_requirement_to_install = False
+                return {
+                    "type": "ir.actions.client",
+                    "tag": "reload",
+                }
 
     @api.multi
     def execute(self):
@@ -161,6 +227,17 @@ class DevopsPlanProject(models.Model):
             # TODO générer du texte
             # TODO créer du contenu sur le site web
             # TODO request_url auto_fill search existing localAI
+            set_module_need = {"website"}
+            module_ids = self.env["ir.module.module"].search(
+                [
+                    ("name", "in", list(set_module_need)),
+                    ("state", "!=", "installed"),
+                ]
+            )
+            if module_ids:
+                rec.has_requirement_to_install = True
+                continue
+
             if not rec.result_one_pager_introduction:
                 if rec.instance_exec_text_id:
                     op_value = {
@@ -179,6 +256,27 @@ class DevopsPlanProject(models.Model):
                     )
                 else:
                     rec.result_one_pager_introduction = rec.type_context
+
+            if (
+                rec.has_aliment
+                and not rec.result_list_aliment
+                and rec.question_list_aliment
+                and rec.instance_exec_text_id
+            ):
+                op_value = {
+                    "prompt": rec.question_list_aliment,
+                    "feature": "generate_text",
+                    "system_id": self.env.ref(
+                        "erplibre_devops.devops_system_local"
+                    ).id,
+                    "request_url": rec.instance_exec_text_id.url,
+                    "temperature": rec.temperature,
+                }
+                op_id = self.env["devops.operate.localai"].create(op_value)
+                op_id.execute_ia()
+                rec.result_list_aliment = op_id.last_result_message.replace(
+                    "\n", ""
+                )
 
             if not rec.result_one_pager_background_introduction:
                 if rec.instance_exec_image_id:
@@ -226,39 +324,43 @@ class DevopsPlanProject(models.Model):
 
             extra_arch_db = ""
             if rec.project_type == "website_one_pager_alimentation":
-                extra_arch_db = """
-      <section class="s_full_menu">
-        <div class="container-fluid">
-          <h2 class="o_default_snippet_text">Menu à la carte</h2>
-          <div class="row menu-container">
-            <div class="col-lg-2 text-center">
-              <h4 class="o_default_snippet_text">Hamburgers</h4>
-              <i class="fa fa-glass fa-5x"/>
-            </div>
-            <div class="col-lg-10 s_full_menu_content">
-              <div class="row">
-                <div class="col-lg-4 text-center">
-                  <img src="/web/image/website_snippet_all.image_content_13" alt="#" class="img img-fluid d-block mx-auto"/>
-                </div>
-                <div class="col-lg-8 s_full_menu_content_description">
-                  <h4 class="o_default_snippet_text">Sandwich with Ham and Cheese<span class="slash o_default_snippet_text"><span class="price o_default_snippet_text"> | €</span> 9.00</span></h4>
-                  <p class="o_default_snippet_text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rerum incidunt, eum quae neque officiis dignissimos, veritatis amet, dolorum aperiam tempore sed. Modi rerum velit itaque ex nobis vero necessitatibus adipisci eaque cum iste nisi molestias quibusdam, voluptate odit deserunt, beatae.</p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-4 text-center">
-                  <img src="/web/image/website_snippet_all.image_content_14" alt="#" class="img img-fluid d-block mx-auto"/>
-                </div>
-                <div class="col-lg-8 s_full_menu_content_description">
-                  <h4 class="o_default_snippet_text">Honey Dijon Chicken Burger<span class="slash o_default_snippet_text"><span class="price o_default_snippet_text"> | €</span> 12.00</span></h4>
-                  <p class="o_default_snippet_text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rerum incidunt, eum quae neque officiis dignissimos, veritatis amet, dolorum aperiam tempore sed. Modi rerum velit itaque ex nobis vero necessitatibus adipisci eaque cum iste nisi molestias quibusdam, voluptate odit deserunt, beatae.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+                try:
+                    dct_aliment_items = json.loads(rec.result_list_aliment)
+                    lst_aliment = dct_aliment_items.get("aliment")
+                    html_aliment = ""
+                    for dct_aliment in lst_aliment:
+                        aliment_name = dct_aliment.get("name")
+                        aliment_description = dct_aliment.get("description")
+                        price = random.randint(1, 30)
+                        html_aliment += f"""
+  <div class="row">
+    <div class="col-lg-4 text-center">
+      <img src="/web/image/website_snippet_all.image_content_13" alt="#" class="img img-fluid d-block mx-auto"/>
+    </div>
+    <div class="col-lg-8 s_full_menu_content_description">
+      <h4 class="o_default_snippet_text">{aliment_name}<span class="slash o_default_snippet_text"><span class="price o_default_snippet_text"> | </span> {price}.00$</span></h4>
+      <p class="o_default_snippet_text">{aliment_description}</p>
+    </div>
+  </div>
 """
+                    extra_arch_db = f"""
+          <section class="s_full_menu">
+            <div class="container-fluid">
+              <h2 class="o_default_snippet_text">Menu à la carte</h2>
+              <div class="row menu-container">
+                <!--<div class="col-lg-2 text-center">
+                  <h4 class="o_default_snippet_text">Hamburgers</h4>
+                  <i class="fa fa-glass fa-5x"/>
+                </div>-->
+                <div class="col-lg-10 s_full_menu_content">
+                    {html_aliment}
+                </div>
+              </div>
+            </div>
+          </section>
+    """
+                except Exception as e:
+                    _logger.error(e)
 
             arch_db = f"""<t name="Homepage" t-name="website.homepage1">
     <t t-call="website.layout">

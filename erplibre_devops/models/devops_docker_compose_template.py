@@ -60,6 +60,7 @@ class DevopsDockerComposeTemplate(models.Model):
     yaml = fields.Text(compute="_compute_yaml", store=True)
 
     @api.depends(
+        "name",
         "docker_compose_model",
         "is_support_gpu",
         "gpu_mode",
@@ -68,8 +69,8 @@ class DevopsDockerComposeTemplate(models.Model):
     )
     def _compute_name_info(self):
         for rec in self:
-            rec.name = (
-                f"{rec.docker_compose_model} {[a.name for a in rec.type_ids]} {rec.port_1}"
+            rec.name_info = (
+                f"{rec.name} {rec.docker_compose_model} {[a.name for a in rec.type_ids]} {rec.port_1}"
             )
             if rec.is_support_gpu:
                 rec.name += f" {rec.gpu_mode}"

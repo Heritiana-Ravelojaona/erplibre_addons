@@ -6,10 +6,19 @@
         <field name="arch" type="xml">
             <form string="Titre">
                 <header>
+                    <button
+                        name="install_requirement"
+                        string="Install requirement"
+                        type="object"
+                        class="btn-danger"
+                        attrs="{'invisible': [('has_requirement_to_install', '=', False)]}"
+                    />
                     <button name="execute" string="Execute" type="object" class="btn-success" />
                     <button name="clear_result" string="Clear result" type="object" class="btn-warning" />
                 </header>
                 <sheet>
+                    <field name="has_aliment" invisible="True" />
+                    <field name="has_requirement_to_install" invisible="True" />
                     <div class="oe_title">
                         <h1>
                             <field name="name" />
@@ -24,6 +33,7 @@
                         </group>
                         <group string="Configuration">
                             <field name="temperature" />
+                            <field name="gen_nb_aliment" attrs="{'invisible': [('has_aliment', '=', False)]}" />
                             <field name="step" />
                             <field name="website_max_number_one_pager" string="Mots maximum" />
                         </group>
@@ -45,6 +55,16 @@
                                     name="result_one_pager_background_introduction"
                                     string="R. Background image introduction"
                                     widget="url"
+                                />
+                                <field
+                                    name="question_list_aliment"
+                                    string="Q. Liste aliment"
+                                    attrs="{'invisible': [('has_aliment', '=', False)]}"
+                                />
+                                <field
+                                    name="result_list_aliment"
+                                    string="R. Liste aliment"
+                                    attrs="{'invisible': [('has_aliment', '=', False)]}"
                                 />
                             </group>
                         </page>
