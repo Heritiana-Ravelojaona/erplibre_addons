@@ -25,7 +25,6 @@
     ],
     "data": [
         "security/ir.model.access.csv",
-        "wizards/devops_plan_action_wizard.xml",
         "data/mail_message_subtype.xml",
         "data/devops_instance_type.xml",
         "data/devops_gen_img_detail.xml",
@@ -102,6 +101,7 @@
         "views/erplibre_mode_source.xml",
         "views/erplibre_mode_version_base.xml",
         "views/erplibre_mode_version_erplibre.xml",
+        "wizards/devops_plan_action_wizard.xml",
         "views/menu.xml",
     ],
     "installable": True,

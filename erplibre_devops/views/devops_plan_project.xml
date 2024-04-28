@@ -7,6 +7,7 @@
             <form string="Titre">
                 <header>
                     <button name="execute" string="Execute" type="object" class="btn-success" />
+                    <button name="clear_result" string="Clear result" type="object" class="btn-warning" />
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -33,8 +34,17 @@
                     <notebook>
                         <page string="Question">
                             <group>
-                                <field name="question_one_pager_introduction" />
-                                <field name="question_one_pager_background_introduction" />
+                                <field name="question_one_pager_introduction" string="Q. Text introduction" />
+                                <field name="result_one_pager_introduction" string="R. Text introduction" />
+                                <field
+                                    name="question_one_pager_background_introduction"
+                                    string="Q. Background image introduction"
+                                />
+                                <field
+                                    name="result_one_pager_background_introduction"
+                                    string="R. Background image introduction"
+                                    widget="url"
+                                />
                             </group>
                         </page>
                     </notebook>

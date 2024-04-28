@@ -103,6 +103,22 @@
                 </group>
                 <group
                     name="init_context"
+                    attrs="{'invisible': ['|',('state', '!=', 'plan_project'),('has_configured_path', '==', True)]}"
+                    style="background-color: #057bc2; color: white;"
+                >
+                    <group>
+                        <div>
+                            <h2>1 Code - Plan a project</h2>
+                            <p>
+                                1. Select a ERPLibre workspace to develop your project, local by default.
+                                <br />
+                                2. Deploy an LLM instance (optional)
+                            </p>
+                        </div>
+                    </group>
+                </group>
+                <group
+                    name="init_context"
                     attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', True)]}"
                     style="background-color: #08a9cb; color: white;"
                 >
@@ -273,6 +289,7 @@
                         <div>
                             <h2>1 Plan</h2>
                         </div>
+                        <button name="state_goto_plan_project" string="Project" type="object" class="btn btn-default" />
                         <!--                        <button name="requirement" string="Requirement" groups="base.group_no_one" />-->
                         <div>Requirement</div>
                         <div>Analyse/Observe/Audit</div>
@@ -439,6 +456,20 @@
                 <!--                        &lt;!&ndash;                        <button name="state_goto_a_g_regen" string="Regenerate the choosing module" type="object" class="btn btn-default" />&ndash;&gt;-->
                 <!--                    </group>-->
                 <!--                </group>-->
+                <group name="group_plan_project" attrs="{'invisible': [('state', '!=', 'plan_project')]}">
+                    <group string="1. Select a ERPLibre workspace">
+                        <field name="root_workspace_id" />
+                        <!--                        <button-->
+                        <!--                            name="state_goto_code_module_shortcut_autopoieses_devops"-->
+                        <!--                            string="DevOps"-->
+                        <!--                            type="object"-->
+                        <!--                            class="btn btn-default"-->
+                        <!--                        />-->
+                    </group>
+                    <group string="2. Deploy LLM">
+                        <field name="enable_deploy_llm_into_project" />
+                    </group>
+                </group>
                 <group name="group_code_shortcut" attrs="{'invisible': [('state', '!=', 'code_shortcut')]}">
                     <group string="Autopoieses">
                         <button
@@ -734,7 +765,9 @@
                         />
                     </group>
                 </group>
-                <group attrs="{'invisible': ['|',('state', '!=', 'i_new_instance'),('working_system_id', '=', False)]}">
+                <group
+                    attrs="{'invisible': ['|',('state', '!=', 'i_new_instance'),('working_system_id', '=', False),('enable_deploy_llm_into_project', '=', False)]}"
+                >
                     <field name="instance_list_to_deploy" />
                     <field name="instance_name" />
                     <field name="instance_path" />
@@ -756,6 +789,13 @@
                         class="btn btn-success"
                         attrs="{'invisible': ['|',('instance_list_to_deploy', '=', False),('instance_name', '=', False)]}"
                     />
+                </group>
+                <group
+                    attrs="{'invisible': ['|',('state', '!=', 'i_new_instance'),('working_system_id', '=', False),('enable_deploy_llm_into_project', '=', False)]}"
+                >
+                    <field name="instance_exec_text_id" />
+                    <field name="instance_exec_image_id" />
+                    <field name="instance_last_exec_id" />
                 </group>
                 <group attrs="{'invisible': ['|',('state', '!=', 'i_new_instance'),('working_system_id', '=', False)]}">
                     <field name="instance_yaml" />
@@ -788,6 +828,24 @@
                             class="btn btn-default"
                         />
                     </div>
+                </group>
+                <group name="group_plan_project_2" attrs="{'invisible': [('state', '!=', 'plan_project')]}">
+                    <group string="4. Requirement">
+                        <!--                        <button-->
+                        <!--                            name="state_goto_code_module_shortcut_autopoieses_devops"-->
+                        <!--                            string="DevOps"-->
+                        <!--                            type="object"-->
+                        <!--                            class="btn btn-default"-->
+                        <!--                        />-->
+                    </group>
+                    <group string="5. Create a project">
+                        <button
+                            name="instance_create_plan_project"
+                            string="Create project"
+                            type="object"
+                            class="btn btn-success"
+                        />
+                    </group>
                 </group>
                 <group
                     string="Choose a system"

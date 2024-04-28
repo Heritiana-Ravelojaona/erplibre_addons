@@ -98,8 +98,20 @@ class DevopsPlanActionWizard(models.TransientModel):
         store=True, compute="_compute_has_configured_path"
     )
 
+    instance_exec_text_id = fields.Many2one(
+        comodel_name="devops.instance.exec"
+    )
+
+    instance_exec_image_id = fields.Many2one(
+        comodel_name="devops.instance.exec"
+    )
+
     force_show_final = fields.Boolean(
         help="Will show final view without being in this state."
+    )
+
+    enable_deploy_llm_into_project = fields.Boolean(
+        help="Will show deploy information about LLM for project."
     )
 
     working_module_path_suggestion = fields.Selection(
@@ -654,6 +666,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             ("e_migrate_from_external_ddb", "Migrate from external database"),
             ("f_new_project_society", "New society"),
             ("g_test_erplibre", "Test ERPLibre"),
+            ("plan_project", "Plan project"),
             ("code_module", "Code module"),
             ("code_shortcut", "Shortcut configuration code"),
             ("g_a_local", "Test ERPLibre local"),
@@ -705,6 +718,13 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def state_goto_g_test_erplibre(self):
         self.state = "g_test_erplibre"
+        return self._reopen_self()
+
+    def state_goto_plan_project(self):
+        self.state = "plan_project"
+        self.working_system_id = self.env.ref(
+            "erplibre_devops.devops_system_local"
+        ).id
         return self._reopen_self()
 
     def state_goto_code_module(self):
@@ -870,6 +890,9 @@ class DevopsPlanActionWizard(models.TransientModel):
         self.state = "init"
 
     def state_previous_g_test_erplibre(self):
+        self.state = "init"
+
+    def state_previous_plan_project(self):
         self.state = "init"
 
     def state_previous_g_a_local(self):
@@ -1298,6 +1321,20 @@ class DevopsPlanActionWizard(models.TransientModel):
             self.instance_last_exec_id = self.env[
                 "devops.instance.exec"
             ].create(inst_exec_value)
+            if (
+                self.env.ref(
+                    "erplibre_devops.devops_instance_type_gen_text"
+                ).id
+                in self.instance_type_ids.ids
+            ):
+                self.instance_exec_text_id = self.instance_last_exec_id.id
+            if (
+                self.env.ref(
+                    "erplibre_devops.devops_instance_type_gen_image"
+                ).id
+                in self.instance_type_ids.ids
+            ):
+                self.instance_exec_image_id = self.instance_last_exec_id.id
         return self._reopen_self()
 
     def instance_create_operate_localai(self):
@@ -1314,6 +1351,29 @@ class DevopsPlanActionWizard(models.TransientModel):
             "res_model": "devops.operate.localai",
             "view_id": self.env.ref(
                 "erplibre_devops.devops_operate_localai_view_form"
+            ).id,
+            "target": "_blank",
+            "context": ctx,
+        }
+
+    def instance_create_plan_project(self):
+        ctx = {}
+        if self.instance_exec_image_id:
+            ctx[
+                "default_instance_exec_image_id"
+            ] = self.instance_exec_image_id.id
+        if self.instance_exec_text_id:
+            ctx[
+                "default_instance_exec_text_id"
+            ] = self.instance_exec_text_id.id
+        return {
+            "name": _("Create plan project."),
+            "type": "ir.actions.act_window",
+            "view_type": "form",
+            "view_mode": "form",
+            "res_model": "devops.plan.project",
+            "view_id": self.env.ref(
+                "erplibre_devops.devops_plan_project_view_form"
             ).id,
             "target": "_blank",
             "context": ctx,
