@@ -28,6 +28,9 @@
                         <field name="instance_exec_id" />
                     </group>
                     <group string="Input">
+                        <div>Suggestion : exagéré la beauté ou certains détails avec des mots amplifiés.</div>
+                    </group>
+                    <group>
                         <field name="prompt" />
                         <field name="prompt_compute" />
                         <field name="cmd" />

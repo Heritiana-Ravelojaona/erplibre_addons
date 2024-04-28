@@ -118,8 +118,9 @@ class DevopsPlanProject(models.Model):
                     f" {rec.type_context}"
                 )
                 message_background = (
-                    f"Présentation des produits «{rec.type_context}» sur des"
-                    " présentoirs de comptoir du magasin."
+                    f"Présentation des produits «{rec.type_context}» dans un"
+                    " superbe emballage sur des présentoirs de comptoir du"
+                    " magasin."
                 )
             rec.question_one_pager_introduction = message
             rec.question_one_pager_background_introduction = message_background

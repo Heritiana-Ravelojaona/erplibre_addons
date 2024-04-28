@@ -4,8 +4,11 @@ from odoo import _, api, fields, models
 class DevopsDockerComposeTemplate(models.Model):
     _name = "devops.docker.compose.template"
     _description = "devops_docker_compose_template"
+    _rec_name = "name_info"
 
     name = fields.Char()
+
+    name_info = fields.Char(compute="_compute_name_info", store=True)
 
     active = fields.Boolean(default=True)
 
@@ -55,6 +58,21 @@ class DevopsDockerComposeTemplate(models.Model):
     is_generic_template = fields.Boolean()
 
     yaml = fields.Text(compute="_compute_yaml", store=True)
+
+    @api.depends(
+        "docker_compose_model",
+        "is_support_gpu",
+        "gpu_mode",
+        "port_1",
+        "type_ids",
+    )
+    def _compute_name_info(self):
+        for rec in self:
+            rec.name = (
+                f"{rec.docker_compose_model} {[a.name for a in rec.type_ids]} {rec.port_1}"
+            )
+            if rec.is_support_gpu:
+                rec.name += f" {rec.gpu_mode}"
 
     @api.depends("docker_compose_model", "gpu_mode", "port_1")
     @api.multi
