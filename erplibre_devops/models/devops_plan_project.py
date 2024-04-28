@@ -7,7 +7,12 @@ class DevopsPlanProject(models.Model):
     _description = "devops_plan_project"
 
     name = fields.Char(
-        help="Project name", required=True, track_visibility="onchange"
+        compute="_compute_name",
+        store=True,
+    )
+
+    society_name = fields.Char(
+        help="Society name", required=True, track_visibility="onchange"
     )
 
     temperature = fields.Float(default=0.1, track_visibility="onchange")
@@ -76,6 +81,17 @@ class DevopsPlanProject(models.Model):
         comodel_name="devops.instance.exec", track_visibility="onchange"
     )
 
+    @api.multi
+    @api.depends(
+        "society_name", "project_type", "type_context", "society_type"
+    )
+    def _compute_name(self):
+        for rec in self:
+            rec.name = (
+                f"{rec.society_type} {rec.society_name} - {rec.project_type} -"
+                f" context {rec.type_context}"
+            )
+
     @api.depends(
         "name",
         "project_type",
@@ -90,8 +106,9 @@ class DevopsPlanProject(models.Model):
                 message = (
                     "Génère moi un texte de"
                     f" {rec.website_max_number_one_pager} mots, un"
-                    f" {rec.society_type} nommé {rec.name} sur le sujet d'une"
-                    f" introduction fabrique des {rec.type_context}"
+                    f" {rec.society_type} nommé {rec.society_name} sur le"
+                    " sujet d'une introduction fabrique des"
+                    f" {rec.type_context}"
                 )
                 message_background = (
                     f"Aliments «{rec.type_context}» d'une beauté extreme sur"
@@ -101,9 +118,9 @@ class DevopsPlanProject(models.Model):
                 message = (
                     "Génère moi un texte de"
                     f" {rec.website_max_number_one_pager} mots, un"
-                    f" {rec.society_type} nommé {rec.name} sur le sujet d'une"
-                    f" introduction sur la {rec.type_context} dans le contexte"
-                    " du domaine de la santé."
+                    f" {rec.society_type} nommé {rec.society_name} sur le"
+                    f" sujet d'une introduction sur la {rec.type_context} dans"
+                    " le contexte du domaine de la santé."
                 )
                 message_background = (
                     "Présentation des produits sur les soins de santé"
@@ -113,9 +130,9 @@ class DevopsPlanProject(models.Model):
                 message = (
                     "Génère moi un texte de"
                     f" {rec.website_max_number_one_pager} mots sur le projet"
-                    f" {rec.name} pour donner une envie au consommateur de"
-                    " venir acheter des produits dans un magasin de"
-                    f" {rec.type_context}"
+                    f" {rec.society_name} pour donner une envie au"
+                    " consommateur de venir acheter des produits dans un"
+                    f" magasin de {rec.type_context}"
                 )
                 message_background = (
                     f"Présentation des produits «{rec.type_context}» dans un"
@@ -252,7 +269,7 @@ class DevopsPlanProject(models.Model):
         <div class="container">
           <div class="row s_nb_column_fixed">
             <div class="col-lg-12 s_title" data-name="Title">
-              <h1 class="s_title_thin o_default_snippet_text" style="font-size: 62px; text-align: center;">{rec.name}</h1>
+              <h1 class="s_title_thin o_default_snippet_text" style="font-size: 62px; text-align: center;">{rec.society_name}</h1>
             </div>
             <div class="col-lg-12 s_text pt16 pb16" data-name="Text">
               <p class="lead o_default_snippet_text" style="text-align: center;">{rec.result_one_pager_introduction}</p>

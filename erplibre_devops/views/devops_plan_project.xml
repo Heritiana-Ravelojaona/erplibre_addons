@@ -17,6 +17,7 @@
                     </div>
                     <group>
                         <group string="Information">
+                            <field name="society_name" />
                             <field name="project_type" />
                             <field name="society_type" />
                             <field name="type_context" />
