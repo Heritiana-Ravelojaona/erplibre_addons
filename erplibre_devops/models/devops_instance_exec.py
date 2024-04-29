@@ -48,8 +48,17 @@ class DevopsInstanceExec(models.Model):
         string="Workspace",
     )
 
+    working_dir_path = fields.Char()
+
     @api.depends("url", "type_ids", "instance_name")
     def _compute_name(self):
         for rec in self:
             str_type = "|".join([a.name for a in rec.type_ids])
             rec.name = f"{rec.instance_name} {str_type} {rec.url}".strip()
+
+    @api.multi
+    def start(self):
+        self.system_id.execute_terminal_gui(
+            folder=self.working_dir_path,
+            cmd=f"docker compose up",
+        )

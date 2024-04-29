@@ -1296,6 +1296,7 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     def instance_deploy(self):
         if self.instance_list_to_deploy and self.instance_yaml:
+            # TODO move this into devops.instance.exec, this to create
             yaml = self.instance_yaml
 
             if self.instance_exec_from_workspace_id:
@@ -1320,10 +1321,6 @@ class DevopsPlanActionWizard(models.TransientModel):
                 None,
                 engine="sh",
             )
-            self.working_system_id.execute_terminal_gui(
-                folder=working_dir_path,
-                cmd=f"docker compose up",
-            )
             # TODO ne pas copier toute la liste de type_ids, sélectionner ce qui est nécessaire
             # Le copier dans la liste par défaut à la copie, l'utilisateur pour l'enlever.
             inst_exec_value = {
@@ -1331,10 +1328,13 @@ class DevopsPlanActionWizard(models.TransientModel):
                 "url": f"http://localhost:{self.instance_port_1}",
                 "type_ids": [(6, 0, self.instance_type_ids.ids)],
                 "system_id": self.working_system_id.id,
+                "workspace_id": self.root_workspace_id.id,
+                "working_dir_path": working_dir_path,
             }
             self.instance_last_exec_id = self.env[
                 "devops.instance.exec"
             ].create(inst_exec_value)
+            self.instance_last_exec_id.start()
             if (
                 self.env.ref(
                     "erplibre_devops.devops_instance_type_gen_text"

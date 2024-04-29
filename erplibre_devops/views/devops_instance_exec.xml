@@ -5,9 +5,19 @@
         <field name="model">devops.instance.exec</field>
         <field name="arch" type="xml">
             <form string="Titre">
+                <header>
+                    <button
+                        name="start"
+                        string="Start"
+                        type="object"
+                        class="oe_highlight"
+                        attrs="{'invisible': [('workspace_id', '=', False)]}"
+                    />
+                </header>
                 <sheet>
                     <group>
                         <field name="name" />
+                        <field name="instance_name" />
                     </group>
                     <group>
                         <field name="docker_container_ids" widget="many2many_tags" />
@@ -19,6 +29,7 @@
                         <field name="type_ids" widget="many2many_tags" />
                         <field name="url" />
                         <field name="workspace_id" />
+                        <field name="working_dir_path" />
                     </group>
                 </sheet>
             </form>
