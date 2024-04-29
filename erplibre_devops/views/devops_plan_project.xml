@@ -41,6 +41,13 @@
                             <field name="instance_exec_text_id" string="Text generator" />
                             <field name="instance_exec_image_id" string="Image generator" />
                         </group>
+                        <group string="Advance conf">
+                            <field
+                                name="advance_aliment_template_repas_image"
+                                string="Template repas image"
+                                attrs="{'invisible': [('has_aliment', '=', False)]}"
+                            />
+                        </group>
                     </group>
                     <notebook>
                         <page string="Question">
@@ -68,7 +75,12 @@
                                 />
                                 <field
                                     name="result_list_aliment_count"
-                                    string="C. Aliment count"
+                                    string="CS. Aliment count"
+                                    attrs="{'invisible': [('has_aliment', '=', False)]}"
+                                />
+                                <field
+                                    name="question_list_aliment_image"
+                                    string="CQ. Aliment image"
                                     attrs="{'invisible': [('has_aliment', '=', False)]}"
                                 />
                                 <field

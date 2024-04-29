@@ -68,6 +68,25 @@ class DevopsPlanProject(models.Model):
         help="A URL link to an image per line", track_visibility="onchange"
     )
 
+    question_list_aliment_image = fields.Text(
+        help=(
+            "The question for result_list_aliment_image, auto-generate from"
+            " question_list_aliment when execute."
+        ),
+        track_visibility="onchange",
+    )
+
+    advance_aliment_template_repas_image = fields.Char(
+        default=(
+            "Gros plan d'un magnifique plat de «%s» d'une"
+            " beauté extrême décrit comme «%s»"
+        ),
+        help=(
+            "Need 2 argument, will be aliment name and aliment description max"
+            " 100 char."
+        ),
+    )
+
     society_type = fields.Selection(
         selection=[
             ("projet", "Projet"),
@@ -206,6 +225,8 @@ class DevopsPlanProject(models.Model):
             rec.result_one_pager_introduction = ""
             rec.result_one_pager_background_introduction = ""
             rec.result_list_aliment = ""
+            rec.result_list_aliment_image = ""
+            rec.question_list_aliment_image = ""
 
     @api.multi
     @api.depends("has_aliment", "result_list_aliment")
@@ -340,16 +361,26 @@ class DevopsPlanProject(models.Model):
                     dct_aliment_items = json.loads(rec.result_list_aliment)
                     lst_aliment = dct_aliment_items.get("aliment")
                     lst_image_url = []
+                    if rec.question_list_aliment_image is False:
+                        rec.question_list_aliment_image = ""
                     for dct_aliment in lst_aliment:
-                        aliment_name = dct_aliment.get("name")
-                        aliment_description = dct_aliment.get("description")
+                        if not rec.question_list_aliment_image:
+                            aliment_name = dct_aliment.get("name")
+                            aliment_description = dct_aliment.get(
+                                "description"
+                            )
+                            prompt = (
+                                rec.advance_aliment_template_repas_image
+                                % (
+                                    aliment_name,
+                                    aliment_description[:100],
+                                )
+                            )
+                            rec.question_list_aliment_image += f"{prompt}\n"
+                        else:
+                            prompt = rec.question_list_aliment_image
                         op_value = {
-                            "prompt": (
-                                "Démonstration d'un magnifique plat en gros"
-                                f" plan de «{aliment_name}» d'une beauté"
-                                " extreme décrit comme"
-                                f" «{aliment_description}»"
-                            ),
+                            "prompt": prompt,
                             "feature": "generate_image",
                             "system_id": self.env.ref(
                                 "erplibre_devops.devops_system_local"
