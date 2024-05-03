@@ -474,21 +474,31 @@
                     <group string="Autopoieses">
                         <button
                             name="state_goto_code_module_shortcut_autopoieses_devops"
-                            string="DevOps"
+                            string="DevOps UcA UcB"
                             type="object"
                             class="btn btn-default"
+                            context="{'ignore_autocomplete_model': True}"
                         />
                         <button
-                            name="state_goto_code_module_shortcut_autopoieses_code_generator"
-                            string="Code Generator UcB"
+                            name="state_goto_code_module_shortcut_autopoieses_devops"
+                            string="DevOps retro direct"
                             type="object"
                             class="btn btn-default"
+                            context="{'force_create_view': True, 'ignore_uca_ucb': True}"
                         />
                         <button
                             name="state_goto_code_module_shortcut_autopoieses_code_generator_code_generator"
                             string="Code Generator UcA"
                             type="object"
                             class="btn btn-default"
+                            context="{'ignore_autocomplete_model': True}"
+                        />
+                        <button
+                            name="state_goto_code_module_shortcut_autopoieses_code_generator"
+                            string="Code Generator UcB"
+                            type="object"
+                            class="btn btn-default"
+                            context="{'ignore_autocomplete_model': True}"
                         />
                     </group>
                 </group>
