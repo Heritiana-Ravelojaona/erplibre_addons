@@ -1571,6 +1571,12 @@ class DevopsCgNewProject(models.Model):
                         # TODO add here nomenclator to each model
                         for a in model.get("fields"):
                             dct_value = {"ttype": a.get("type")}
+                            if "related" in a.keys():
+                                _logger.warning(
+                                    f"CG not support related field {a} from"
+                                    f" model {model_name}"
+                                )
+                                continue
                             if "relation" in a.keys():
                                 dct_value["relation"] = a["relation"]
                             if "relation_field" in a.keys():

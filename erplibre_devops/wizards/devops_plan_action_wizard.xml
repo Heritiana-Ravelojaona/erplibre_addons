@@ -15,6 +15,67 @@
                     attrs="{'invisible': [('has_next', '=', False)]}"
                 />
             </xpath>
+            <!--            <xpath expr="//field[@name='state']" position="before">-->
+            <xpath expr="//div[@name='states_buttons']" position="inside">
+                <!--                <header>-->
+                <button
+                    name="action_code_module_autocomplete_module_path"
+                    string="Auto-complete"
+                    type="object"
+                    class="btn btn-success"
+                    attrs="{'invisible': [('state', '!=', 'code_module')]}"
+                />
+                <button
+                    name="action_purge_metadata"
+                    string="Clear cache"
+                    type="object"
+                    class="btn btn-warning"
+                    attrs="{'invisible': [('state', '!=', 'code_module')]}"
+                />
+                <button
+                    name="action_code_module_generate"
+                    string="Generate"
+                    type="object"
+                    class="btn btn-success"
+                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False),('force_show_final', '==', False)]}"
+                />
+                <button
+                    name="action_git_commit"
+                    string="Git commit module"
+                    type="object"
+                    class="btn btn-success"
+                    attrs="{'invisible': ['|',('state', '!=', 'code_module'),('plan_cg_id', '=', False)]}"
+                />
+                <button
+                    name="action_git_commit"
+                    string="Git commit UcA"
+                    type="object"
+                    class="btn btn-success"
+                    attrs="{'invisible': ['|','|','|',('state', '!=', 'code_module'),('plan_cg_id', '=', False),('use_existing_meta_module', '==', False),('use_existing_meta_module_ucb_only','==',True)]}"
+                />
+                <button
+                    name="action_git_commit"
+                    string="Git commit UcB"
+                    type="object"
+                    class="btn btn-success"
+                    attrs="{'invisible': ['|','|','|',('state', '!=', 'code_module'),('plan_cg_id', '=', False),('use_existing_meta_module', '==', False),('use_existing_meta_module_uca_only','==',True)]}"
+                />
+                <button
+                    name="action_git_meld_remote"
+                    string="Git meld remote"
+                    type="object"
+                    class="btn btn-success"
+                    attrs="{'invisible': ['|','|',('state', '!=', 'code_module'),('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
+                />
+                <button
+                    name="action_git_clean_remote"
+                    string="Git clean remote"
+                    type="object"
+                    class="btn btn-success"
+                    attrs="{'invisible': ['|','|',('state', '!=', 'code_module'),('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
+                />
+                <!--                </header>-->
+            </xpath>
             <xpath expr="//footer" position="before">
                 <field name="root_workspace_id_is_me" invisible="True" />
                 <field name="root_workspace_id" invisible="True" />
@@ -65,6 +126,12 @@
                             type="object"
                             class="btn btn-success"
                         />
+                        <button
+                            name="action_purge_metadata"
+                            string="Clear cache"
+                            type="object"
+                            class="btn btn-warning"
+                        />
                     </group>
                 </group>
                 <group
@@ -82,7 +149,7 @@
                                 <br />
                                 3. Adjust B to change path, with C for parameters.
                             </p>
-                            <p>4. Create models and options.</p>
+                            <p>4. Create models, views and controllers.</p>
                         </div>
                     </group>
                     <group>
@@ -92,6 +159,12 @@
                             string="Auto-complete"
                             type="object"
                             class="btn btn-default"
+                        />
+                        <button
+                            name="action_purge_metadata"
+                            string="Clear cache"
+                            type="object"
+                            class="btn btn-warning"
                         />
                         <button
                             name="action_code_module_generate"
@@ -116,7 +189,7 @@
                                 <br />
                                 3. Adjust B to change path, with C for parameters.
                                 <br />
-                                4. Create models and options.
+                                4. Create models, views and controllers.
                             </p>
                             <p>5. Result</p>
                         </div>
@@ -130,38 +203,16 @@
                             class="btn btn-default"
                         />
                         <button
+                            name="action_purge_metadata"
+                            string="Clear cache"
+                            type="object"
+                            class="btn btn-warning"
+                        />
+                        <button
                             name="action_code_module_generate"
                             string="Generate"
                             type="object"
-                            class="btn btn-default"
-                        />
-                        <button
-                            name="action_git_commit"
-                            string="Git commit"
-                            type="object"
                             class="btn btn-success"
-                            attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', True)]}"
-                        />
-                        <button
-                            name="action_git_commit_remote"
-                            string="Git commit remote"
-                            type="object"
-                            class="btn btn-success"
-                            attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
-                        />
-                        <button
-                            name="action_git_meld_remote"
-                            string="Git meld remote"
-                            type="object"
-                            class="btn btn-success"
-                            attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
-                        />
-                        <button
-                            name="action_git_clean_remote"
-                            string="Git clean remote"
-                            type="object"
-                            class="btn btn-success"
-                            attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
                         />
                     </group>
                 </group>
@@ -426,7 +477,6 @@
                     attrs="{'invisible': [('state', '!=', 'a_a_model'),('state', '!=', 'c_a_model')]}"
                 >
                     <field name="model_ids" />
-                    <field name="model_to_remove_ids" />
                 </group>
                 <!--                <group name="group_a_f_devops_regen" attrs="{'invisible': [('state', '!=', 'a_f_devops_regen')]}">-->
                 <!--                    -->
@@ -436,23 +486,27 @@
                         <button name="state_goto_g_a_local" string="Local" type="object" class="btn btn-default" />
                     </group>
                 </group>
-                <group name="group_code_module" attrs="{'invisible': [('state', '!=', 'code_module')]}">
-                    <group string="A-Module name">
-                        <field name="working_module_id" string="Existing module" />
+                <group
+                    name="group_code_module"
+                    string="A-Module"
+                    attrs="{'invisible': [('state', '!=', 'code_module')]}"
+                >
+                    <group string="Name">
+                        <field name="working_module_id" string="By existing" />
                         <field
                             name="working_module_name"
-                            string="OR module name"
+                            string="OR name"
                             attrs="{'invisible': [('working_module_id', '!=', False)]}"
                         />
-                        <field name="is_new_module" />
                         <button
                             name="action_code_module_autocomplete_module_path"
-                            string="Auto-complete 'B-Module path'"
+                            string="Auto-complete"
                             type="object"
                             class="btn btn-default"
                         />
+                        <field name="is_new_module" string="Is new?" />
                     </group>
-                    <group string="B-Module path">
+                    <group string="Path">
                         <field name="working_module_path_suggestion" string="Suggested path" />
                         <field
                             name="working_module_path"
@@ -460,15 +514,19 @@
                             attrs="{'invisible': [('working_module_path_suggestion', '!=', '#')]}"
                         />
                     </group>
-                    <group string="C-Parameter" attrs="{'invisible': [('state', '!=', 'code_module')]}">
+                </group>
+                <group
+                    string="B-Parameter"
+                    name="group_code_module_part_2"
+                    attrs="{'invisible': [('state', '!=', 'code_module')]}"
+                >
+                    <group string="Code generator" attrs="{'invisible': [('state', '!=', 'code_module')]}">
                         <field name="mode_view_generator" />
-                        <field name="is_remote_cg" string="Generate outside" />
                         <field name="force_generate" />
+                        <field name="is_remote_cg" string="Generate outside ME" />
+                        <!--                        <field name="is_cg_temporary" string="Generate temporary" />-->
                     </group>
-                    <group
-                        string="C-Parameter Meta UcA &amp; UcB"
-                        attrs="{'invisible': [('state', '!=', 'code_module')]}"
-                    >
+                    <group string="Meta UcA &amp; UcB" attrs="{'invisible': [('state', '!=', 'code_module')]}">
                         <field name="use_external_cg" string="With UcA UcB" />
                         <field
                             name="use_existing_meta_module"
@@ -523,18 +581,20 @@
                     </group>
                 </group>
                 <group
-                    string="D-Model"
+                    string="C-Model"
                     attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
                 >
                     <field name="model_ids" />
-                    <field name="model_to_remove_ids" />
                 </group>
                 <group
                     name="group_code_module_2"
-                    string="E-Options"
+                    string="D-View"
                     attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
                 >
-                    <group string="Snippet">
+                    <group string="Web / admin space">
+                        <div>Activate by default.</div>
+                    </group>
+                    <group string="Website Snippet">
                         <field name="mode_view_snippet" string="Mode" />
                         <field
                             name="mode_view_snippet_template_generate_website_snippet_generic_mdl"
@@ -590,20 +650,18 @@
                             string="Support delete"
                         />
                     </group>
-                    <group string="Data">
-                        <field name="config_uca_enable_export_data" />
-                    </group>
                 </group>
                 <group
-                    string="F-Generate"
+                    name="group_code_module_3"
+                    string="E-Data"
                     attrs="{'invisible': ['|',('state', '!=', 'code_module'),('has_configured_path', '==', False)]}"
                 >
-                    <button
-                        name="action_code_module_generate"
-                        string="Generate"
-                        type="object"
-                        class="btn btn-default"
-                    />
+                    <group string="Export from ME">
+                        <field
+                            name="config_uca_enable_export_data"
+                            attrs="{'invisible': [('use_external_cg', '==', True)]}"
+                        />
+                    </group>
                 </group>
                 <group name="group_g_a_local" attrs="{'invisible': [('state', '!=', 'g_a_local')]}">
                     <group string="DB">
@@ -842,6 +900,7 @@
                 <group name="not_supported" attrs="{'invisible': [('state', '!=', 'not_supported')]}">
                     <p>This state is not supported, please go back.</p>
                 </group>
+                <hr attrs="{'invisible': [('state', '!=', 'final'), ('force_show_final', '!=', True)]}" />
                 <group
                     string="Result"
                     name="final"
@@ -850,7 +909,7 @@
                     <div>
                         <p>Your action is done, close this dialog below.</p>
                     </div>
-                    <field name="plan_cg_id" attrs="{'invisible': [('plan_cg_id', '=', False)]}" />
+                    <field name="plan_cg_id" string="CG plan" attrs="{'invisible': [('plan_cg_id', '=', False)]}" />
                     <field
                         name="generated_new_project_id"
                         attrs="{'invisible': [('generated_new_project_id', '=', False)]}"
@@ -859,27 +918,6 @@
                     <field name="working_system_id" attrs="{'invisible': [('working_system_id', '=', False)]}" />
                     <field name="working_cg_module_id" attrs="{'invisible': [('working_cg_module_id', '=', False)]}" />
                     <field name="working_cg_writer_id" attrs="{'invisible': [('working_cg_writer_id', '=', False)]}" />
-                    <button
-                        name="action_git_commit"
-                        string="Git commit module"
-                        type="object"
-                        class="oe_highlight"
-                        attrs="{'invisible': [('plan_cg_id', '=', False)]}"
-                    />
-                    <button
-                        name="action_git_meld"
-                        string="Git meld module"
-                        type="object"
-                        class="oe_highlight"
-                        attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
-                    />
-                    <button
-                        name="action_git_clean"
-                        string="Git clean module"
-                        type="object"
-                        class="oe_highlight"
-                        attrs="{'invisible': ['|',('plan_cg_id', '=', False),('is_remote_cg', '=', False)]}"
-                    />
                 </group>
             </xpath>
         </field>

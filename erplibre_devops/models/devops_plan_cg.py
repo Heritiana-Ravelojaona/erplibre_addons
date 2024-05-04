@@ -495,12 +495,12 @@ class DevopsPlanCg(models.Model):
                         if model_conf:
                             dct_new_project["config"] = model_conf
                             # extra_arg = f" --config '{model_conf}'"
-                        if rec.devops_cg_model_to_remove_ids:
+                        model_to_remove_ids = rec.devops_cg_model_ids.filtered(
+                            lambda r: r.is_to_remove
+                        )
+                        if model_to_remove_ids:
                             dct_new_project["model_to_remove"] = ";".join(
-                                [
-                                    a.name
-                                    for a in rec.devops_cg_model_to_remove_ids
-                                ]
+                                [a.name for a in model_to_remove_ids]
                             )
                         if rec.use_external_cg:
                             new_project_id = self.env[
@@ -595,7 +595,11 @@ class DevopsPlanCg(models.Model):
                 ]
             else:
                 lst_portal_model = []
-            for model_model_id in rec.devops_cg_model_ids:
+            # TODO reorder the model from dependency inter model, ignore one2many
+            model_ids = rec.devops_cg_model_ids.filtered(
+                lambda r: not r.is_to_remove
+            )
+            for model_model_id in model_ids:
                 lst_depend_model = None
                 if (
                     lst_portal_model
@@ -1245,7 +1249,15 @@ class DevopsPlanCg(models.Model):
                     "help": field_id.help,
                     "type": field_id.type,
                 }
-                if field_id.type in [
+                # ignore_field_relation = bool(field_id.related_manual or field_id.related_field_id)
+                ignore_field_relation = bool(field_id.related_manual)
+                if ignore_field_relation:
+                    if field_id.related_manual:
+                        dct_value_field["related"] = field_id.related_manual
+                    # else:
+                    #     # TODO support related field id
+                    #     dct_value_field["related"] = field_id.related_manual
+                if not ignore_field_relation and field_id.type in [
                     "many2one",
                     "many2many",
                     "one2many",
@@ -1263,7 +1275,7 @@ class DevopsPlanCg(models.Model):
                             f" '{field_id.type}'"
                         )
                         raise exceptions.Warning(msg_err)
-                if field_id.type in [
+                if not ignore_field_relation and field_id.type in [
                     "one2many",
                 ]:
                     dct_value_field["relation_field"] = (

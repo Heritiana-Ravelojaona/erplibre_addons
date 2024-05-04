@@ -6,10 +6,16 @@
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
                     <group>
                         <group>
-                            <field name="name" />
                             <field name="type" />
+                            <field name="string" />
                             <field
                                 name="relation"
                                 attrs="{'invisible': [('type', 'not in', ['many2one', 'many2many', 'one2many'])]}"
@@ -23,13 +29,22 @@
                                 name="field_relation_manual"
                                 attrs="{'invisible': ['|', ('type', 'not in', ['one2many']), ('field_relation', '!=', False)]}"
                             />
+                            <field name="relation_ref" attrs="{'invisible': [('type', 'not in', ['many2many'])]}" />
+                            <field name="related_manual" />
+                            <!--                            <field name="related_field_id" />-->
                             <field name="help" />
                         </group>
                     </group>
                     <group>
                         <field name="model_id" />
-                        <field name="devops_workspace_ids" />
                     </group>
+                    <notebook>
+                        <page string="Workspace">
+                            <group>
+                                <field name="devops_workspace_ids" />
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
@@ -131,7 +146,6 @@
                 <field name="field_relation" />
                 <field name="field_relation_manual" />
                 <field name="help" />
-                <field name="devops_workspace_ids" widget="many2many_tags" />
             </tree>
         </field>
     </record>

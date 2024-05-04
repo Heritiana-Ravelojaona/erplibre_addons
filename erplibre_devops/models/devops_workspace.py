@@ -1264,12 +1264,14 @@ class DevopsWorkspace(models.Model):
 
                 line_number = int(lst_tb[1][5:])
                 method_name = None
-                keyword = lst_tb[2]
-                if keyword.startswith("in "):
+                tb_info = lst_tb[2]
+                keyword = ""
+                if tb_info.startswith("in "):
                     # in MethodName, remove it for keyword
-                    lst_keyword = keyword.split("\n", 1)
+                    lst_keyword = tb_info.split("\n", 1)
                     method_name = lst_keyword[0][3:]
-                    keyword = lst_keyword[1].strip()
+                    if len(lst_keyword) > 1:
+                        keyword = lst_keyword[1].strip()
                 bp_value = {
                     "name": "breakpoint_exec",
                     "description": (

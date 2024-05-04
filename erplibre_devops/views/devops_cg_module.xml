@@ -6,18 +6,27 @@
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
-                    <group>
-                        <field name="name" />
-                    </group>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
                     <group>
                         <field name="code_generator" />
                     </group>
-                    <group>
-                        <field name="model_ids" />
-                    </group>
-                    <group>
-                        <field name="devops_workspace_ids" />
-                    </group>
+                    <notebook>
+                        <page string="Workspace">
+                            <group>
+                                <field name="devops_workspace_ids" />
+                            </group>
+                        </page>
+                        <page string="Model">
+                            <group>
+                                <field name="model_ids" />
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>

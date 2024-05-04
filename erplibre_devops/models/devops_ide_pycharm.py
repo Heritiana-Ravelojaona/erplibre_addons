@@ -400,6 +400,45 @@ class DevopsIdePycharm(models.Model):
                         f"Unknown add_configuration mode {conf_add_mode}"
                     )
 
+    def add_script_python_configuration(
+        self,
+        cmd,
+        args="",
+    ):
+        for rec in self:
+            with self.devops_workspace.devops_create_exec_bundle(
+                "PyCharm add script python configuration"
+            ) as rec_ws:
+                rec = rec.with_context(rec_ws._context)
+                file_content_before = rec_ws.os_read_file(
+                    "conf/pycharm_default_configuration.csv"
+                )
+                conf_add_conf_name = f"debug_{uuid.uuid4().hex[:8]}"
+                group = "custom_script"
+                default = True
+                if args:
+                    build_args = args.replace(",", "\,")
+                    cmd = f"{cmd},{build_args}"
+                line_to_add = f"\n{conf_add_conf_name},{cmd},{group},{default}"
+
+                v = {
+                    "name": conf_add_conf_name,
+                    "command": cmd,
+                    "group": group,
+                    "is_default": default,
+                    "devops_workspace_id": rec_ws.id,
+                    "devops_ide_pycharm": rec.id,
+                }
+                self.env["devops.ide.pycharm.configuration"].create(v)
+
+                if line_to_add not in file_content_before:
+                    new_content = file_content_before + line_to_add
+                    rec_ws.os_write_file(
+                        "conf/pycharm_default_configuration.csv", new_content
+                    )
+
+                rec.action_pycharm_conf_init()
+
     @api.model
     def add_breakpoint(
         self, file_path, line, condition=None, minus_1_line=False

@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import time
@@ -104,7 +105,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             ("addons/ERPLibre_erplibre_addons", "ERPLibre addons"),
             ("addons/TechnoLibre_odoo-code-generator", "Code generator"),
         ],
-        default="#",
+        default="addons/addons",
         required=True,
         help="Suggestion relative path",
     )
@@ -198,6 +199,10 @@ class DevopsPlanActionWizard(models.TransientModel):
 
     # TODO compute it, detect when it's remote, when cg path is different working path
     is_remote_cg = fields.Boolean(
+        help="When it's remote, need tool to copy code with the developers."
+    )
+
+    is_cg_temporary = fields.Boolean(
         help="When it's remote, need tool to copy code with the developers."
     )
 
@@ -678,6 +683,7 @@ class DevopsPlanActionWizard(models.TransientModel):
             self.use_external_cg = True
             self.config_uca_enable_export_data = False
             self.use_existing_meta_module = True
+            self.is_cg_temporary = True
             self.set_mode_edit_module()
             self.action_code_module_autocomplete_module_path()
         return self.state_goto_code_module()
@@ -940,6 +946,15 @@ class DevopsPlanActionWizard(models.TransientModel):
             # # finally
             # self.state = "final"
 
+    def action_purge_metadata(self):
+        with self.root_workspace_id.devops_create_exec_bundle(
+            "Code Module - purge metadata"
+        ) as wp_id:
+            self.env["devops.cg.module"].search([]).unlink()
+            self.env["devops.cg.model"].search([]).unlink()
+            self.env["devops.cg.field"].search([]).unlink()
+        return self._reopen_self()
+
     def action_code_module_autocomplete_module_path(self):
         with self.root_workspace_id.devops_create_exec_bundle(
             "Code Module - auto-complete module path"
@@ -996,15 +1011,183 @@ class DevopsPlanActionWizard(models.TransientModel):
             else:
                 self.working_module_path = relative_path_module
             self.set_mode_edit_module()
+            exec_id = wp_id.execute(
+                cmd=(
+                    "./script/code_generator/search_class_model.py -d"
+                    f" {relative_path_module}/{module_name} --json"
+                    " --with_inherit"
+                ),
+                run_into_workspace=True,
+                error_on_status=False,
+            )
+            str_dct_model = exec_id.log_all.strip()
+            if exec_id.exec_status != 0:
+                _logger.error("TODO i crash and forgot to raise an error!")
+            else:
+                # The file need to finish by }, or cut it and remove output execution
+                last_pos_char = str_dct_model.rfind("}")
+                if last_pos_char == -1:
+                    _logger.error(
+                        "Cannot detect JSON dict when searching class model."
+                    )
+                    # TODO You can stop execution here, but let crash later
+                    str_dct_model_complete = str_dct_model
+                    lst_logs_model = []
+                else:
+                    str_dct_model_complete = str_dct_model[: last_pos_char + 1]
+                    lst_logs_model = (
+                        str_dct_model[last_pos_char + 1 :].strip().split("\n")
+                    )
+                    # TODO show this log to action view
+                    _logger.warning("\n".join(lst_logs_model))
+                # Create cg.model
+                dct_model = json.loads(str_dct_model_complete)
+                dct_model_cg = {}
+                dct_model_cg_depend = {}
+                lst_model_to_add = []
+                lst_model_field = []
+                for model_name, v in dct_model.items():
+                    model_id = self.env["devops.cg.model"].search(
+                        [("name", "=", model_name)]
+                    )
+                    if not model_id:
+                        model_value = {
+                            "name": model_name,
+                            "is_inherit": v.get("is_inherit", False),
+                        }
+                        model_id = self.env["devops.cg.model"].create(
+                            model_value
+                        )
+                    lst_model_to_add.append(model_id.id)
+                    lst_model_field.append((model_id, v))
+                    dct_model_cg[model_name] = model_id
+                    dct_model_cg_depend[model_name] = []
+                # Create cg.field
+                for model_id, v in lst_model_field:
+                    if "fields" in v.keys():
+                        # This algorithm only works when the module is working and formatted
+                        for dct_field in v.get("fields").values():
+                            ttype = dct_field.get("type").lower()
+                            field_name = dct_field.get("name")
+                            value_value = {
+                                "name": field_name,
+                                "type": ttype,
+                                "model_id": model_id.id,
+                            }
+                            model_name = model_id.name
+                            # Check if exist
+                            field_id = self.env["devops.cg.field"].search(
+                                [
+                                    ("name", "=", field_name),
+                                    ("model_id", "=", model_id.id),
+                                ]
+                            )
+                            if field_id:
+                                continue
+                            if "comodel_name" in dct_field.keys():
+                                comodel_name = dct_field.get("comodel_name")
+                                model_id_searched = dct_model_cg.get(
+                                    comodel_name
+                                )
+                                if model_id_searched:
+                                    value_value[
+                                        "relation"
+                                    ] = model_id_searched.id
+                                    if (
+                                        model_id_searched.id
+                                        not in dct_model_cg_depend[model_name]
+                                        and ttype not in ["one2many"]
+                                        and model_id_searched.id != model_id.id
+                                    ):
+                                        # Ignore one2many and depend on itself
+                                        # Keep cache on depend model
+                                        dct_model_cg_depend[model_name].append(
+                                            model_id_searched.id
+                                        )
+                                else:
+                                    value_value[
+                                        "relation_manual"
+                                    ] = comodel_name
+                                if "inverse_name" in dct_field.keys():
+                                    inverse_name = dct_field.get(
+                                        "inverse_name"
+                                    )
+                                    # TODO detect field_relation, need to reorder the field model
+                                    value_value[
+                                        "field_relation_manual"
+                                    ] = inverse_name
+                                if "relation" in dct_field.keys():
+                                    relation_ref = dct_field.get("relation")
+                                    value_value["relation_ref"] = relation_ref
+                            if "help" in dct_field.keys():
+                                value_value["help"] = dct_field.get("help")
+                            if "string" in dct_field.keys():
+                                value_value["string"] = dct_field.get("string")
+                            if "related" in dct_field.keys():
+                                value_value["related_manual"] = dct_field.get(
+                                    "related"
+                                )
+
+                            field_id = self.env["devops.cg.field"].create(
+                                value_value
+                            )
+
+                self.model_ids = [(6, 0, lst_model_to_add)]
+                # reorder from dependency
+                # TODO reorder from dependency list, change sequence
+                lst_model_delete = []
+                sequence_no = 10
+                max_loop = 1000
+                i = 0
+                lst_id_model_order = []
+                has_change = True
+                while i < max_loop and dct_model_cg_depend and has_change:
+                    i += 1
+                    has_change = False
+                    for model_name, lst_depend in dct_model_cg_depend.items():
+                        model_id = dct_model_cg.get(model_name)
+                        if not lst_depend:
+                            model_id.sequence = sequence_no
+                            sequence_no += 1
+                            lst_model_delete.append(model_name)
+                            lst_id_model_order.append(model_id.id)
+                            has_change = True
+                        else:
+                            # delete dependency from lst_model_order
+                            lst_diff = list(
+                                set(lst_id_model_order).intersection(
+                                    set(lst_depend)
+                                )
+                            )
+                            if lst_diff:
+                                for i_diff in lst_diff:
+                                    lst_depend.remove(i_diff)
+                                    has_change = True
+
+                    for model_to_delete in lst_model_delete:
+                        del dct_model_cg_depend[model_to_delete]
+                    lst_model_delete = []
+                if dct_model_cg_depend:
+                    _logger.error(
+                        "Cannot reorder dependency of models, debug:"
+                        f" {dct_model_cg_depend}"
+                    )
+                    for model_name, lst_depend in dct_model_cg_depend.items():
+                        model_id = dct_model_cg.get(model_name)
+                        model_id.sequence = sequence_no
+                        sequence_no += 1
+
         return self._reopen_self()
 
     def set_mode_new_module(self):
         self.is_new_module = True
         self.mode_view_generator = "new_view"
+        self.config_uca_enable_export_data = False
 
     def set_mode_edit_module(self):
         self.is_new_module = False
         self.mode_view_generator = "same_view"
+        self.config_uca_enable_export_data = True
 
     def generate_new_model(
         self,
@@ -1099,9 +1282,6 @@ class DevopsPlanActionWizard(models.TransientModel):
             "devops_cg_ids": [(6, 0, cg_id.ids)],
             "devops_cg_module_ids": [(6, 0, cg_module_id.ids)],
             "devops_cg_model_ids": [(6, 0, self.model_ids.ids)],
-            "devops_cg_model_to_remove_ids": [
-                (6, 0, self.model_to_remove_ids.ids)
-            ],
             "devops_cg_field_ids": [(6, 0, lst_field_id)],
             "stop_execution_if_env_not_clean": not self.force_generate,
             "use_external_cg": self.use_external_cg,
@@ -1164,6 +1344,12 @@ class DevopsPlanActionWizard(models.TransientModel):
             plan_cg_value["code_generator_name"] = self.code_generator_name
         if self.template_name:
             plan_cg_value["template_name"] = self.template_name
+        # Before generate, clean if necessary
+        cg_module_id = self.env["code.generator.module"].search(
+            [("name", "=", module_name)]
+        )
+        if cg_module_id:
+            cg_module_id.unlink()
         # Generate
         plan_cg_id = self.env["devops.plan.cg"].create(plan_cg_value)
         plan_cg_id.action_code_generator_generate_all()
@@ -1190,9 +1376,10 @@ class DevopsPlanActionWizard(models.TransientModel):
                 f"{module_name}/security/ir.model.access.csv",
                 f"{module_name}/views/menu.xml",
             ]
-            if self.model_ids:
+            model_ids = self.model_ids.filtered(lambda r: not r.is_to_remove)
+            if model_ids:
                 lst_default_file.append(f"{module_name}/models/__init__.py")
-                for cg_model_id in self.model_ids:
+                for cg_model_id in model_ids:
                     model_file_name = cg_model_id.name.replace(".", "_")
                     lst_default_file.append(
                         f"{module_name}/models/{model_file_name}.py"
@@ -1203,8 +1390,9 @@ class DevopsPlanActionWizard(models.TransientModel):
         cmd_git_add = ";".join([f"git add '{a}'" for a in lst_default_file])
         # Git remove
         lst_default_file_rm = []
-        if self.model_to_remove_ids:
-            for cg_model_id in self.model_to_remove_ids:
+        model_to_remove_ids = self.model_ids.filtered(lambda r: r.is_to_remove)
+        if model_to_remove_ids:
+            for cg_model_id in model_to_remove_ids:
                 model_file_name = cg_model_id.name.replace(".", "_")
                 lst_default_file_rm.append(
                     f"{module_name}/models/{model_file_name}.py"
@@ -1213,14 +1401,7 @@ class DevopsPlanActionWizard(models.TransientModel):
                     f"{module_name}/views/{model_file_name}.xml"
                 )
         cmd_git_rm = ";".join([f"git rm '{a}'" for a in lst_default_file_rm])
-        if cmd_git_add and cmd_git_rm:
-            cmd_git = f"{cmd_git_add};{cmd_git_rm}"
-        elif cmd_git_add:
-            cmd_git = cmd_git_add
-        elif cmd_git_rm:
-            cmd_git = cmd_git_rm
-        else:
-            cmd_git = ""
+        cmd_git = ";".join([cmd_git_add, cmd_git_rm])
         if cmd_git:
             wp_id.execute(
                 cmd=cmd_git,
