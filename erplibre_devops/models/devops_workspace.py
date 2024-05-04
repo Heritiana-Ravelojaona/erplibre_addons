@@ -64,6 +64,7 @@ class DevopsWorkspace(models.Model):
     instance_exec_external_project_ids = fields.One2many(
         comodel_name="devops.instance.exec",
         inverse_name="workspace_id",
+        string="Instance Exec External Project",
     )
 
     devops_code_todo_count = fields.Integer(

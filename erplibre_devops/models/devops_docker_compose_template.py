@@ -19,8 +19,8 @@ class DevopsDockerComposeTemplate(models.Model):
             ("nextcloud", "Nextcloud"),
             ("localai", "LocalAI"),
         ],
-        default="erplibre",
         required=True,
+        default="erplibre",
         help="Instance list, from project list.",
     )
 
@@ -34,21 +34,20 @@ class DevopsDockerComposeTemplate(models.Model):
             ("gpu_cuda_11", "GPU Cuda 11"),
             ("gpu_cuda_12", "GPU Cuda 12"),
         ],
-        default="no_gpu",
         required=True,
+        default="no_gpu",
         help="Choose a GPU mode.",
     )
 
     port_1 = fields.Integer(
-        string="Port 1",
-        help="Principal port",
         default=8080,
         readonly=False,
+        help="Principal port",
     )
 
-    port_2 = fields.Integer(string="Port 2", help="Second port")
+    port_2 = fields.Integer(help="Second port")
 
-    port_3 = fields.Integer(string="Port 3", help="Third port")
+    port_3 = fields.Integer(help="Third port")
 
     type_ids = fields.Many2many(
         comodel_name="devops.instance.type",
@@ -57,7 +56,10 @@ class DevopsDockerComposeTemplate(models.Model):
 
     is_generic_template = fields.Boolean()
 
-    yaml = fields.Text(compute="_compute_yaml", store=True)
+    yaml = fields.Text(
+        compute="_compute_yaml",
+        store=True,
+    )
 
     @api.depends(
         "name",

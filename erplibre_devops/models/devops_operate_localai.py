@@ -13,26 +13,38 @@ class DevopsOperateLocalai(models.Model):
 
     name = fields.Char(track_visibility="onchange")
 
-    last_result = fields.Text(readonly=True, track_visibility="onchange")
+    last_result = fields.Text(
+        readonly=True,
+        track_visibility="onchange",
+    )
 
     last_result_message = fields.Text(
-        readonly=True, track_visibility="onchange"
+        readonly=True,
+        track_visibility="onchange",
     )
 
-    last_result_url = fields.Char(readonly=True, track_visibility="onchange")
+    last_result_url = fields.Char(
+        readonly=True,
+        track_visibility="onchange",
+    )
 
     instance_exec_id = fields.Many2one(
-        comodel_name="devops.instance.exec", track_visibility="onchange"
+        comodel_name="devops.instance.exec",
+        string="Instance Exec",
+        track_visibility="onchange",
     )
 
-    request_url = fields.Char(required=True, track_visibility="onchange")
+    request_url = fields.Char(
+        required=True,
+        track_visibility="onchange",
+    )
 
     prompt = fields.Text(track_visibility="onchange")
 
     prompt_compute = fields.Text(
+        track_visibility="onchange",
         compute="_compute_prompt_compute",
         store=True,
-        track_visibility="onchange",
     )
 
     feature = fields.Selection(
@@ -40,21 +52,22 @@ class DevopsOperateLocalai(models.Model):
             ("generate_text", "Generate text"),
             ("generate_image", "Generate image"),
         ],
-        default="generate_text",
         required=True,
         track_visibility="onchange",
+        default="generate_text",
     )
 
     model_name_llm = fields.Selection(
-        selection=[
-            ("mistral-openorca", "Mistral OpenOrca"),
-        ],
-        default="mistral-openorca",
+        selection=[("mistral-openorca", "Mistral OpenOrca")],
         required=True,
         track_visibility="onchange",
+        default="mistral-openorca",
     )
 
-    step = fields.Integer(default=10, track_visibility="onchange")
+    step = fields.Integer(
+        track_visibility="onchange",
+        default=10,
+    )
 
     temperature = fields.Float(default=0.1, track_visibility="onchange")
 
@@ -101,9 +114,9 @@ class DevopsOperateLocalai(models.Model):
             ("512x512", "512x512"),
             # ("1024x1024", "1024x1024"),
         ],
-        default="512x512",
         required=True,
         track_visibility="onchange",
+        default="512x512",
     )
 
     cmd = fields.Char(

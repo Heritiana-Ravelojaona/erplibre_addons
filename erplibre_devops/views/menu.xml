@@ -35,9 +35,9 @@
 
     <menuitem id="menu_code_quality" name="Quality" sequence="4" parent="menu_code" />
 
-    <menuitem id="menu_deploy_instance_group" name="Instance" sequence="1" parent="menu_deploy" />
-
     <menuitem id="menu_deploy_docker_group" name="Docker" sequence="2" parent="menu_deploy" />
+
+    <menuitem id="menu_deploy_instance_group" name="Instance" sequence="1" parent="menu_deploy" />
 
     <menuitem id="menu_deploy_vm_group" name="VM" sequence="3" parent="menu_deploy" />
 
@@ -370,8 +370,8 @@
     <menuitem
         id="menu_operate_localai"
         name="LocalAI"
-        sequence="3"
         action="devops_operate_localai_operate_localai_action_window"
+        sequence="3"
         parent="menu_operate"
     />
 

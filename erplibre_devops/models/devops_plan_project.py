@@ -18,24 +18,33 @@ class DevopsPlanProject(models.Model):
     )
 
     society_name = fields.Char(
-        help="Society name", required=True, track_visibility="onchange"
+        required=True,
+        track_visibility="onchange",
+        help="Society name",
     )
 
     temperature = fields.Float(default=0.1, track_visibility="onchange")
 
-    step = fields.Integer(default=20, track_visibility="onchange")
+    step = fields.Integer(
+        track_visibility="onchange",
+        default=20,
+    )
 
     has_requirement_to_install = fields.Boolean()
 
-    gen_nb_aliment = fields.Integer(default=5, track_visibility="onchange")
+    gen_nb_aliment = fields.Integer(
+        track_visibility="onchange",
+        default=5,
+    )
 
     type_context = fields.Char(
-        help="Will generate about this type context",
         track_visibility="onchange",
+        help="Will generate about this type context",
     )
 
     website_max_number_one_pager = fields.Integer(
-        default=10, track_visibility="onchange"
+        track_visibility="onchange",
+        default=10,
     )
 
     project_type = fields.Selection(
@@ -47,39 +56,42 @@ class DevopsPlanProject(models.Model):
             ("website_one_pager_sante", "Website one pager Santé"),
             ("website_one_pager_magasin", "Website one pager Magasin"),
         ],
-        default="website_one_pager_alimentation",
         required=True,
-        help="Will use DevOps tools to create this project type.",
         track_visibility="onchange",
+        default="website_one_pager_alimentation",
+        help="Will use DevOps tools to create this project type.",
     )
 
     has_aliment = fields.Boolean(
-        compute="_compute_has_aliment", store=True, track_visibility="onchange"
+        track_visibility="onchange",
+        compute="_compute_has_aliment",
+        store=True,
     )
 
     result_list_aliment_count = fields.Integer(
-        compute="_compute_result_list_aliment_count",
-        help="Will count the aliment from question question_list_aliment",
-        store=True,
         track_visibility="onchange",
+        compute="_compute_result_list_aliment_count",
+        store=True,
+        help="Will count the aliment from question question_list_aliment",
     )
 
     result_list_aliment_image = fields.Text(
-        help="A URL link to an image per line", track_visibility="onchange"
+        track_visibility="onchange",
+        help="A URL link to an image per line",
     )
 
     question_list_aliment_image = fields.Text(
+        track_visibility="onchange",
         help=(
             "The question for result_list_aliment_image, auto-generate from"
             " question_list_aliment when execute."
         ),
-        track_visibility="onchange",
     )
 
     advance_aliment_template_repas_image = fields.Char(
         default=(
-            "Gros plan d'un magnifique plat de «%s» d'une"
-            " beauté extrême décrit comme «%s»"
+            "Gros plan d'un magnifique plat de «%s» d'une beauté extrême"
+            " décrit comme «%s»"
         ),
         help=(
             "Need 2 argument, will be aliment name and aliment description max"
@@ -98,31 +110,37 @@ class DevopsPlanProject(models.Model):
             ("entreprise", "Entreprise"),
             ("société à but non lucratif", "OBNL"),
         ],
-        default="projet",
         required=True,
         track_visibility="onchange",
+        default="projet",
     )
 
     question_one_pager_introduction = fields.Text(
-        compute="_compute_question", track_visibility="onchange"
+        track_visibility="onchange",
+        compute="_compute_question",
+        store=True,
     )
 
     question_list_aliment = fields.Text(
-        compute="_compute_question", track_visibility="onchange"
+        track_visibility="onchange",
+        compute="_compute_question",
+        store=True,
     )
 
     result_list_aliment = fields.Text(
+        track_visibility="onchange",
         help=(
             "List of aliment, by csv, separate by ;. Use header : name,"
             " description"
         ),
-        track_visibility="onchange",
     )
 
     result_one_pager_introduction = fields.Text(track_visibility="onchange")
 
     question_one_pager_background_introduction = fields.Text(
-        compute="_compute_question", track_visibility="onchange"
+        track_visibility="onchange",
+        compute="_compute_question",
+        store=True,
     )
 
     result_one_pager_background_introduction = fields.Char(
@@ -130,11 +148,15 @@ class DevopsPlanProject(models.Model):
     )
 
     instance_exec_text_id = fields.Many2one(
-        comodel_name="devops.instance.exec", track_visibility="onchange"
+        comodel_name="devops.instance.exec",
+        string="Instance Exec Text",
+        track_visibility="onchange",
     )
 
     instance_exec_image_id = fields.Many2one(
-        comodel_name="devops.instance.exec", track_visibility="onchange"
+        comodel_name="devops.instance.exec",
+        string="Instance Exec Image",
+        track_visibility="onchange",
     )
 
     @api.multi

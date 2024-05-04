@@ -129,13 +129,7 @@ class DevopsSystem(models.Model):
 
     use_search_cmd = fields.Selection(
         # TODO support mdfind for OSX
-        selection=[
-            (
-                "locate",
-                "locate",
-            ),
-            ("find", "find"),
-        ],
+        selection=[("locate", "locate"), ("find", "find")],
         default=lambda self: self.env["ir.config_parameter"]
         .sudo()
         .get_param("erplibre_devops.default_search_engine", False),

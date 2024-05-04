@@ -5,7 +5,10 @@ class DevopsInstanceExec(models.Model):
     _name = "devops.instance.exec"
     _description = "devops_instance_exec"
 
-    name = fields.Char(compute="_compute_name", store=True)
+    name = fields.Char(
+        compute="_compute_name",
+        store=True,
+    )
 
     instance_name = fields.Char(help="Optional")
 
