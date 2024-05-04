@@ -1,9 +1,9 @@
 from odoo import _, api, fields, models
 
 
-class DevopsDeployDockerVolume(models.Model):
-    _name = "devops.deploy.docker.volume"
-    _description = "devops_deploy_docker_volume"
+class DevopsDockerVolume(models.Model):
+    _name = "devops.docker.volume"
+    _description = "devops_docker_volume"
 
     name = fields.Char(readonly=True)
 
@@ -22,7 +22,7 @@ class DevopsDeployDockerVolume(models.Model):
     driver = fields.Char(readonly=True)
 
     compose_id = fields.Many2one(
-        comodel_name="devops.deploy.docker.compose",
+        comodel_name="devops.docker.compose",
         string="Compose",
         readonly=True,
     )

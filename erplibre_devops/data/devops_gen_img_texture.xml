@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="devops_gen_img_texture_01" model="devops.gen.img.texture">
+            <field name="name">doux</field>
+        </record>
+        <record id="devops_gen_img_texture_02" model="devops.gen.img.texture">
+            <field name="name">granuleux</field>
+        </record>
+        <record id="devops_gen_img_texture_03" model="devops.gen.img.texture">
+            <field name="name">onduleux</field>
+        </record>
+        <record id="devops_gen_img_texture_04" model="devops.gen.img.texture">
+            <field name="name">comme du verre</field>
+        </record>
+        <record id="devops_gen_img_texture_05" model="devops.gen.img.texture">
+            <field name="name">carrelé</field>
+        </record>
+        <record id="devops_gen_img_texture_06" model="devops.gen.img.texture">
+            <field name="name">peinture à l'huile</field>
+        </record>
+        <record id="devops_gen_img_texture_07" model="devops.gen.img.texture">
+            <field name="name">peinture dégoulinante</field>
+        </record>
+        <record id="devops_gen_img_texture_08" model="devops.gen.img.texture">
+            <field name="name">lisse</field>
+        </record>
+        <record id="devops_gen_img_texture_09" model="devops.gen.img.texture">
+            <field name="name">rugueuse</field>
+        </record>
+        <record id="devops_gen_img_texture_10" model="devops.gen.img.texture">
+            <field name="name">velouté</field>
+        </record>
+        <record id="devops_gen_img_texture_11" model="devops.gen.img.texture">
+            <field name="name">côtelée</field>
+        </record>
+        <record id="devops_gen_img_texture_12" model="devops.gen.img.texture">
+            <field name="name">fibreuse</field>
+        </record>
+        <record id="devops_gen_img_texture_13" model="devops.gen.img.texture">
+            <field name="name">écaillée</field>
+        </record>
+        <record id="devops_gen_img_texture_14" model="devops.gen.img.texture">
+            <field name="name">métallique</field>
+        </record>
+    </data>
+</odoo>

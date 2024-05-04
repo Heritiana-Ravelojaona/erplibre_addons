@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="devops_plan_project_view_form" model="ir.ui.view">
+        <field name="name">devops_plan_project_form</field>
+        <field name="model">devops.plan.project</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <header>
+                    <button
+                        name="install_requirement"
+                        string="Install requirement"
+                        type="object"
+                        class="btn-danger"
+                        attrs="{'invisible': [('has_requirement_to_install', '=', False)]}"
+                    />
+                    <button name="execute" string="Execute" type="object" class="btn-success" />
+                    <button name="clear_result" string="Clear result" type="object" class="btn-warning" />
+                </header>
+                <sheet>
+                    <field name="has_aliment" invisible="True" />
+                    <field name="has_requirement_to_install" invisible="True" />
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Information">
+                            <field name="society_name" />
+                            <field name="project_type" />
+                            <field name="society_type" />
+                            <field name="type_context" />
+                        </group>
+                        <group string="Configuration">
+                            <field name="temperature" />
+                            <field name="gen_nb_aliment" attrs="{'invisible': [('has_aliment', '=', False)]}" />
+                            <field name="step" />
+                            <field name="website_max_number_one_pager" string="Mots maximum" />
+                        </group>
+                        <group string="Instance">
+                            <field name="instance_exec_text_id" string="Text generator" />
+                            <field name="instance_exec_image_id" string="Image generator" />
+                        </group>
+                        <group string="Advance conf">
+                            <field
+                                name="advance_aliment_template_repas_image"
+                                string="Template repas image"
+                                attrs="{'invisible': [('has_aliment', '=', False)]}"
+                            />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Question">
+                            <group>
+                                <field name="question_one_pager_introduction" string="Q. Text introduction" />
+                                <field name="result_one_pager_introduction" string="R. Text introduction" />
+                                <field
+                                    name="question_one_pager_background_introduction"
+                                    string="Q. Background image introduction"
+                                />
+                                <field
+                                    name="result_one_pager_background_introduction"
+                                    string="R. Background image introduction"
+                                    widget="url"
+                                />
+                                <field
+                                    name="question_list_aliment"
+                                    string="Q. Liste aliment"
+                                    attrs="{'invisible': [('has_aliment', '=', False)]}"
+                                />
+                                <field
+                                    name="result_list_aliment"
+                                    string="R. Liste aliment"
+                                    attrs="{'invisible': [('has_aliment', '=', False)]}"
+                                />
+                                <field
+                                    name="result_list_aliment_count"
+                                    string="CS. Aliment count"
+                                    attrs="{'invisible': [('has_aliment', '=', False)]}"
+                                />
+                                <field
+                                    name="question_list_aliment_image"
+                                    string="CQ. Aliment image"
+                                    attrs="{'invisible': [('has_aliment', '=', False)]}"
+                                />
+                                <field
+                                    name="result_list_aliment_image"
+                                    string="R. Aliment image"
+                                    attrs="{'invisible': [('has_aliment', '=', False)]}"
+                                />
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" options="{'post_refresh': 'recipients'}" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="devops_plan_project_view_graph" model="ir.ui.view">
+        <field name="name">devops_plan_project_graph</field>
+        <field name="model">devops.plan.project</field>
+        <field name="arch" type="xml">
+            <graph string="Devops plan project">
+                <field name="name" type="row" />
+                <field name="project_type" type="row" />
+                <field name="type_context" type="row" />
+                <field name="website_max_number_one_pager" type="measure" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="devops_plan_project_view_kanban" model="ir.ui.view">
+        <field name="name">devops_plan_project_kanban</field>
+        <field name="model">devops.plan.project</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <field name="project_type" />
+                <field name="type_context" />
+                <field name="website_max_number_one_pager" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="project_type" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="type_context" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="website_max_number_one_pager" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="devops_plan_project_view_pivot" model="ir.ui.view">
+        <field name="name">devops_plan_project_pivot</field>
+        <field name="model">devops.plan.project</field>
+        <field name="arch" type="xml">
+            <pivot string="Devops plan project">
+                <field name="name" type="row" />
+                <field name="project_type" type="row" />
+                <field name="type_context" type="row" />
+                <field name="website_max_number_one_pager" type="measure" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="devops_plan_project_view_search" model="ir.ui.view">
+        <field name="name">devops_plan_project_search</field>
+        <field name="model">devops.plan.project</field>
+        <field name="arch" type="xml">
+            <search string="Devops plan project">
+                <filter domain="[('name','!=',False)]" name="name" string="Name" />
+                <filter domain="[('project_type','!=',False)]" name="project_type" string="Project Type" />
+                <filter domain="[('type_context','!=',False)]" name="type_context" string="Type Repas Restaurant" />
+                <filter
+                    domain="[('website_max_number_one_pager','!=',False)]"
+                    name="website_max_number_one_pager"
+                    string="Website Max Number One Pager"
+                />
+            </search>
+        </field>
+    </record>
+
+    <record id="devops_plan_project_view_tree" model="ir.ui.view">
+        <field name="name">devops_plan_project_tree</field>
+        <field name="model">devops.plan.project</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="project_type" />
+                <field name="type_context" />
+                <field name="website_max_number_one_pager" />
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+
+    <act_window
+        id="devops_plan_project_plan_project_action_window"
+        name="Plan project"
+        res_model="devops.plan.project"
+        view_mode="kanban,tree,pivot,graph,form"
+    />
+</odoo>

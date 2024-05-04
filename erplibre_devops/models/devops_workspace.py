@@ -61,6 +61,12 @@ class DevopsWorkspace(models.Model):
         string="Code TODO",
     )
 
+    instance_exec_external_project_ids = fields.One2many(
+        comodel_name="devops.instance.exec",
+        inverse_name="workspace_id",
+        string="Instance Exec External Project",
+    )
+
     devops_code_todo_count = fields.Integer(
         string="Test code TODO count",
         compute="_compute_devops_code_todo_count",
@@ -165,8 +171,8 @@ class DevopsWorkspace(models.Model):
         help="The automated robot to manage ERPLibre.",
     )
 
-    deploy_docker_compose_id = fields.Many2one(
-        comodel_name="devops.deploy.docker.compose",
+    docker_compose_id = fields.Many2one(
+        comodel_name="devops.docker.compose",
         string="Docker composite",
     )
 
@@ -356,9 +362,9 @@ class DevopsWorkspace(models.Model):
     @api.multi
     @api.depends(
         "workspace_docker_id",
-        "deploy_docker_compose_id",
-        "deploy_docker_compose_id.active",
-        "deploy_docker_compose_id.is_running",
+        "docker_compose_id",
+        "docker_compose_id.active",
+        "docker_compose_id.is_running",
         "is_running_with_process",
         "is_me",
     )
@@ -369,9 +375,9 @@ class DevopsWorkspace(models.Model):
                 # TODO seems duplicate docker status
                 is_running = rec.workspace_docker_id.docker_is_running
             if (
-                rec.deploy_docker_compose_id
-                and rec.deploy_docker_compose_id.active
-                and rec.deploy_docker_compose_id.is_running
+                rec.docker_compose_id
+                and rec.docker_compose_id.active
+                and rec.docker_compose_id.is_running
             ):
                 is_running = True
             if rec.is_me:
@@ -648,6 +654,19 @@ class DevopsWorkspace(models.Model):
                         "Support other mode_exec to detect is_running"
                         f" '{rec.mode_exec}'"
                     )
+                # Show external project associate to this workspace
+                exec_id = rec.execute(
+                    cmd=f"ls {rec.folder}/.venv/project", error_on_status=False
+                )
+                if exec_id.exec_status == 0:
+                    lst_dir = exec_id.log_all.split()
+                    for dir_name in lst_dir:
+                        # TODO fill more information, detect what is inside
+                        value = {
+                            "instance_name": dir_name,
+                            "workspace_id": rec.id,
+                        }
+                        self.env["devops.instance.exec"].create(value)
 
     @api.multi
     def action_install_me_workspace(self):
@@ -662,6 +681,7 @@ class DevopsWorkspace(models.Model):
                     cmd=f"ls {rec.folder}/.git", error_on_status=False
                 )
                 status_ls = exec_id.log_all
+                # TODO check status instead of no such file, french broke this
                 if "No such file or directory" not in status_ls:
                     rec.erplibre_mode = self.env.ref(
                         "erplibre_devops.erplibre_mode_git_robot_libre"

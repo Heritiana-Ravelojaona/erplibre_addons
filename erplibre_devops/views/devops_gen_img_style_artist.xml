@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="devops_gen_img_style_artist_view_form" model="ir.ui.view">
+        <field name="name">devops_gen_img_style_artist_form</field>
+        <field name="model">devops.gen.img.style_artist</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                        <field name="description" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="devops_gen_img_style_artist_view_graph" model="ir.ui.view">
+        <field name="name">devops_gen_img_style_artist_graph</field>
+        <field name="model">devops.gen.img.style_artist</field>
+        <field name="arch" type="xml">
+            <graph string="Devops gen img style artist">
+                <field name="name" type="row" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="devops_gen_img_style_artist_view_kanban" model="ir.ui.view">
+        <field name="name">devops_gen_img_style_artist_kanban</field>
+        <field name="model">devops.gen.img.style_artist</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="devops_gen_img_style_artist_view_pivot" model="ir.ui.view">
+        <field name="name">devops_gen_img_style_artist_pivot</field>
+        <field name="model">devops.gen.img.style_artist</field>
+        <field name="arch" type="xml">
+            <pivot string="Devops gen img style artist">
+                <field name="name" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="devops_gen_img_style_artist_view_search" model="ir.ui.view">
+        <field name="name">devops_gen_img_style_artist_search</field>
+        <field name="model">devops.gen.img.style_artist</field>
+        <field name="arch" type="xml">
+            <search string="Devops gen img style artist">
+                <filter domain="[('name','!=',False)]" name="name" string="Name" />
+            </search>
+        </field>
+    </record>
+
+    <record id="devops_gen_img_style_artist_view_tree" model="ir.ui.view">
+        <field name="name">devops_gen_img_style_artist_tree</field>
+        <field name="model">devops.gen.img.style_artist</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="description" />
+            </tree>
+        </field>
+    </record>
+
+    <act_window
+        id="devops_gen_img_style_artist_gen_img_style_artist_action_window"
+        name="Gen img style artist"
+        res_model="devops.gen.img.style_artist"
+        view_mode="tree,kanban,pivot,graph,form"
+    />
+</odoo>

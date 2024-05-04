@@ -3,10 +3,10 @@ import os
 from odoo import _, api, fields, models
 
 
-class DevopsDeployDockerCompose(models.Model):
-    _name = "devops.deploy.docker.compose"
+class DevopsDockerCompose(models.Model):
+    _name = "devops.docker.compose"
     _inherit = ["mail.activity.mixin", "mail.thread"]
-    _description = "devops_deploy_docker_compose"
+    _description = "devops_docker_compose"
 
     name = fields.Char(readonly=True)
 

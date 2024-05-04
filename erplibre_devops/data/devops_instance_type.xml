@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="devops_instance_type_erp" model="devops.instance.type">
+            <field name="name">ERP</field>
+        </record>
+        <record id="devops_instance_type_gen_text" model="devops.instance.type">
+            <field name="name">Générateur de texte</field>
+        </record>
+        <record id="devops_instance_type_gen_image" model="devops.instance.type">
+            <field name="name">Générateur d'image</field>
+        </record>
+    </data>
+</odoo>

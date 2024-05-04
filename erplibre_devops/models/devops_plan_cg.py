@@ -131,7 +131,7 @@ class DevopsPlanCg(models.Model):
     )
 
     config_uca_enable_export_data = fields.Boolean(
-        default=True,
+        default=False,
         help=(
             "Will enable option nonmenclator in CG to export data associate to"
             " models."

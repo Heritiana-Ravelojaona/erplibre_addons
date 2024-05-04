@@ -319,8 +319,8 @@ volumes:
             result = exec_id.log_all
             # rec.docker_compose_ps = f"\n{result}"
             rec.docker_is_running = bool(result)
-            if rec.workspace_id.deploy_docker_compose_id:
-                rec.workspace_id.deploy_docker_compose_id.is_running = (
+            if rec.workspace_id.docker_compose_id:
+                rec.workspace_id.docker_compose_id.is_running = (
                     rec.docker_is_running
                 )
 

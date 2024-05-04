@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record id="devops_deploy_docker_compose_view_form" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_compose_form</field>
-        <field name="model">devops.deploy.docker.compose</field>
+    <record id="devops_docker_compose_view_form" model="ir.ui.view">
+        <field name="name">devops_docker_compose_form</field>
+        <field name="model">devops.docker.compose</field>
         <field name="arch" type="xml">
             <form string="Titre">
                 <sheet>
@@ -16,7 +16,7 @@
                             <field name="active" widget="boolean_button" />
                         </button>
                         <button
-                            name="%(erplibre_devops.devops_deploy_docker_container_deploy_docker_container_action_window)d"
+                            name="%(erplibre_devops.devops_docker_container_docker_container_action_window)d"
                             string="Docker container"
                             type="action"
                             class="oe_stat_button"
@@ -24,7 +24,7 @@
                             context="{'search_default_compose_id': [active_id]}"
                         />
                         <button
-                            name="%(erplibre_devops.devops_deploy_docker_volume_deploy_docker_volume_action_window)d"
+                            name="%(erplibre_devops.devops_docker_volume_docker_volume_action_window)d"
                             string="Docker volume"
                             type="action"
                             class="oe_stat_button"
@@ -48,11 +48,11 @@
         </field>
     </record>
 
-    <record id="devops_deploy_docker_compose_view_graph" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_compose_graph</field>
-        <field name="model">devops.deploy.docker.compose</field>
+    <record id="devops_docker_compose_view_graph" model="ir.ui.view">
+        <field name="name">devops_docker_compose_graph</field>
+        <field name="model">devops.docker.compose</field>
         <field name="arch" type="xml">
-            <graph string="Devops deploy docker compose">
+            <graph string="Devops docker compose">
                 <field name="name" type="row" />
                 <field name="config_file_path" type="row" />
                 <field name="is_running" type="row" />
@@ -61,9 +61,9 @@
         </field>
     </record>
 
-    <record id="devops_deploy_docker_compose_view_kanban" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_compose_kanban</field>
-        <field name="model">devops.deploy.docker.compose</field>
+    <record id="devops_docker_compose_view_kanban" model="ir.ui.view">
+        <field name="name">devops_docker_compose_kanban</field>
+        <field name="model">devops.docker.compose</field>
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <field name="name" />
@@ -105,11 +105,11 @@
         </field>
     </record>
 
-    <record id="devops_deploy_docker_compose_view_pivot" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_compose_pivot</field>
-        <field name="model">devops.deploy.docker.compose</field>
+    <record id="devops_docker_compose_view_pivot" model="ir.ui.view">
+        <field name="name">devops_docker_compose_pivot</field>
+        <field name="model">devops.docker.compose</field>
         <field name="arch" type="xml">
-            <pivot string="Devops deploy docker compose">
+            <pivot string="Devops docker compose">
                 <field name="name" type="row" />
                 <field name="config_file_path" type="row" />
                 <field name="is_running" type="row" />
@@ -118,11 +118,11 @@
         </field>
     </record>
 
-    <record id="devops_deploy_docker_compose_view_search" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_compose_search</field>
-        <field name="model">devops.deploy.docker.compose</field>
+    <record id="devops_docker_compose_view_search" model="ir.ui.view">
+        <field name="name">devops_docker_compose_search</field>
+        <field name="model">devops.docker.compose</field>
         <field name="arch" type="xml">
-            <search string="Devops deploy docker compose">
+            <search string="Devops docker compose">
                 <field name="name" />
                 <field name="system_id" />
                 <filter name="active" string="Active" domain="[('active','=',True)]" help="Show active" />
@@ -134,9 +134,9 @@
         </field>
     </record>
 
-    <record id="devops_deploy_docker_compose_view_tree" model="ir.ui.view">
-        <field name="name">devops_deploy_docker_compose_tree</field>
-        <field name="model">devops.deploy.docker.compose</field>
+    <record id="devops_docker_compose_view_tree" model="ir.ui.view">
+        <field name="name">devops_docker_compose_tree</field>
+        <field name="model">devops.docker.compose</field>
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
@@ -148,17 +148,17 @@
     </record>
 
     <act_window
-        id="devops_deploy_docker_compose_deploy_docker_compose_group_action_window"
-        name="Deploy docker compose"
-        res_model="devops.deploy.docker.compose"
+        id="devops_docker_compose_docker_compose_group_action_window"
+        name="Docker compose"
+        res_model="devops.docker.compose"
         view_mode="kanban,tree,pivot,graph,form"
         context="{'search_default_group_by_system_id': True}"
     />
 
     <act_window
-        id="devops_deploy_docker_compose_deploy_docker_compose_action_window"
-        name="Deploy docker compose"
-        res_model="devops.deploy.docker.compose"
+        id="devops_docker_compose_docker_compose_action_window"
+        name="Docker compose"
+        res_model="devops.docker.compose"
         view_mode="tree,kanban,pivot,graph,form"
     />
 </odoo>

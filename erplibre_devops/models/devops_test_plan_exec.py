@@ -69,11 +69,13 @@ class DevopsTestPlanExec(models.Model):
     )
 
     exec_start_date = fields.Datetime(
-        string="Execution start date", readonly=True
+        string="Execution start date",
+        readonly=True,
     )
 
     exec_stop_date = fields.Datetime(
-        string="Execution stop date", readonly=True
+        string="Execution stop date",
+        readonly=True,
     )
 
     exec_time_duration = fields.Float(

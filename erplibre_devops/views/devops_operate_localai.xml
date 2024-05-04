@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="devops_operate_localai_view_form" model="ir.ui.view">
+        <field name="name">devops_operate_localai_form</field>
+        <field name="model">devops.operate.localai</field>
+        <field name="arch" type="xml">
+            <form string="Titre">
+                <header>
+                    <button
+                        name="execute_ia"
+                        string="Execute"
+                        type="object"
+                        class="btn-success"
+                        attrs="{'invisible': [('system_id', '=', False)]}"
+                    />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group string="Info">
+                        <field name="system_id" />
+                        <field name="request_url" />
+                        <field name="model_name_llm" />
+                        <field name="feature" />
+                        <field name="instance_exec_id" />
+                    </group>
+                    <group string="Input">
+                        <div>Suggestion : exagéré la beauté ou certains détails avec des mots amplifiés.</div>
+                    </group>
+                    <group>
+                        <field name="prompt" />
+                        <field name="prompt_compute" />
+                        <field name="cmd" />
+                    </group>
+                    <group string="Configuration">
+                        <group string="Text">
+                            <field name="temperature" />
+                        </group>
+                        <group string="Image">
+                            <field name="step" />
+                            <field name="gen_img_size" />
+                            <field name="gen_img_detail_level_id" />
+                            <field name="gen_img_light_ids" widget="many2many_tags" />
+                            <field name="gen_img_style_artist_ids" widget="many2many_tags" />
+                            <field name="gen_img_style_type_ids" widget="many2many_tags" />
+                            <field name="gen_img_texture_ids" widget="many2many_tags" />
+                        </group>
+                    </group>
+                    <group string="Result">
+                        <field name="last_result_message" />
+                        <field name="last_result_url" widget="url" />
+                        <field name="last_result" />
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" options="{'post_refresh': 'recipients'}" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="devops_operate_localai_view_graph" model="ir.ui.view">
+        <field name="name">devops_operate_localai_graph</field>
+        <field name="model">devops.operate.localai</field>
+        <field name="arch" type="xml">
+            <graph string="Devops operate localai">
+                <field name="name" type="row" />
+                <field name="last_result" type="row" />
+                <field name="last_result_url" type="row" />
+                <field name="request_url" type="row" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="devops_operate_localai_view_kanban" model="ir.ui.view">
+        <field name="name">devops_operate_localai_kanban</field>
+        <field name="model">devops.operate.localai</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name" />
+                <field name="last_result" />
+                <field name="last_result_url" />
+                <field name="request_url" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <ul>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="name" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="last_result" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="last_result_url" />
+                                        </strong>
+                                    </li>
+                                    <li class="mb4">
+                                        <strong>
+                                            <field name="request_url" />
+                                        </strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="devops_operate_localai_view_pivot" model="ir.ui.view">
+        <field name="name">devops_operate_localai_pivot</field>
+        <field name="model">devops.operate.localai</field>
+        <field name="arch" type="xml">
+            <pivot string="Devops operate localai">
+                <field name="name" type="row" />
+                <field name="last_result" type="row" />
+                <field name="last_result_url" type="row" />
+                <field name="request_url" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="devops_operate_localai_view_search" model="ir.ui.view">
+        <field name="name">devops_operate_localai_search</field>
+        <field name="model">devops.operate.localai</field>
+        <field name="arch" type="xml">
+            <search string="Devops operate localai">
+                <filter domain="[('name','!=',False)]" name="name" string="Name" />
+                <filter domain="[('last_result','!=',False)]" name="last_result" string="Last Result" />
+                <filter domain="[('last_result_url','!=',False)]" name="last_result_url" string="Last Result Url" />
+                <filter domain="[('request_url','!=',False)]" name="request_url" string="Request Url" />
+            </search>
+        </field>
+    </record>
+
+    <record id="devops_operate_localai_view_tree" model="ir.ui.view">
+        <field name="name">devops_operate_localai_tree</field>
+        <field name="model">devops.operate.localai</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="last_result" />
+                <field name="last_result_url" />
+                <field name="request_url" />
+            </tree>
+        </field>
+    </record>
+
+    <act_window
+        id="devops_operate_localai_operate_localai_action_window"
+        name="Operate localai"
+        res_model="devops.operate.localai"
+        view_mode="tree,kanban,pivot,graph,form"
+    />
+</odoo>

@@ -21,7 +21,9 @@
 
     <menuitem id="menu_devops" name="DevOps" sequence="1" parent="menu_erplibre_devops" />
 
-    <menuitem id="menu_erplibre" name="ERPLibre" sequence="2" parent="menu_erplibre_devops" />
+    <menuitem id="menu_erplibre" name="ERPLibre" sequence="4" parent="menu_config" />
+
+    <menuitem id="menu_gen_image_config" name="Image generator" sequence="5" parent="menu_config" />
 
     <menuitem id="menu_plan" name="Plan" sequence="3" parent="menu_erplibre_devops" />
 
@@ -33,9 +35,11 @@
 
     <menuitem id="menu_code_quality" name="Quality" sequence="4" parent="menu_code" />
 
-    <menuitem id="menu_deploy_docker_group" name="Docker" sequence="1" parent="menu_deploy" />
+    <menuitem id="menu_deploy_docker_group" name="Docker" sequence="2" parent="menu_deploy" />
 
-    <menuitem id="menu_deploy_vm_group" name="VM" sequence="2" parent="menu_deploy" />
+    <menuitem id="menu_deploy_instance_group" name="Instance" sequence="1" parent="menu_deploy" />
+
+    <menuitem id="menu_deploy_vm_group" name="VM" sequence="3" parent="menu_deploy" />
 
     <menuitem id="menu_erplibre_config" name="Config" sequence="2" parent="menu_erplibre" />
 
@@ -152,46 +156,6 @@
     />
 
     <menuitem
-        id="menu_deploy_docker_compose"
-        name="Compose"
-        action="devops_deploy_docker_compose_deploy_docker_compose_group_action_window"
-        sequence="1"
-        parent="menu_deploy_docker_group"
-    />
-
-    <menuitem
-        id="menu_deploy_docker_container"
-        name="Container"
-        action="devops_deploy_docker_container_deploy_docker_container_group_action_window"
-        sequence="2"
-        parent="menu_deploy_docker_group"
-    />
-
-    <menuitem
-        id="menu_deploy_docker_image"
-        name="Image"
-        action="devops_deploy_docker_image_deploy_docker_image_group_action_window"
-        sequence="3"
-        parent="menu_deploy_docker_group"
-    />
-
-    <menuitem
-        id="menu_deploy_docker_network"
-        name="Network"
-        action="devops_deploy_docker_network_deploy_docker_network_group_action_window"
-        sequence="4"
-        parent="menu_deploy_docker_group"
-    />
-
-    <menuitem
-        id="menu_deploy_docker_volume"
-        name="Volume"
-        action="devops_deploy_docker_volume_deploy_docker_volume_group_action_window"
-        sequence="5"
-        parent="menu_deploy_docker_group"
-    />
-
-    <menuitem
         id="menu_deploy_vm"
         name="VM"
         action="devops_deploy_vm_deploy_vm_action_window"
@@ -237,6 +201,110 @@
         action="devops_exec_error_action_window"
         sequence="7"
         parent="menu_process"
+    />
+
+    <menuitem
+        id="menu_instance_type"
+        name="Instance type"
+        action="devops_instance_type_instance_type_action_window"
+        sequence="3"
+        parent="menu_config"
+    />
+
+    <menuitem
+        id="menu_instance_exec"
+        name="Execution"
+        action="devops_instance_exec_instance_exec_action_window"
+        sequence="1"
+        parent="menu_deploy_instance_group"
+    />
+
+    <menuitem
+        id="menu_docker_compose"
+        name="Compose"
+        action="devops_docker_compose_docker_compose_group_action_window"
+        sequence="1"
+        parent="menu_deploy_docker_group"
+    />
+
+    <menuitem
+        id="menu_docker_container"
+        name="Container"
+        action="devops_docker_container_docker_container_group_action_window"
+        sequence="2"
+        parent="menu_deploy_docker_group"
+    />
+
+    <menuitem
+        id="menu_docker_image"
+        name="Image"
+        action="devops_docker_image_docker_image_group_action_window"
+        sequence="3"
+        parent="menu_deploy_docker_group"
+    />
+
+    <menuitem
+        id="menu_docker_network"
+        name="Network"
+        action="devops_docker_network_docker_network_group_action_window"
+        sequence="4"
+        parent="menu_deploy_docker_group"
+    />
+
+    <menuitem
+        id="menu_docker_volume"
+        name="Volume"
+        action="devops_docker_volume_docker_volume_group_action_window"
+        sequence="5"
+        parent="menu_deploy_docker_group"
+    />
+
+    <menuitem
+        id="menu_docker_compose_template"
+        name="Compose template"
+        action="devops_docker_compose_template_docker_compose_template_action_window"
+        sequence="6"
+        parent="menu_deploy_docker_group"
+    />
+
+    <menuitem
+        id="menu_gen_img_detail"
+        name="Level detail"
+        action="devops_gen_img_detail_gen_img_detail_action_window"
+        sequence="1"
+        parent="menu_gen_image_config"
+    />
+
+    <menuitem
+        id="menu_gen_img_light"
+        name="Light style"
+        action="devops_gen_img_light_gen_img_light_action_window"
+        sequence="2"
+        parent="menu_gen_image_config"
+    />
+
+    <menuitem
+        id="menu_gen_img_style_artist"
+        name="Artist style"
+        action="devops_gen_img_style_artist_gen_img_style_artist_action_window"
+        sequence="3"
+        parent="menu_gen_image_config"
+    />
+
+    <menuitem
+        id="menu_gen_img_style_type"
+        name="Style type"
+        action="devops_gen_img_style_type_gen_img_style_type_action_window"
+        sequence="4"
+        parent="menu_gen_image_config"
+    />
+
+    <menuitem
+        id="menu_gen_img_texture"
+        name="Texture"
+        action="devops_gen_img_texture_gen_img_texture_action_window"
+        sequence="5"
+        parent="menu_gen_image_config"
     />
 
     <menuitem
@@ -300,10 +368,26 @@
     <menuitem id="menu_operate" name="Operate" sequence="9" parent="menu_erplibre_devops" />
 
     <menuitem
+        id="menu_operate_localai"
+        name="LocalAI"
+        action="devops_operate_localai_operate_localai_action_window"
+        sequence="3"
+        parent="menu_operate"
+    />
+
+    <menuitem
         id="menu_plan_cg"
         name="Code generator"
         action="devops_plan_cg_plan_cg_action_window"
         sequence="1"
+        parent="menu_plan"
+    />
+
+    <menuitem
+        id="menu_plan_project"
+        name="Projet"
+        action="devops_plan_project_plan_project_action_window"
+        sequence="2"
         parent="menu_plan"
     />
 

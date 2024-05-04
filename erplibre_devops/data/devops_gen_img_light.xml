@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="devops_gen_img_light_01" model="devops.gen.img.light">
+            <field name="name">dramatique</field>
+        </record>
+        <record id="devops_gen_img_light_02" model="devops.gen.img.light">
+            <field name="name">étincelante</field>
+        </record>
+        <record id="devops_gen_img_light_03" model="devops.gen.img.light">
+            <field name="name">cinématique</field>
+        </record>
+        <record id="devops_gen_img_light_04" model="devops.gen.img.light">
+            <field name="name">studio</field>
+        </record>
+        <record id="devops_gen_img_light_05" model="devops.gen.img.light">
+            <field name="name">bioluminescente</field>
+        </record>
+        <record id="devops_gen_img_light_06" model="devops.gen.img.light">
+            <field name="name">éclairage néon</field>
+        </record>
+    </data>
+</odoo>
